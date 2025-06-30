@@ -1,0 +1,13 @@
+//
+//  NavigationDestination.swift
+//  WeAct
+//
+//  Created by 최승아 on 6/30/25.
+//
+
+import Foundation
+
+enum NavigationDestination: Hashable {
+    case createGroup
+    case addPartner
+}

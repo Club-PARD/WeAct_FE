@@ -10,6 +10,7 @@ import SwiftUI
 struct MainView: View {
     @State private var navigationPath = NavigationPath()
     @State private var TodayDate = Date()
+    //@State private var group: GroupModel? = nil
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -86,6 +87,10 @@ struct MainView: View {
                                 CreateGroup(navigationPath: $navigationPath)
                             case .addPartner:
                                 AddPartner(navigationPath: $navigationPath)
+                            case .notification:
+                                NotificationView(navigationPath: $navigationPath)
+                            case .myPage:
+                                MypageView(navigationPath: $navigationPath)
                             }
                         }
         }

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NameEditView: View {
     var body: some View {
-        
         VStack{
             Text("이름 변경")
                 .font(Font.custom("Pretendard", size: 18).weight(.medium))

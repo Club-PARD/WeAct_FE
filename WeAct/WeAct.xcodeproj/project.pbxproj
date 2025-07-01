@@ -52,10 +52,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D153EE72E126A5700AFA2BF /* WeAct */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				517366C42E129FA300493B2E /* Exceptions for "WeAct" folder in "WeAct" target */,
-				517366C52E129FA300493B2E /* Exceptions for "WeAct" folder in "Copy Bundle Resources" phase from "WeAct" target */,
-			);
 			path = WeAct;
 			sourceTree = "<group>";
 		};
@@ -67,6 +63,11 @@
 		4D153EFF2E126A5D00AFA2BF /* WeActUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = WeActUITests;
+			sourceTree = "<group>";
+		};
+		E52F3F3A2E12714900B2E885 /* WeAct */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WeAct;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -99,7 +100,7 @@
 		4D153EDC2E126A5700AFA2BF = {
 			isa = PBXGroup;
 			children = (
-				4D153EE72E126A5700AFA2BF /* WeAct */,
+				E52F3F3A2E12714900B2E885 /* WeAct */,
 				4D153EF52E126A5D00AFA2BF /* WeActTests */,
 				4D153EFF2E126A5D00AFA2BF /* WeActUITests */,
 				4D153EE62E126A5700AFA2BF /* Products */,
@@ -132,7 +133,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4D153EE72E126A5700AFA2BF /* WeAct */,
+				E52F3F3A2E12714900B2E885 /* WeAct */,
 			);
 			name = WeAct;
 			packageProductDependencies = (
@@ -421,7 +422,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -450,7 +451,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

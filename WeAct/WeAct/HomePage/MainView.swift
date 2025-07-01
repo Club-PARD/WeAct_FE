@@ -10,7 +10,6 @@ import SwiftUI
 struct MainView: View {
     @State private var navigationPath = NavigationPath()
     @State private var TodayDate = Date()
-
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(alignment: .leading) {

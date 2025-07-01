@@ -13,7 +13,7 @@ var profileImage: UIImage? = nil
 struct MypageView: View {
     var body: some View {
         
-            VStack{                
+            VStack{
                 Text("마이페이지")
                     .font(Font.custom("Pretendard", size: 18).weight(.medium))
                     .foregroundColor(.black)

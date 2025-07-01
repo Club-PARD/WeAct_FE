@@ -2,9 +2,25 @@
 
 import SwiftUI
 
+enum NotificationType {
+    case groupInvite
+    case verificationRejected
+    case memberNoVerification
+}
+
+struct NotificationItem: Identifiable {
+    let id = UUID()
+    let type: NotificationType
+    let senderName: String
+    let title: String?       // 그룹명, 부가 설명 등
+    let reason: String?      // 거절 사유
+    let image: UIImage?      // 거절 이미지
+}
+
 struct NotificationRow: View {
     var content: String
     var title: String
+    var item: NotificationItem
     
     var body: some View {
 
@@ -49,9 +65,32 @@ struct NotificationRow: View {
             .padding(.horizontal)
 
     }
+    
+    var mainText: String {
+           switch item.type {
+           case .groupInvite:
+               return "\(item.senderName)님이 보낸 그룹 초대"
+           case .verificationRejected:
+               return "\(item.senderName)의 인증이 거절되었어요"
+           case .memberNoVerification:
+               return "\(item.senderName)가 오늘 인증하지 않았어요"
+           }
+       }
+
+       var subtitle: String? {
+           return item.title
+       }
 }
 
-#Preview {
-    NotificationRow(content:"이주원님이 보낸 그룹 초대",title:"롱커톤 모여라")
-}
 
+
+//그룹 초대 알림 : 수락, 거절
+//다른 멤버의 미인증 알림
+//내 인증에 대한 거절 알림 : 사진
+
+
+//
+//#Preview {
+//    NotificationRow(content:"이주원님이 보낸 그룹 초대",title:"롱커톤 모여라")
+//}
+//

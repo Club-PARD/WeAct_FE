@@ -25,10 +25,10 @@ struct NotificationView: View {
             
             ScrollView{
                 VStack(spacing: 40) {
-                    NotificationRow(content:"이주원님이 보낸 그룹 초대",title:"롱커톤 모여라")
-                    NotificationRow(content:"주현아님이 보낸 그룹 초대",title:"숏커톤 모여라")
-            
-                    NotificationRow(content:"이주원님의 인증이 거절되었어요",title:"아무것도 안보여....")
+//                    NotificationRow(content:"이주원님이 보낸 그룹 초대",title:"롱커톤 모여라")
+//                    NotificationRow(content:"주현아님이 보낸 그룹 초대",title:"숏커톤 모여라")
+//            
+//                    NotificationRow(content:"이주원님의 인증이 거절되었어요",title:"아무것도 안보여....")
                 }
                 .padding(.top, 10)
                 .padding(.horizontal, 5)

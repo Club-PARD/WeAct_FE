@@ -50,11 +50,6 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4D153EE72E126A5700AFA2BF /* WeAct */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WeAct;
-			sourceTree = "<group>";
-		};
 		4D153EF52E126A5D00AFA2BF /* WeActTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = WeActTests;

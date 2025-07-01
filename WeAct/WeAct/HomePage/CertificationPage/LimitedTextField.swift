@@ -21,7 +21,6 @@ struct LimitedTextField: UIViewRepresentable {
         textField.backgroundColor = .clear
         textField.returnKeyType = .done
 
-        // ✅ '완료' 버튼이 있는 툴바를 키보드 상단에 붙임
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
 

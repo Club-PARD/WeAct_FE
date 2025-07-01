@@ -11,7 +11,9 @@ import SwiftUI
 struct WeActApp: App {
     var body: some Scene {
         WindowGroup {
-            CertificationView()
+            NavigationStack {
+                FinalResultButton()
+            }
         }
     }
 }

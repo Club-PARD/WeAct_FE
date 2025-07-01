@@ -11,7 +11,7 @@ struct ContentView: View {
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
-    @State private var goToSignUp = false  // ✅ 네비게이션 상태
+    @State private var goToSignUp = false
 
     enum Field {
         case userId

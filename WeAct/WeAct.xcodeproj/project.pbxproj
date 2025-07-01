@@ -29,26 +29,6 @@
 		4D153EFC2E126A5D00AFA2BF /* WeActUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeActUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		517366C42E129FA300493B2E /* Exceptions for "WeAct" folder in "WeAct" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				HexColor.swift,
-			);
-			target = 4D153EE42E126A5700AFA2BF /* WeAct */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		517366C52E129FA300493B2E /* Exceptions for "WeAct" folder in "Copy Bundle Resources" phase from "WeAct" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 4D153EE32E126A5700AFA2BF /* Resources */;
-			membershipExceptions = (
-				HexColor.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D153EF52E126A5D00AFA2BF /* WeActTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;

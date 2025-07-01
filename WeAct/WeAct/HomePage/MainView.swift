@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @State private var navigationPath = NavigationPath()
+    @ObservedObject var userModel: UserModel
     @State private var TodayDate = Date()
     //@State private var group: GroupModel? = nil
     
@@ -20,7 +21,7 @@ struct MainView: View {
                     Text("로고")
                     Spacer()
                     Button {
-                        
+                        navigationPath.append(NavigationDestination.notification)
                     } label: {
                         Image(systemName: "bell.fill")
                             .resizable()
@@ -31,7 +32,7 @@ struct MainView: View {
                     .padding(.trailing, 7)
                     
                     Button {
-                        
+                        navigationPath.append(NavigationDestination.myPage)
                     } label: {
                         
                         Image(systemName: "person.fill")
@@ -82,21 +83,25 @@ struct MainView: View {
             } // VStack
             .padding(.horizontal, 18)
             .navigationDestination(for: NavigationDestination.self) { destination in
-                            switch destination {
-                            case .createGroup:
-                                CreateGroup(navigationPath: $navigationPath)
-                            case .addPartner:
-                                AddPartner(navigationPath: $navigationPath)
-                            case .notification:
-                                NotificationView(navigationPath: $navigationPath)
-                            case .myPage:
-                                MypageView(navigationPath: $navigationPath)
-                            }
-                        }
+                switch destination {
+                case .createGroup:
+                    CreateGroup(navigationPath: $navigationPath)
+                case .addPartner:
+                    AddPartner(navigationPath: $navigationPath)
+                case .notification:
+                    NotificationView(navigationPath: $navigationPath)
+                case .myPage:
+                    MypageView(navigationPath: $navigationPath, userModel: userModel)
+                case .nameEdit:
+                    NameEditView(navigationPath: $navigationPath, userModel: userModel)
+                    
+                }
+            }
         }
     }
 }
 
 #Preview {
-    MainView()
+    let testUserModel = UserModel()
+    return MainView(userModel: testUserModel)
 }

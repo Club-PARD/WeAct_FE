@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MypageRow: View {
+    @Binding var navigationPath: NavigationPath
     var text: String
 
     var body: some View {
@@ -24,6 +25,6 @@ struct MypageRow: View {
 }
 
 #Preview {
-    MypageRow(text:"Hi")
+    @State var dummyPath = NavigationPath()
+    return MypageRow(navigationPath: $dummyPath, text: "Hi")
 }
-

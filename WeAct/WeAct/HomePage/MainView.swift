@@ -74,7 +74,7 @@ struct MainView: View {
                             .frame(height: 74)
                             .foregroundColor((Color(hex: "9FADBC")))
                         
-                    } // NavigationLink
+                    } // Button
                     .padding(.bottom, 58)
                 }
                 .padding(.horizontal, 24)
@@ -87,10 +87,10 @@ struct MainView: View {
                                 CreateGroup(navigationPath: $navigationPath)
                             case .addPartner:
                                 AddPartner(navigationPath: $navigationPath)
-                            case .notification:
-                                NotificationView(navigationPath: $navigationPath)
-                            case .myPage:
-                                MypageView(navigationPath: $navigationPath)
+//                            case .notification:
+//                                NotificationView(navigationPath: $navigationPath)
+//                            case .myPage:
+//                                MypageView(navigationPath: $navigationPath)
                             }
                         }
         }

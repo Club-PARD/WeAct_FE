@@ -243,7 +243,17 @@ struct CreateGroup: View {
         .padding(.vertical, 18)
         .padding(.horizontal, 18)
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: customBackButton)
+        .navigationBarItems(leading: customBackButton, trailing: Button {
+        } label: {
+            
+            Image(systemName: "plus.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 74)
+                .foregroundColor((Color(hex: "9FADBC")))
+            
+        } // Button
+                            )
         .navigationTitle("방 만들기")
         .navigationBarTitleDisplayMode(.inline)
     }

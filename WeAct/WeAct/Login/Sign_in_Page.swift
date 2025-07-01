@@ -1,15 +1,9 @@
-//
 //  Sign_in_Page.swift
 //  WeAct
 //
 //  Created by 현승훈 on 6/30/25.
 //
-//
-//  Sign_in_Page.swift
-//  WeAct
-//
-//  Created by 현승훈 on 6/30/25.
-//
+
 import SwiftUI
 
 struct Sign_in_Page: View {

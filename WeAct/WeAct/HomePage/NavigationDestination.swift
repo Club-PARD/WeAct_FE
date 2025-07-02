@@ -10,4 +10,5 @@ import Foundation
 enum NavigationDestination: Hashable {
     case createGroup
     case addPartner
+    case groupBoard(GroupModel)
 }

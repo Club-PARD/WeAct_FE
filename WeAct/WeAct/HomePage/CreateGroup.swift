@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CreateGroup: View {
+    @ObservedObject var groupStore: GroupStore
     @Binding var navigationPath: NavigationPath
     
     @State private var name = ""
@@ -221,13 +222,18 @@ struct CreateGroup: View {
             Spacer()
             
             Button(action: {
-                print("방 이름: \(name)")
-                print("기간: \(period)")
-                print("선택된 요일: \(SelectedDaysString())")
-                print("주 \(SelectedDaysCount())회")
-                print("보상: \(reward)")
-              
-                navigationPath.append(NavigationDestination.addPartner)
+                print("🟡 [디버그] isFormValid:", isFormValid)
+                print("🟢 [디버그] 방 이름(name):", name)
+                print("🔵 [디버그] 기간(period):", period)
+                print("🟣 [디버그] 선택된 요일(selectedDays):", selectedDays)
+                print("🟠 [디버그] 선택된 요일 개수:", selectedDays.count)
+                print("🔴 [디버그] 보상(reward):", reward)
+                
+                if isFormValid {
+                    navigationPath.append(NavigationDestination.addPartner)
+                } else {
+                    print("⚠️ [디버그] 입력 조건이 충족되지 않아 다음으로 넘어가지 않음")
+                }
             }) {
                 Text("다음")
                     .font(.system(size: 16, weight: .medium))
@@ -239,6 +245,33 @@ struct CreateGroup: View {
             }
             .disabled(!isFormValid)
             .padding(.bottom, 10)
+
+            
+//            Button(action: {
+//                print("방 이름: \(name)")
+//                print("기간: \(period)")
+//                print("선택된 요일: \(SelectedDaysString())")
+//                print("주 \(SelectedDaysCount())회")
+//                print("보상: \(reward)")
+//                
+//                // 임시 데이터를 환경 객체에 저장
+//                                CreateGroupData.shared.name = name
+//                                CreateGroupData.shared.period = period
+//                                CreateGroupData.shared.reward = reward
+//                                CreateGroupData.shared.selectedDaysCount = selectedDays.count
+//              
+//                navigationPath.append(NavigationDestination.addPartner)
+//            }) {
+//                Text("다음")
+//                    .font(.system(size: 16, weight: .medium))
+//                    .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
+//                    .frame(maxWidth: .infinity)
+//                    .padding(.vertical, 16)
+//                    .background(isFormValid ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
+//                    .cornerRadius(8)
+//            }
+//            .disabled(!isFormValid)
+//            .padding(.bottom, 10)
         } // VStack
         .padding(.vertical, 18)
         .padding(.horizontal, 18)
@@ -246,11 +279,11 @@ struct CreateGroup: View {
         .navigationBarItems(leading: customBackButton, trailing: Button {
         } label: {
             
-            Image(systemName: "plus.circle.fill")
+            Image(systemName: "square.and.arrow.up")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 74)
-                .foregroundColor((Color(hex: "9FADBC")))
+                .frame(height: 30)
+                .foregroundColor(.black)
             
         } // Button
                             )
@@ -279,8 +312,27 @@ extension CreateGroup {
     }
 }
 
+// 그룹 생성 과정에서 임시 데이터를 저장하는 싱글톤
+class CreateGroupData: ObservableObject {
+    static let shared = CreateGroupData()
+    
+    @Published var name: String = ""
+    @Published var period: String = ""
+    @Published var reward: String = ""
+    @Published var selectedDaysCount: Int = 0
+    
+    private init() {}
+    
+    func reset() {
+        name = ""
+        period = ""
+        reward = ""
+        selectedDaysCount = 0
+    }
+}
 
 #Preview {
     @State var path = NavigationPath()
-    return CreateGroup(navigationPath: .constant(path))
+    let groupStore = GroupStore()
+    CreateGroup(groupStore: groupStore, navigationPath: .constant(path))
 }

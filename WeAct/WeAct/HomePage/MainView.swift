@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct MainView: View {
+    @StateObject private var groupStore = GroupStore()
     @State private var navigationPath = NavigationPath()
     @State private var TodayDate = Date()
-    //@State private var group: GroupModel? = nil
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -52,15 +52,28 @@ struct MainView: View {
                     .foregroundColor(Color(hex: "8691A2"))
                     .font(.system(size: 26, weight: .medium))
                 Spacer()
-                HStack {
-                    Spacer()
-                    Image("")
-                    
-                    Text("습관 방이 텅 비어있어요\n         추가해주세요")
-                        .foregroundColor(Color(hex: "9FADBC"))
-                        .font(.system(size: 20, weight: .medium))
-                    Spacer()
-                } // HStack
+                if groupStore.groups.isEmpty {
+                    HStack {
+                        Spacer()
+                        Image("")
+                        
+                        Text("습관 방이 텅 비어있어요\n         추가해주세요")
+                            .foregroundColor(Color(hex: "9FADBC"))
+                            .font(.system(size: 20, weight: .medium))
+                        Spacer()
+                    } // HStack
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(groupStore.groups) { group in
+                                                            GroupCard(group: group) {
+                                                                navigationPath.append(NavigationDestination.groupBoard(group))
+                                                            }
+                                                        }
+                        }
+                        .padding(.top, 20)
+                    }
+                }
                 Spacer()
                 HStack {
                     Spacer()
@@ -76,7 +89,7 @@ struct MainView: View {
                         
                     } // Button
                     .padding(.bottom, 58)
-                }
+                } // HStack
                 .padding(.horizontal, 24)
                 
             } // VStack
@@ -84,9 +97,11 @@ struct MainView: View {
             .navigationDestination(for: NavigationDestination.self) { destination in
                             switch destination {
                             case .createGroup:
-                                CreateGroup(navigationPath: $navigationPath)
+                                CreateGroup(groupStore: groupStore, navigationPath: $navigationPath)
                             case .addPartner:
-                                AddPartner(navigationPath: $navigationPath)
+                                AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
+                            case .groupBoard (let group):
+                                                GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
 //                            case .notification:
 //                                NotificationView(navigationPath: $navigationPath)
 //                            case .myPage:
@@ -94,6 +109,7 @@ struct MainView: View {
                             }
                         }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

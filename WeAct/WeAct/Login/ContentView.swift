@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
-    @State private var goToSignUp = false  // ✅ 네비게이션 상태
-
+    @State private var showSignUp = false
+    
     enum Field {
         case userId
         case password
@@ -23,7 +24,6 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
             VStack(spacing: 20) {
                 Spacer()
 
@@ -53,7 +53,7 @@ struct ContentView: View {
                     .focused($focusedField, equals: .password)
 
                 Button(action: {
-                    print("로그인 버튼 클릭됨")
+                    isLoggedIn = true
                 }) {
                     Text("로그인")
                         .foregroundColor(.white)
@@ -65,21 +65,24 @@ struct ContentView: View {
                 .disabled(!isFormValid)
                 .padding(.horizontal)
 
-                NavigationLink(destination: Sign_in_Page(), isActive: $goToSignUp) {
+             
                     Button(action: {
-                        goToSignUp = true
+                        showSignUp = true
                     }) {
                         Text("회원가입")
                             .foregroundColor(.gray)
                             .underline()
                             .padding(.top, 10)
                     }
-                }
+                
                 .buttonStyle(.plain)
 
                 Spacer()
             }
             .padding()
+            .fullScreenCover(isPresented: $showSignUp) {
+                        Sign_in_Page()
+                    }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -88,6 +91,6 @@ struct ContentView: View {
                     }
                 }
             }
-        }
+        
     }
 }

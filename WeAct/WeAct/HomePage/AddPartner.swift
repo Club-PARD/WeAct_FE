@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct AddPartner: View {
+    @ObservedObject var groupStore: GroupStore
     @Binding var navigationPath: NavigationPath
     @State private var selectedPartners: Set<String> = []
+    @State private var selectedDaysString: Set<String> = []
     @State private var showingBottomSheet = false
     
     var isFormValid: Bool {
@@ -111,10 +113,26 @@ struct AddPartner: View {
             
             Button(action: {
                 print("선택된 파트너: \(selectedPartners)")
-                
-                //navigationPath.append(NavigationDestination.addPartner)
+                // 새로운 그룹 생성
+                                let newGroup = GroupModel(
+                                    name: CreateGroupData.shared.name,
+                                    period: CreateGroupData.shared.period,
+                                    reward: CreateGroupData.shared.reward,
+                                    partners: Array(selectedPartners),
+                                    selectedDaysString: Array(selectedDaysString),
+                                    selectedDaysCount: CreateGroupData.shared.selectedDaysCount
+                                )
+                                
+                                // 그룹 스토어에 추가
+                                groupStore.addGroup(newGroup)
+                                
+                                // 임시 데이터 초기화
+                                CreateGroupData.shared.reset()
+                                
+                                // 메인 화면으로 돌아가기
+                                navigationPath = NavigationPath()
             }) {
-                Text("다음")
+                Text("방 생성하기")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
                     .frame(maxWidth: .infinity)
@@ -140,5 +158,6 @@ struct AddPartner: View {
 
 #Preview {
     @State var path = NavigationPath()
-    return AddPartner(navigationPath: .constant(path))
+    let groupStore = GroupStore()
+    AddPartner(groupStore: groupStore, navigationPath: .constant(path))
 }

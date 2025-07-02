@@ -10,14 +10,12 @@ import SwiftUI
 struct AddPartner: View {
     @ObservedObject var groupStore: GroupStore
     @Binding var navigationPath: NavigationPath
-    @State private var selectedPartners: Set<String> = []
-    @State private var selectedDaysString: Set<String> = []
+    @State private var selectedPartners: Set<PartnerModel> = []
     @State private var showingBottomSheet = false
     
     var isFormValid: Bool {
         return !selectedPartners.isEmpty
     }
-    
     
     var customBackButton: some View {
         Button(action: {
@@ -34,125 +32,185 @@ struct AddPartner: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("함께 할\n친구를 초대해주세요")
-                .foregroundColor(Color(hex: "8691A2"))
-                .font(.system(size: 26, weight: .medium))
-                .padding(.bottom, 26)
-            
-            Text("\(selectedPartners.count)명 선택되었어요")
-                           .font(.system(size: 16, weight: .medium))
-                           .foregroundColor(Color(hex: "4C5B73"))
-            
-            // 파트너 추가 버튼
-            Button(action: {
-                showingBottomSheet = true
-            }) {
-                VStack(spacing: 12) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(Color(hex: "8691A2"))
-                    
-                    Text("파트너 추가")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(hex: "8691A2"))
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 100)
-                .background(Color(hex: "F8F9FA"))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(hex: "E9ECEF"), lineWidth: 1)
-                )
-                .cornerRadius(8)
+        ZStack {
+            Color(hex: "F7F7F7")
+                .edgesIgnoringSafeArea(.all)
+            VStack(alignment: .leading) {
+                // 헤더
+                headerView
+                
+                // 선택된 파트너 카운트
+                selectedCountView
+                
+                // 파트너 선택 영역
+                partnerSelectionView
+                
+                Spacer()
+                
+                // 방 생성 버튼
+                createRoomButton
             }
-            
-            // 선택된 파트너 목록
-            if !selectedPartners.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("선택된 파트너")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color(hex: "40444B"))
-                        .padding(.top, 20)
-                    
-                    ForEach(Array(selectedPartners), id: \.self) { partner in
-                        HStack {
-                            Circle()
-                                .fill(Color(hex: "40444B"))
-                                .frame(width: 32, height: 32)
-                                .overlay(
-                                    //Text(String(partner.first ?? "U"))
-                                    Image(systemName: "person")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .foregroundColor(.white)
-                                )
-                            
-                            Text(partner)
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "40444B"))
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                selectedPartners.remove(partner)
-                            }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(Color(hex: "8691A2"))
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(Color(hex: "F8F9FA"))
-                        .cornerRadius(8)
-                    }
-                }
+            .padding(.vertical, 18)
+            .padding(.horizontal, 18)
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: customBackButton)
+            .navigationTitle("친구초대")
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showingBottomSheet) {
+                PartnerSearchSheet(selectedPartners: $selectedPartners)
             }
-            
-            
-            Spacer()
-            
-            Button(action: {
-                print("선택된 파트너: \(selectedPartners)")
-                // 새로운 그룹 생성
-                                let newGroup = GroupModel(
-                                    name: CreateGroupData.shared.name,
-                                    period: CreateGroupData.shared.period,
-                                    reward: CreateGroupData.shared.reward,
-                                    partners: Array(selectedPartners),
-                                    selectedDaysString: Array(selectedDaysString),
-                                    selectedDaysCount: CreateGroupData.shared.selectedDaysCount
-                                )
-                                
-                                // 그룹 스토어에 추가
-                                groupStore.addGroup(newGroup)
-                                
-                                // 임시 데이터 초기화
-                                CreateGroupData.shared.reset()
-                                
-                                // 메인 화면으로 돌아가기
-                                navigationPath = NavigationPath()
-            }) {
-                Text("방 생성하기")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(isFormValid ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
-                    .cornerRadius(8)
-            }
-            .disabled(!isFormValid)
-            .padding(.bottom, 10)
         }
-        .padding(.vertical, 18)
-        .padding(.horizontal, 18)
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: customBackButton)
-        .navigationTitle("친구초대")
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingBottomSheet) {
-                    PartnerSearchSheet(selectedPartners: $selectedPartners)
+    }
+    
+    // MARK: - View Components
+    
+    private var headerView: some View {
+        Text("함께 할 친구를\n초대해 주세요")
+            .foregroundColor(Color(hex: "171717"))
+            .font(.system(size: 26, weight: .medium))
+            .padding(.bottom, 14)
+    }
+    
+    private var selectedCountView: some View {
+        HStack {
+            Text("\(selectedPartners.count)")
+                .font(.custom("Pretendard-Medium", size: 16))
+                .foregroundColor(Color(hex: "FF4B2F"))
+            Text("명 선택되었어요")
+                .font(.custom("Pretendard-Medium", size: 16))
+                .foregroundColor(Color(hex: "858588"))
+        }
+        .padding(.bottom, 32)
+    }
+    
+    private var partnerSelectionView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                // 추가 버튼
+                addButton
+                
+                // 내 프로필
+                myProfileView
+                
+                // 선택된 파트너들
+                selectedPartnersView
+            }
+            .padding(.vertical, 8)
+        }
+    }
+    
+    private var addButton: some View {
+        Button(action: {
+            showingBottomSheet = true
+        }) {
+            VStack(spacing: 7) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(25)
+                    .background(Color(hex: "FF4B2F"))
+                    .cornerRadius(20)
+                
+                Text("추가")
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .foregroundColor(Color(hex: "FF4B2F"))
+            }
+        }
+    }
+    
+    private var myProfileView: some View {
+        VStack(spacing: 7) {
+            Image("profile")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 70)
+            
+            Text("나")
+                .font(.custom("Pretendard-Medium", size: 14))
+                .foregroundColor(Color(hex: "464646"))
+        }
+    }
+    
+    private var selectedPartnersView: some View {
+        ForEach(Array(selectedPartners), id: \.self) { partner in
+            ZStack(alignment: .topTrailing) {
+                VStack(spacing: 7) {
+                    // 프로필 이미지
+                    if let imageName = partner.profileImageName {
+                        Image(imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 70, height: 70)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(Color(hex: "464646"))
+                            .padding(25)
+                            .background(.white)
+                            .cornerRadius(20)
+                    }
+                    
+                    Text(partner.name)
+                        .font(.custom("Pretendard-Medium", size: 14))
+                        .foregroundColor(Color(hex: "464646"))
+                    
+                    
                 }
-
+                .cornerRadius(20)
+                
+                Button(action: {
+                    selectedPartners.remove(partner)
+                }) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(.white)
+                        .font(.system(size: 10, weight: .bold))
+                        .frame(width: 24, height: 24)
+                        .background(Color(hex: "464646"))
+                        .clipShape(Circle())
+                }
+                .offset(x: 5, y: -5)
+            }
+        }
+    }
+    
+    private var createRoomButton: some View {
+        Button(action: createRoom) {
+            Text("방 생성하기")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(isFormValid ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
+                .cornerRadius(8)
+        }
+        .disabled(!isFormValid)
+        .padding(.bottom, 10)
+    }
+    
+    // MARK: - Actions
+    
+    private func createRoom() {
+        print("선택된 파트너: \(selectedPartners)")
+        
+        // 새로운 그룹 생성
+        let newGroup = GroupModel(
+            name: CreateGroupData.shared.name,
+            period: CreateGroupData.shared.period,
+            reward: CreateGroupData.shared.reward,
+            partners: selectedPartners.map { $0.name },
+            selectedDaysString: CreateGroupData.shared.selectedDaysString,
+            selectedDaysCount: CreateGroupData.shared.selectedDaysCount
+        )
+        
+        // 그룹 스토어에 추가
+        groupStore.addGroup(newGroup)
+        
+        // 임시 데이터 초기화
+        CreateGroupData.shared.reset()
+        
+        // 메인 화면으로 돌아가기
+        navigationPath = NavigationPath()
     }
 }
 

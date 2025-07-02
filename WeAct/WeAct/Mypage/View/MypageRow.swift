@@ -10,6 +10,7 @@ import SwiftUI
 struct MypageRow: View {
     @Binding var navigationPath: NavigationPath
     var text: String
+    var action: () -> Void
 
     var body: some View {
         HStack {
@@ -17,8 +18,14 @@ struct MypageRow: View {
                 .font(.custom("Pretendard", size: 16))
                 .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
             Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+            
+            Button(action: {
+                action()
+            }){
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            //.buttonStyle(.plain)
         }
         .padding(.horizontal)
     }
@@ -26,5 +33,7 @@ struct MypageRow: View {
 
 #Preview {
     @State var dummyPath = NavigationPath()
-    return MypageRow(navigationPath: $dummyPath, text: "Hi")
+    return MypageRow(navigationPath: $dummyPath, text: "Hi") {
+        print("Chevron tapped")
+    }
 }

@@ -109,10 +109,16 @@ struct MypageView: View {
                   .background(Color(red: 0.97, green: 0.97, blue: 0.98))
                 
                 VStack(spacing: 40) {
-                    MypageRow(navigationPath: $navigationPath, text: "내 습관 기록")
-                    MypageRow(navigationPath: $navigationPath, text: "로그아웃")
+                    MypageRow(navigationPath: $navigationPath, text: "내 습관 기록"){
+                        print("지원 예정입니다")
+                    }
+                    MypageRow(navigationPath: $navigationPath, text: "로그아웃"){
+                        print("로그아웃되었습니다.")
+                    }
                     MypageRow(navigationPath: $navigationPath, text: "회원 탈퇴")
-                
+                    {
+                        print("탈퇴되었습니다.")
+                    }
                 }
                 .padding(.top, 32)
                 .padding(.horizontal, 20)

@@ -26,8 +26,8 @@ struct CertificationView: View {
                     Text("인증할래요")
                         .foregroundColor(selectedOption == "인증할래요" ? .white : .gray)
                         .padding()
-                        .background(selectedOption == "인증할래요" ? Color.gray : Color(.systemGray5))
-                        .cornerRadius(20)
+                        .background(selectedOption == "인증할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
+                        .cornerRadius(8)
                 }
 
                 Button(action: {
@@ -36,8 +36,8 @@ struct CertificationView: View {
                     Text("해명할래요")
                         .foregroundColor(selectedOption == "해명할래요" ? .white : .gray)
                         .padding()
-                        .background(selectedOption == "해명할래요" ? Color.gray : Color(.systemGray5))
-                        .cornerRadius(20)
+                        .background(selectedOption == "해명할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
+                        .cornerRadius(8)
                 }
             }
 
@@ -115,5 +115,7 @@ struct CertificationView: View {
             ImagePicker(image: $image)
         }
     }
+       // .background(Color(hex:"#FF632F"))
+
 }
 

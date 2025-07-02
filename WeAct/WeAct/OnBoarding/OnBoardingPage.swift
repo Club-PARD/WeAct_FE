@@ -63,7 +63,7 @@ struct OnBoardingPage: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.gray)
+                        .background(Color.init(hex: "#FF632F"))
                         .cornerRadius(10)
                 }
                 .padding(.horizontal)

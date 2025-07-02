@@ -52,6 +52,11 @@ struct NameEditView: View {
                     .padding(.vertical, 12)
                     .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                     .cornerRadius(4)
+                    .onAppear {
+                            if editedName.isEmpty {
+                                editedName = userModel.username
+                            }
+                        }
 
             }
             Spacer()

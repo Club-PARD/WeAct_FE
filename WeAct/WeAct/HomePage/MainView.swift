@@ -120,8 +120,8 @@ struct MainView: View {
         .navigationBarBackButtonHidden(true)
     }
 }
-
-#Preview {
-    let testUserModel = UserViewModel()
-    MainView(userViewModel: testUserModel)
-}
+//
+//#Preview {
+//    let testUserModel = UserViewModel()
+//    MainView(userViewModel: testUserModel)
+//}

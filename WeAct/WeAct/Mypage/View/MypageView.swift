@@ -7,13 +7,29 @@
 
 import SwiftUI
 
-var username: String = "이주원"
-var profileImage: UIImage? = nil
 
 struct MypageView: View {
+    @Binding var navigationPath: NavigationPath
+    //@ObservedObject var userModel: UserModel
+    @ObservedObject var userViewModel: UserViewModel
+    
+    @State private var isShowingImagePicker = false
+    
+    private var customBackButton: some View {
+            Button(action: {
+                if !navigationPath.isEmpty {
+                    navigationPath.removeLast()
+                }
+            }) {
+                Image(systemName: "chevron.left")
+                    .frame(width: 12, height: 21)
+                    .foregroundColor(.black)
+            }
+        }
+    
     var body: some View {
         
-            VStack{                
+            VStack{
                 Text("마이페이지")
                     .font(Font.custom("Pretendard", size: 18).weight(.medium))
                     .foregroundColor(.black)
@@ -27,28 +43,32 @@ struct MypageView: View {
                       .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                       .cornerRadius(20)
                     
-                    Text("프로필\n사진")
-                      .font(
-                        Font.custom("Pretendard", size: 16)
-                          .weight(.medium)
-                      )
-                      .multilineTextAlignment(.center)
-                      .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
-          
+                    if let imageURLString = userViewModel.user.profileImageURL,
+                       let imageURL = URL(string: imageURLString),
+                       let data = try? Data(contentsOf: imageURL),
+                       let image = UIImage(data: data){
+                           Image(uiImage: image)
+                               .resizable()
+                               .scaledToFill()
+                               .frame(width: 100, height: 100)
+                               .clipShape(RoundedRectangle(cornerRadius: 20))
+                       } else {
+                           Text("프로필\n사진")
+                               .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                               .multilineTextAlignment(.center)
+                               .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
+                       }
                     
                 } //ZStack
                 .padding(.top, 15)
                 
-                Text(username)
-                  .font(
-                    Font.custom("Pretendard", size: 22)
-                      .weight(.medium)
-                  )
+                Text(userViewModel.user.username)
+                  .font(Font.custom("Pretendard", size: 22).weight(.medium))
                   .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                 
                 HStack(alignment: .center, spacing: 10){
                     Button(action: {
-                        // 여기에 사진 변경 로직
+                        userViewModel.changeProfileImage() 
                     }) {
                         Text("프로필 사진 변경")
                             .font(
@@ -64,7 +84,8 @@ struct MypageView: View {
                            .cornerRadius(6)
                     
                     Button(action: {
-                        // 여기에 사진 변경 로직
+                        userViewModel.goToNameEdit() 
+                        navigationPath.append(NavigationDestination.nameEdit)
                     }) {
                         Text("이름 변경")
                             .font(
@@ -89,9 +110,16 @@ struct MypageView: View {
                   .background(Color(red: 0.97, green: 0.97, blue: 0.98))
                 
                 VStack(spacing: 40) {
-                    MypageRow(text: "내 습관 기록")
-                    MypageRow(text: "로그아웃")
-                    MypageRow(text: "회원 탈퇴")
+                    MypageRow(navigationPath: $navigationPath, text: "내 습관 기록"){
+                        print("지원 예정입니다")
+                    }
+                    MypageRow(navigationPath: $navigationPath, text: "로그아웃"){
+                        print("로그아웃되었습니다.")
+                    }
+                    MypageRow(navigationPath: $navigationPath, text: "회원 탈퇴")
+                    {
+                        print("탈퇴되었습니다.")
+                    }
                 }
                 .padding(.top, 32)
                 .padding(.horizontal, 20)
@@ -100,12 +128,16 @@ struct MypageView: View {
 
             }//VStack
             .background(Color.white)
-
-
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: customBackButton)
+            .sheet(isPresented: $isShowingImagePicker) {
+                ImagePicker(image: $userViewModel.selectedImage)
+            }
     }
 }
 
 #Preview {
-    MypageView()
-    
+    @State var path = NavigationPath()
+    let userViewModel = UserViewModel()  // userModel -> userViewModel
+    MypageView(navigationPath: .constant(path), userViewModel: userViewModel)
 }

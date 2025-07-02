@@ -10,6 +10,7 @@ import SwiftUI
 struct MainView: View {
     @StateObject private var groupStore = GroupStore()
     @State private var navigationPath = NavigationPath()
+    @ObservedObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
     
     var body: some View {
@@ -20,7 +21,7 @@ struct MainView: View {
                     Text("로고")
                     Spacer()
                     Button {
-                        
+                        navigationPath.append(NavigationDestination.notification)
                     } label: {
                         Image(systemName: "bell.fill")
                             .resizable()
@@ -31,7 +32,7 @@ struct MainView: View {
                     .padding(.trailing, 7)
                     
                     Button {
-                        
+                        navigationPath.append(NavigationDestination.myPage)
                     } label: {
                         
                         Image(systemName: "person.fill")
@@ -102,10 +103,13 @@ struct MainView: View {
                                 AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
                             case .groupBoard (let group):
                                                 GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
-//                            case .notification:
-//                                NotificationView(navigationPath: $navigationPath)
-//                            case .myPage:
-//                                MypageView(navigationPath: $navigationPath)
+                            case .notification:
+                                                NotificationView(navigationPath: $navigationPath)
+                            case .myPage:
+                                                MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                            case .nameEdit:
+                                                NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
+
                             }
                         }
         }
@@ -114,5 +118,6 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView()
+    let testUserModel = UserViewModel()
+    MainView(userViewModel: testUserModel)
 }

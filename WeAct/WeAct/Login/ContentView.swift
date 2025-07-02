@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
-    @State private var goToSignUp = false
+    @State private var showSignUp = false
     
     enum Field {
         case userId

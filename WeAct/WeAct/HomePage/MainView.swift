@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct MainView: View {
+    @StateObject private var groupStore = GroupStore()
     @State private var navigationPath = NavigationPath()
+    @ObservedObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
+    
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(alignment: .leading) {
@@ -20,7 +23,7 @@ struct MainView: View {
 
                     // 알림 버튼
                     Button {
-                        // 알림 기능 구현 예정
+                        navigationPath.append(NavigationDestination.notification)
                     } label: {
                         Image(systemName: "bell.fill")
                             .resizable()
@@ -32,7 +35,7 @@ struct MainView: View {
 
                     // 프로필 버튼
                     Button {
-                        // 프로필 기능 구현 예정
+                        navigationPath.append(NavigationDestination.myPage)
                     } label: {
                         Image(systemName: "person.fill")
                             .resizable()
@@ -54,17 +57,28 @@ struct MainView: View {
                     .font(.system(size: 26, weight: .medium))
 
                 Spacer()
-
-                // 빈 상태 안내
-                HStack {
-                    Spacer()
-                    Image("")
-                    Text("습관 방이 텅 비어있어요\n         추가해주세요")
-                        .foregroundColor(Color(hex: "9FADBC"))
-                        .font(.system(size: 20, weight: .medium))
-                    Spacer()
+                if groupStore.groups.isEmpty {
+                    HStack {
+                        Spacer()
+                        Image("")
+                        
+                        Text("습관 방이 텅 비어있어요\n         추가해주세요")
+                            .foregroundColor(Color(hex: "9FADBC"))
+                            .font(.system(size: 20, weight: .medium))
+                        Spacer()
+                    } // HStack
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(groupStore.groups) { group in
+                                                            GroupCard(group: group) {
+                                                                navigationPath.append(NavigationDestination.groupBoard(group))
+                                                            }
+                                                        }
+                        }
+                        .padding(.top, 20)
+                    }
                 }
-
                 Spacer()
 
                 // 추가 버튼
@@ -80,19 +94,34 @@ struct MainView: View {
                             .foregroundColor(Color(hex: "9FADBC"))
                     }
                     .padding(.bottom, 58)
-                }
+                } // HStack
                 .padding(.horizontal, 24)
             }
             .padding(.horizontal, 18)
             .navigationBarBackButtonHidden(true) // 🔥 여기서 뒤로가기 버튼 제거
             .navigationDestination(for: NavigationDestination.self) { destination in
-                switch destination {
-                case .createGroup:
-                    CreateGroup(navigationPath: $navigationPath)
-                case .addPartner:
-                    AddPartner(navigationPath: $navigationPath)
-                }
-            }
+                            switch destination {
+                            case .createGroup:
+                                CreateGroup(groupStore: groupStore, navigationPath: $navigationPath)
+                            case .addPartner:
+                                AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
+                            case .groupBoard (let group):
+                                                GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
+                            case .notification:
+                                                NotificationView(navigationPath: $navigationPath)
+                            case .myPage:
+                                                MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                            case .nameEdit:
+                                                NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
+
+                            }
+                        }
         }
+        .navigationBarBackButtonHidden(true)
     }
+}
+
+#Preview {
+    let testUserModel = UserViewModel()
+    MainView(userViewModel: testUserModel)
 }

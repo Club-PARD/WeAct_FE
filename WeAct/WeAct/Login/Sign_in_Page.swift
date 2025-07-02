@@ -7,13 +7,15 @@ import SwiftUI
 
 struct Sign_in_Page: View {
     @Environment(\.dismiss) var dismiss
-
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @State private var showWelcome = false
+    
     @State private var name = ""
     @State private var userId = ""
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var selectedGender: String? = nil
-
+    
     // 상태 관리
     @State private var userIdError: String?
     @State private var userIdStatus: String?
@@ -22,8 +24,8 @@ struct Sign_in_Page: View {
     @State private var passwordMismatchError = false
     @State private var isUserIdChecked = false
     @State private var isUserIdCheckingEnabled = false
-    @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
-
+    // @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
+    
     var isFormValid: Bool {
         !name.isEmpty &&
         userIdError == nil &&
@@ -31,12 +33,12 @@ struct Sign_in_Page: View {
         isUserIdChecked &&
         selectedGender != nil
     }
-
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-
+                    
                     // 상단 바
                     HStack {
                         Button(action: {
@@ -51,7 +53,7 @@ struct Sign_in_Page: View {
                         Spacer()
                     }
                     .padding(.bottom, 10)
-
+                    
                     // 이름
                     Group {
                         Text("이름")
@@ -60,7 +62,7 @@ struct Sign_in_Page: View {
                             .background(Color.white)
                             .cornerRadius(8)
                     }
-
+                    
                     // 아이디
                     Group {
                         Text("아이디")
@@ -75,7 +77,7 @@ struct Sign_in_Page: View {
                                     userIdError = nil
                                     userIdStatus = nil
                                 }
-
+                            
                             Button("중복 확인") {
                                 checkUserId()
                             }
@@ -86,7 +88,7 @@ struct Sign_in_Page: View {
                             .foregroundColor(isUserIdCheckingEnabled ? .white : .gray)
                             .cornerRadius(8)
                         }
-
+                        
                         if let error = userIdError {
                             Text(error)
                                 .font(.caption)
@@ -101,7 +103,7 @@ struct Sign_in_Page: View {
                                 .foregroundColor(.gray)
                         }
                     }
-
+                    
                     // 비밀번호
                     Group {
                         Text("비밀번호")
@@ -117,7 +119,7 @@ struct Sign_in_Page: View {
                             .onChange(of: password) { _ in
                                 validatePassword()
                             }
-
+                        
                         SecureField("비밀번호 확인", text: $confirmPassword)
                             .padding()
                             .background(Color.white)
@@ -129,7 +131,7 @@ struct Sign_in_Page: View {
                             .onChange(of: confirmPassword) { _ in
                                 validatePassword()
                             }
-
+                        
                         if let error = passwordError {
                             Text(error)
                                 .font(.caption)
@@ -140,7 +142,7 @@ struct Sign_in_Page: View {
                                 .foregroundColor(.gray)
                         }
                     }
-
+                    
                     // 성별
                     Group {
                         Text("성별")
@@ -153,10 +155,10 @@ struct Sign_in_Page: View {
                             }
                         }
                     }
-
+                    
                     // 회원가입 버튼
                     Button(action: {
-                        navigateToWelcome = true
+                        showWelcome = true
                     }) {
                         Text("회원가입")
                             .foregroundColor(.white)
@@ -168,19 +170,20 @@ struct Sign_in_Page: View {
                     .disabled(!isFormValid)
                     .padding(.top, 30)
                 }
+                .fullScreenCover(isPresented: $showWelcome) {
+                    WelcomePage()
+                }
                 .padding()
             }
             .navigationBarHidden(true)
             .ignoresSafeArea(.keyboard)
             .background(Color(hex: "#F7F7F7"))
         }
-        .fullScreenCover(isPresented: $navigateToWelcome) {
-            WelcomePage()
-        }
+        
     }
-
+    
     // MARK: - 유효성 검사
-
+    
     func checkUserId() {
         if userId.count < 4 || userId.count > 12 {
             userIdError = "아이디는 4~12자여야 합니다"
@@ -196,7 +199,7 @@ struct Sign_in_Page: View {
             isUserIdChecked = true
         }
     }
-
+    
     func validatePassword() {
         passwordLengthError = false
         passwordMismatchError = false
@@ -218,7 +221,7 @@ struct GenderButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text(title)

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WelcomePage: View {
-    @State private var navigateToOnboarding = false
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -35,7 +35,7 @@ struct WelcomePage: View {
 
             // 시작하기 버튼
             Button(action: {
-                navigateToOnboarding = true
+                isLoggedIn = true
             }) {
                 Text("시작하기")
                     .foregroundColor(.white)
@@ -47,8 +47,8 @@ struct WelcomePage: View {
             .padding(.horizontal)
         }
         .padding(.vertical)
-        .fullScreenCover(isPresented: $navigateToOnboarding) {
-            OnBoardingPage()
-        }
+//        .fullScreenCover(isPresented: $navigateToOnboarding) {
+//            OnBoardingPage()
+//        }
     }
 }

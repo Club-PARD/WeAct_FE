@@ -13,4 +13,6 @@ struct GroupModel: Hashable, Identifiable {
     let period: String
     let reward: String
     let partners: [String]
+    let selectedDaysString: [String]
+    let selectedDaysCount: Int
 }

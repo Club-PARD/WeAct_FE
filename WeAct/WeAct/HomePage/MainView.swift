@@ -9,8 +9,9 @@ import SwiftUI
 
 struct MainView: View {
     @State private var navigationPath = NavigationPath()
-    @ObservedObject var userModel: UserModel
+    @ObservedObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
+    
     //@State private var group: GroupModel? = nil
     
     var body: some View {
@@ -91,9 +92,9 @@ struct MainView: View {
                 case .notification:
                     NotificationView(navigationPath: $navigationPath)
                 case .myPage:
-                    MypageView(navigationPath: $navigationPath, userModel: userModel)
+                    MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
                 case .nameEdit:
-                    NameEditView(navigationPath: $navigationPath, userModel: userModel)
+                    NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
                     
                 }
             }
@@ -102,6 +103,6 @@ struct MainView: View {
 }
 
 #Preview {
-    let testUserModel = UserModel()
-    return MainView(userModel: testUserModel)
+    let testUserModel = UserViewModel()
+    return MainView(userViewModel: testUserModel)
 }

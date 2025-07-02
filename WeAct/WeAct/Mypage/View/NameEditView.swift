@@ -10,13 +10,14 @@ import SwiftUI
 struct NameEditView: View {
     // 새로 입력한 이름
     @Binding var navigationPath: NavigationPath
-    @ObservedObject var userModel: UserModel
+    //@ObservedObject var userModel: UserModel
+    @ObservedObject var userViewModel: UserViewModel
     // 이름이 변경되었고 공백이 아닌지 확인
     @State private var editedName: String = ""
 
     private var isFormValid: Bool {
            !editedName.trimmingCharacters(in: .whitespaces).isEmpty &&
-            editedName != userModel.username
+            editedName != userViewModel.user.username
        }
     
     // 커스텀 뒤로가기 버튼
@@ -53,7 +54,7 @@ struct NameEditView: View {
                     .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                     .cornerRadius(4)
                     .onAppear {
-                        editedName = userModel.username
+                        editedName = userViewModel.user.username
                     }
 
 
@@ -61,14 +62,14 @@ struct NameEditView: View {
             Spacer()
             
             Button(action: {
-                userModel.username = editedName
-                navigationPath.append(NavigationDestination.myPage)
+                //userModel.username = editedName
+                Task{
+                    await userViewModel.saveNewName(editedName: editedName)
+                    navigationPath.append(NavigationDestination.myPage)
+                }
             }) {
                 Text("저장하기")
-                    .font(
-                      Font.custom("Pretendard", size: 16)
-                        .weight(.medium)
-                      )
+                    .font(Font.custom("Pretendard", size: 16).weight(.medium))
                     .foregroundColor(.white)
             }
             .font(Font.custom("Pretendard", size: 16).weight(.medium))
@@ -90,6 +91,8 @@ struct NameEditView: View {
 
 #Preview {
     @State var path = NavigationPath()
-    @StateObject var userModel = UserModel()
-    return NameEditView(navigationPath: .constant(path), userModel: userModel)
+    let userViewModel = UserViewModel()  
+    return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
 }
+
+

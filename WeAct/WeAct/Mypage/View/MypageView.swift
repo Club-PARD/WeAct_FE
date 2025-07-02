@@ -10,7 +10,8 @@ import SwiftUI
 
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
-    @ObservedObject var userModel: UserModel
+    //@ObservedObject var userModel: UserModel
+    @ObservedObject var userViewModel: UserViewModel
     
     @State private var isShowingImagePicker = false
     
@@ -42,7 +43,10 @@ struct MypageView: View {
                       .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                       .cornerRadius(20)
                     
-                    if let image = userModel.profileImage {
+                    if let imageURLString = userViewModel.user.profileImageURL,
+                       let imageURL = URL(string: imageURLString),
+                       let data = try? Data(contentsOf: imageURL),
+                       let image = UIImage(data: data){
                            Image(uiImage: image)
                                .resizable()
                                .scaledToFill()
@@ -54,21 +58,17 @@ struct MypageView: View {
                                .multilineTextAlignment(.center)
                                .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                        }
-          
                     
                 } //ZStack
                 .padding(.top, 15)
                 
-                Text(userModel.username)
-                  .font(
-                    Font.custom("Pretendard", size: 22)
-                      .weight(.medium)
-                  )
+                Text(userViewModel.user.username)
+                  .font(Font.custom("Pretendard", size: 22).weight(.medium))
                   .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                 
                 HStack(alignment: .center, spacing: 10){
                     Button(action: {
-                        isShowingImagePicker = true
+                        userViewModel.changeProfileImage() 
                     }) {
                         Text("프로필 사진 변경")
                             .font(
@@ -84,6 +84,7 @@ struct MypageView: View {
                            .cornerRadius(6)
                     
                     Button(action: {
+                        userViewModel.goToNameEdit() 
                         navigationPath.append(NavigationDestination.nameEdit)
                     }) {
                         Text("이름 변경")
@@ -130,15 +131,13 @@ struct MypageView: View {
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: customBackButton)
             .sheet(isPresented: $isShowingImagePicker) {
-                ImagePicker(image: $userModel.profileImage)
+                ImagePicker(image: $userViewModel.selectedImage)
             }
-
-
     }
 }
 
 #Preview {
     @State var path = NavigationPath()
-    let userModel = UserModel()
-    return MypageView(navigationPath: .constant(path), userModel: userModel)
+    let userViewModel = UserViewModel()  // userModel -> userViewModel
+    MypageView(navigationPath: .constant(path), userViewModel: userViewModel)
 }

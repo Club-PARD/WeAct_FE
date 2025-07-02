@@ -1,15 +1,8 @@
-//
 //  Sign_in_Page.swift
 //  WeAct
 //
 //  Created by 현승훈 on 6/30/25.
-//
-//
-//  Sign_in_Page.swift
-//  WeAct
-//
-//  Created by 현승훈 on 6/30/25.
-//
+
 import SwiftUI
 
 struct Sign_in_Page: View {
@@ -27,6 +20,8 @@ struct Sign_in_Page: View {
     @State private var userIdError: String?
     @State private var userIdStatus: String?
     @State private var passwordError: String?
+    @State private var passwordLengthError = false
+    @State private var passwordMismatchError = false
     @State private var isUserIdChecked = false
     @State private var isUserIdCheckingEnabled = false
     // @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
@@ -64,7 +59,7 @@ struct Sign_in_Page: View {
                         Text("이름")
                         TextField("이름 입력", text: $name)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
                             .cornerRadius(8)
                     }
                     
@@ -74,7 +69,7 @@ struct Sign_in_Page: View {
                         HStack {
                             TextField("아이디 입력", text: $userId)
                                 .padding()
-                                .background(Color.gray.opacity(0.1))
+                                .background(Color.white)
                                 .cornerRadius(8)
                                 .onChange(of: userId) { newValue in
                                     isUserIdCheckingEnabled = !newValue.isEmpty
@@ -89,7 +84,7 @@ struct Sign_in_Page: View {
                             .disabled(!isUserIdCheckingEnabled)
                             .frame(width: 100)
                             .padding()
-                            .background(isUserIdCheckingEnabled ? Color.blue : Color.gray.opacity(0.2))
+                            .background(isUserIdCheckingEnabled ? Color.init(hex: "#464646") : Color.gray.opacity(0.2))
                             .foregroundColor(isUserIdCheckingEnabled ? .white : .gray)
                             .cornerRadius(8)
                         }
@@ -112,9 +107,14 @@ struct Sign_in_Page: View {
                     // 비밀번호
                     Group {
                         Text("비밀번호")
+
                         SecureField("비밀번호 입력", text: $password)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(passwordLengthError ? Color.red : Color.clear, lineWidth: 1)
+                            )
                             .cornerRadius(8)
                             .onChange(of: password) { _ in
                                 validatePassword()
@@ -122,7 +122,11 @@ struct Sign_in_Page: View {
                         
                         SecureField("비밀번호 확인", text: $confirmPassword)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(passwordMismatchError ? Color.red : Color.clear, lineWidth: 1)
+                            )
                             .cornerRadius(8)
                             .onChange(of: confirmPassword) { _ in
                                 validatePassword()
@@ -160,7 +164,7 @@ struct Sign_in_Page: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(isFormValid ? Color.blue : Color.gray.opacity(0.2))
+                            .background(isFormValid ? Color.init(hex: "#FF632F") : Color.gray.opacity(0.2))
                             .cornerRadius(8)
                     }
                     .disabled(!isFormValid)
@@ -173,6 +177,7 @@ struct Sign_in_Page: View {
             }
             .navigationBarHidden(true)
             .ignoresSafeArea(.keyboard)
+            .background(Color(hex: "#F7F7F7"))
         }
         
     }
@@ -196,10 +201,15 @@ struct Sign_in_Page: View {
     }
     
     func validatePassword() {
+        passwordLengthError = false
+        passwordMismatchError = false
+
         if password.count < 4 || password.count > 12 {
             passwordError = "비밀번호는 4~12자여야 합니다"
+            passwordLengthError = true
         } else if password != confirmPassword {
             passwordError = "비밀번호가 일치하지 않습니다"
+            passwordMismatchError = true
         } else {
             passwordError = nil
         }
@@ -215,10 +225,16 @@ struct GenderButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(isSelected ? .white : .gray)
+                .foregroundColor(isSelected ? Color(hex: "#FF632F") : .gray)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isSelected ? Color.blue : Color.gray.opacity(0.1))
+                .background(
+                    isSelected ? Color(hex: "#FFF1EC") : .white
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(isSelected ? Color(hex: "#FF632F") : Color.clear, lineWidth: 1)
+                )
                 .cornerRadius(8)
         }
     }

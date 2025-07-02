@@ -14,7 +14,7 @@ struct WelcomePage: View {
                     .fontWeight(.bold)
                     .foregroundColor(.black)
 
-                Text("대충 축하한다는 내용의 글")
+                Text("이제부터 WeAct와 함께 습관 인증 시작해요.")
                     .font(.body)
                     .foregroundColor(.gray)
             }
@@ -41,7 +41,7 @@ struct WelcomePage: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.gray)
+                    .background(Color.init(hex: "#FF632F"))
                     .cornerRadius(10)
             }
             .padding(.horizontal)

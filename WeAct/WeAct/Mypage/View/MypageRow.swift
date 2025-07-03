@@ -16,19 +16,24 @@ struct MypageRow: View {
         HStack {
             Text(text)
                 .font(.custom("Pretendard", size: 16))
-                .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
+                .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+
             Spacer()
             
             Button(action: {
                 action()
             }){
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
             }
             //.buttonStyle(.plain)
         }
-        .padding(.horizontal)
+       
     }
+    
+    
+    
+    
 }
 
 #Preview {

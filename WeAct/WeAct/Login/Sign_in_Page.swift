@@ -164,7 +164,7 @@ struct Sign_in_Page: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(isFormValid ? Color.init(hex: "#FF632F") : Color.gray.opacity(0.2))
+                            .background(isFormValid ? Color.init(hex: "#FF4B2F") : Color.gray.opacity(0.2))
                             .cornerRadius(8)
                     }
                     .disabled(!isFormValid)
@@ -186,16 +186,16 @@ struct Sign_in_Page: View {
     
     func checkUserId() {
         if userId.count < 4 || userId.count > 12 {
-            userIdError = "아이디는 4~12자여야 합니다"
+            userIdError = "아이디는 4~12자여야 해요"
             userIdStatus = nil
             isUserIdChecked = false
         } else if userId.lowercased() == "2weeksone" {
-            userIdError = "중복되는 아이디입니다"
+            userIdError = "중복되는 아이디에요. 다시 시도 해주세요"
             userIdStatus = nil
             isUserIdChecked = false
         } else {
             userIdError = nil
-            userIdStatus = "사용 가능한 아이디입니다"
+            userIdStatus = "사용 가능한 아이디에요"
             isUserIdChecked = true
         }
     }
@@ -205,10 +205,10 @@ struct Sign_in_Page: View {
         passwordMismatchError = false
 
         if password.count < 4 || password.count > 12 {
-            passwordError = "비밀번호는 4~12자여야 합니다"
+            passwordError = "비밀번호는 4~12자여야 해요"
             passwordLengthError = true
         } else if password != confirmPassword {
-            passwordError = "비밀번호가 일치하지 않습니다"
+            passwordError = "비밀번호가 일치하지 않아요"
             passwordMismatchError = true
         } else {
             passwordError = nil
@@ -225,7 +225,7 @@ struct GenderButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(isSelected ? Color(hex: "#FF632F") : .gray)
+                .foregroundColor(isSelected ? Color(hex: "#FF4B2F") : .gray)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
@@ -233,7 +233,7 @@ struct GenderButton: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(isSelected ? Color(hex: "#FF632F") : Color.clear, lineWidth: 1)
+                        .stroke(isSelected ? Color(hex: "#FF4B2F") : Color.clear, lineWidth: 1)
                 )
                 .cornerRadius(8)
         }

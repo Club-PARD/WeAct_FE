@@ -13,16 +13,16 @@ struct NotificationView: View {
     @State private var isShowingRejectToast = false
     
     private var customBackButton: some View {
-            Button(action: {
-                if !navigationPath.isEmpty {
-                    navigationPath.removeLast()
-                }
-            }) {
-                Image(systemName: "chevron.left")
-                    .frame(width: 12, height: 21)
-                    .foregroundColor(.black)
+        Button(action: {
+            if !navigationPath.isEmpty {
+                navigationPath.removeLast()
             }
+        }) {
+            Image(systemName: "chevron.left")
+                .frame(width: 12, height: 21)
+                .foregroundColor(.black)
         }
+    }
     
     let mockItems: [NotificationType] = [
         .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
@@ -34,7 +34,6 @@ struct NotificationView: View {
         NavigationView{
             ZStack{
                 VStack{
-                    //경계바
                     Rectangle()
                         .foregroundColor(.clear)
                         .frame(width: 375, height: 8)
@@ -53,13 +52,12 @@ struct NotificationView: View {
                             }
                         }
                         .padding(.top, 10)
-                        .padding(.horizontal, 5)
+                        .padding(.horizontal, 16)
                         
                         Spacer()
                         
                     }//ScrollView
                 }//VStack
-                
                 .background(Color.white)
                 
                 if isShowingRejectToast {
@@ -68,11 +66,11 @@ struct NotificationView: View {
                          ToastView(message: "그룹 초대를 거절했어요")
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
-                         
                      }
                  }//isShowingRejectToast
 
             }//ZStack
+
         }//NavigationView
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)

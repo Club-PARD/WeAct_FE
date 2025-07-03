@@ -56,7 +56,6 @@ struct NotificationRow: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
 //
                 }//verificationRejected
-
             } //HStack
             .padding(.horizontal)
         }
@@ -93,7 +92,6 @@ private extension View {
             .cornerRadius(50)
     }
 }
-    
 
 #Preview {
     @State var selectedImage: UIImage? = nil

@@ -14,3 +14,5 @@ enum NavigationDestination: Hashable {
     case myPage
     case nameEdit // myPage -> nameEdit
 }
+
+

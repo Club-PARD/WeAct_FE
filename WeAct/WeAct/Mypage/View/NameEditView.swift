@@ -35,56 +35,50 @@ struct NameEditView: View {
     
     
     var body: some View {
-        VStack{
-            Text("이름 변경")
-                .font(Font.custom("Pretendard", size: 18).weight(.medium))
-                .foregroundColor(.black)
-                .frame(height: 44)
-                .padding(.top, 5)
-                .padding(.bottom, 44)
-            
-            
-            VStack(alignment: .leading){
-                Text("이름")
-                    .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
-                
-                TextField("이름 입력", text: $editedName)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color(red: 0.93, green: 0.95, blue: 0.96))
-                    .cornerRadius(4)
-                    .onAppear {
-                        editedName = userViewModel.user.username
-                    }
-
-
-            }
-            Spacer()
-            
-            Button(action: {
-                //userModel.username = editedName
-                Task{
-                    await userViewModel.saveNewName(editedName: editedName)
-                    navigationPath.append(NavigationDestination.myPage)
+        NavigationView {
+            VStack{                
+                VStack(alignment: .leading){
+                    Text("이름")
+                        .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
+                    
+                    TextField("이름 입력", text: $editedName)
+                        .padding(.leading, 22)
+                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity, minHeight: 54, maxHeight: 54, alignment: .leading)
+                        .background(.white)
+                        .cornerRadius(8)
+                        .onAppear {
+                            editedName = userViewModel.user.username
+                        }
+                    
                 }
-            }) {
-                Text("저장하기")
-                    .font(Font.custom("Pretendard", size: 16).weight(.medium))
-                    .foregroundColor(.white)
+                Spacer()
+                
+                Button(action: {
+                    Task{
+                        await userViewModel.saveNewName(editedName: editedName)
+                        navigationPath.append(NavigationDestination.myPage)
+                    }
+                }) {
+                    Text("저장하기")
+                        .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                        .foregroundColor(.white)
+                }
+                .foregroundColor(.white)
+                .frame(width: 330, height: 56)
+                .cornerRadius(8)
+                .disabled(!isFormValid)
+                .background(isFormValid ? (Color(red: 1, green: 0.39, blue: 0.18)): Color(red: 0.93, green: 0.95, blue: 0.96))
+                
             }
-            .font(Font.custom("Pretendard", size: 16).weight(.medium))
-                   .foregroundColor(.white)
-                   .frame(width: 330, height: 56)
-                   //.background(Color(red: 0.37, green: 0.4, blue: 0.43))
-                   .cornerRadius(4)
-                   .disabled(!isFormValid)
-                   .background(isFormValid ? Color(red: 0.37, green: 0.4, blue: 0.43) : Color(red: 0.93, green: 0.95, blue: 0.96))
-            
+            .padding(.horizontal,17)
+            .background(Color(red: 0.97, green: 0.97, blue: 0.97))
         }
-        .padding(.horizontal,10)
-        .background(Color.white)
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
+        .navigationTitle("이름 변경")
+        .navigationBarTitleDisplayMode(.inline)
+        
         Spacer()
     }
 }

@@ -6,25 +6,30 @@ struct NotificationRow: View {
 
     var item: NotificationType
     @Binding var selectedImage: UIImage?
-    @Binding var isImagePopupPresented: Bool
+    var onReject: () -> Void
     
     var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: 5){
                     Text(mainText)
-                        .font(.custom("Pretendard", size: 16))
-                        .foregroundColor(Color(red: 0.33, green: 0.37, blue: 0.42))
+                        .font(
+                        Font.custom("Pretendard", size: 16)
+                        .weight(.medium)
+                        )
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     
                     if let subtitle = subtitleText {
                         Text(subtitle)
-                            .font(.custom("Pretendard", size: 14))
-                            .foregroundColor(Color(red: 0.76, green: 0.8, blue: 0.86))
+                            .font(
+                            Font.custom("Pretendard", size: 14)
+                            .weight(.medium)
+                            )
+                            .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
                     }
             
                 }//VStack
 
                 Spacer()
-
                 
                 if case .groupInvite = item {
                     Button(action: {
@@ -35,6 +40,7 @@ struct NotificationRow: View {
                     .style()
                     
                     Button(action: {
+                        onReject()
                         print("그룹 초대를 거절하셨습니다")
                     }) {
                         Image(systemName: "xmark")
@@ -48,10 +54,7 @@ struct NotificationRow: View {
                         .frame(width: 43, height: 43)
                         .background(Color(red: 0.9, green: 0.93, blue: 0.96))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .onTapGesture {
-                            selectedImage = image
-                            isImagePopupPresented = true
-                        }
+//
                 }//verificationRejected
 
             } //HStack
@@ -90,21 +93,21 @@ private extension View {
             .cornerRadius(50)
     }
 }
-
     
 
-    #Preview {
-        @State var selectedImage: UIImage? = nil
-        @State var isPopup = false
-        
-        let mockItem: NotificationType = .groupInvite(
-            sender: "이주원",
-            groupName: "롱커톤 모여라"
-        )
+#Preview {
+    @State var selectedImage: UIImage? = nil
 
-        return NotificationRow(
-            item: mockItem,
-            selectedImage: $selectedImage,
-            isImagePopupPresented: $isPopup
-        )
-    }
+    let mockItem: NotificationType = .groupInvite(
+        sender: "이주원",
+        groupName: "롱커톤 모여라"
+    )
+
+    return NotificationRow(
+        item: mockItem,
+        selectedImage: $selectedImage,
+        onReject: {
+            print("프리뷰에서 거절 버튼 눌림")
+        }
+    )
+}

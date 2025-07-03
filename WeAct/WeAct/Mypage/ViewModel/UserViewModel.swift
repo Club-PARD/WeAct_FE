@@ -11,6 +11,12 @@ class UserViewModel: ObservableObject {
     @Published var isShowingImagePicker = false
     @Published var selectedImage: UIImage?
     
+    //목데이터
+    init() {
+        self.user = User.sampleUser
+    }
+
+    
     private let service = UserService()
     
     

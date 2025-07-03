@@ -10,7 +10,7 @@ import SwiftUI
 struct NotificationView: View {
     @Binding var navigationPath: NavigationPath
     @State private var selectedImage: UIImage? = nil
-    @State private var isImagePopupPresented = false
+    @State private var isShowingRejectToast = false
     
     private var customBackButton: some View {
             Button(action: {
@@ -26,60 +26,67 @@ struct NotificationView: View {
     
     let mockItems: [NotificationType] = [
         .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
-        .groupInvite(sender: "주현아", groupName: "숏커톤 모여라"),
-               .verificationRejected(sender: "이주원", reason: "다른 각도로 찍어줘...", image: UIImage(named: "example") ?? UIImage()),
-               .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
+        .verificationRejected(sender: "이주원", reason: "다른 각도로 찍어줘...", image: UIImage(named: "example") ?? UIImage()),
+        .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
     ]
     
     var body: some View {
-        VStack{
-            Text("알림")
-                .font(Font.custom("Pretendard", size: 18).weight(.medium))
-                .foregroundColor(.black)
-                .frame(height: 44)
-                .padding(.vertical, 5)
-
-            //경계바
-            Rectangle()
-                .foregroundColor(.clear)
-                .frame(width: 375, height: 8)
-                .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-            
-            ScrollView{
-                VStack(spacing: 40) {
-                    ForEach(mockItems, id: \.id) { item in
-                       NotificationRow(
-                        item: item,
-                        selectedImage: $selectedImage,
-                        isImagePopupPresented:$isImagePopupPresented)
+        NavigationView{
+            ZStack{
+                VStack{
+                    //경계바
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: 375, height: 8)
+                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
+                    
+                    ScrollView{
+                        VStack(spacing: 40) {
+                            ForEach(mockItems, id: \.id) { item in
+                                NotificationRow(
+                                    item: item,
+                                    selectedImage: $selectedImage,onReject: {
+                                        showRejectToast()
+                                    }
+                                   
+                                )
+                            }
+                        }
+                        .padding(.top, 10)
+                        .padding(.horizontal, 5)
                         
-                   }
-                }
-                .padding(.top, 10)
-                .padding(.horizontal, 5)
+                        Spacer()
+                        
+                    }//ScrollView
+                }//VStack
                 
-                Spacer()
+                .background(Color.white)
                 
-            }//VStack
-        }//ScrollView
+                if isShowingRejectToast {
+                     VStack {
+                         Spacer()
+                         ToastView(message: "그룹 초대를 거절했어요")
+                             .transition(.move(edge: .bottom).combined(with: .opacity))
+                             .animation(.easeInOut, value: isShowingRejectToast)
+                         
+                     }
+                 }//isShowingRejectToast
+
+            }//ZStack
+        }//NavigationView
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
-        .background(Color.white)
-        .sheet(isPresented: $isImagePopupPresented) {
-           if let image = selectedImage {
-               ZStack {
-                   Color.black.opacity(0.9).ignoresSafeArea()
-                   Image(uiImage: image)
-                       .resizable()
-                       .scaledToFit()
-                       .padding()
-               }
-               .onTapGesture {
-                   isImagePopupPresented = false
-               }
-           }
-       }
+        .navigationTitle("알림")
+        .navigationBarTitleDisplayMode(.inline)
     }
+    
+    private func showRejectToast() {
+           isShowingRejectToast = true
+           DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+               isShowingRejectToast = false
+       }
+   }//showRejectToast
+    
 }
 
 #Preview {

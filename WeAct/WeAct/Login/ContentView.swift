@@ -27,12 +27,7 @@ struct ContentView: View {
             VStack(spacing: 20) {
                 Spacer()
 
-                Text("서비스 로고")
-                    .font(.headline)
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
+                Image("logo")
 
                 Text("친구와 함께 하는 습관 형성 서비스")
                     .foregroundColor(.gray)
@@ -59,7 +54,7 @@ struct ContentView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isFormValid ? Color.blue : Color.gray.opacity(0.2))
+                        .background(isFormValid ? Color(hex: "#FF632F") : Color.gray.opacity(0.2))
                         .cornerRadius(8)
                 }
                 .disabled(!isFormValid)
@@ -71,7 +66,6 @@ struct ContentView: View {
                     }) {
                         Text("회원가입")
                             .foregroundColor(.gray)
-                            .underline()
                             .padding(.top, 10)
                     }
                 
@@ -90,7 +84,8 @@ struct ContentView: View {
                         focusedField = nil
                     }
                 }
-            }
+            }.background(Color(hex: "#F7F7F7"))
+
         
     }
 }

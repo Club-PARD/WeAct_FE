@@ -1,29 +1,37 @@
-//
-//  RootView.swift
-//  WeAct
-//
-//  Created by 현승훈 on 6/30/25.
-//
-
 import SwiftUI
 
 struct RootView: View {
-    @State private var isSplashActive = true
-
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("isFirstLaunch") private var isFirstLaunch = true
+    @State private var showSplash = true
+    @StateObject private var userViewModel = UserViewModel()
+    
     var body: some View {
         ZStack {
-            if isSplashActive {
+            if showSplash {
                 Splash()
             } else {
-                ContentView()
+                if isLoggedIn {
+                    MainView(userViewModel: userViewModel)
+                } else {
+                    if isFirstLaunch {
+                        OnBoardingPage(isFirstLaunch: $isFirstLaunch)
+                    } else {
+                        ContentView()
+                    }
+                }
             }
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation {
-                    isSplashActive = false
+                    showSplash = false
                 }
             }
         }
     }
+}
+
+#Preview {
+    RootView()
 }

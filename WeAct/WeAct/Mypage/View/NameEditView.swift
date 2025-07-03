@@ -36,7 +36,7 @@ struct NameEditView: View {
     
     var body: some View {
         NavigationView {
-            VStack{                
+            VStack{
                 VStack(alignment: .leading){
                     Text("이름")
                         .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
@@ -85,8 +85,7 @@ struct NameEditView: View {
 
 #Preview {
     @State var path = NavigationPath()
-    let userViewModel = UserViewModel()  
+    let userViewModel = UserViewModel()
     return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
 }
-
 

@@ -8,6 +8,7 @@
 struct User: Codable {
     var username: String
     var profileImageURL: String?
-    
+
     static let sampleUser = User(username: "이주원", profileImageURL: "https://example.com/profile.jpg")
+
 }

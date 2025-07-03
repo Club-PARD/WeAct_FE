@@ -1,34 +1,31 @@
-//
 //  Sign_in_Page.swift
 //  WeAct
 //
 //  Created by 현승훈 on 6/30/25.
-//
-//
-//  Sign_in_Page.swift
-//  WeAct
-//
-//  Created by 현승훈 on 6/30/25.
-//
+
 import SwiftUI
 
 struct Sign_in_Page: View {
     @Environment(\.dismiss) var dismiss
-
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @State private var showWelcome = false
+    
     @State private var name = ""
     @State private var userId = ""
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var selectedGender: String? = nil
-
+    
     // 상태 관리
     @State private var userIdError: String?
     @State private var userIdStatus: String?
     @State private var passwordError: String?
+    @State private var passwordLengthError = false
+    @State private var passwordMismatchError = false
     @State private var isUserIdChecked = false
     @State private var isUserIdCheckingEnabled = false
-    @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
-
+    // @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
+    
     var isFormValid: Bool {
         !name.isEmpty &&
         userIdError == nil &&
@@ -36,12 +33,12 @@ struct Sign_in_Page: View {
         isUserIdChecked &&
         selectedGender != nil
     }
-
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-
+                    
                     // 상단 바
                     HStack {
                         Button(action: {
@@ -56,23 +53,23 @@ struct Sign_in_Page: View {
                         Spacer()
                     }
                     .padding(.bottom, 10)
-
+                    
                     // 이름
                     Group {
                         Text("이름")
                         TextField("이름 입력", text: $name)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
                             .cornerRadius(8)
                     }
-
+                    
                     // 아이디
                     Group {
                         Text("아이디")
                         HStack {
                             TextField("아이디 입력", text: $userId)
                                 .padding()
-                                .background(Color.gray.opacity(0.1))
+                                .background(Color.white)
                                 .cornerRadius(8)
                                 .onChange(of: userId) { newValue in
                                     isUserIdCheckingEnabled = !newValue.isEmpty
@@ -80,18 +77,18 @@ struct Sign_in_Page: View {
                                     userIdError = nil
                                     userIdStatus = nil
                                 }
-
+                            
                             Button("중복 확인") {
                                 checkUserId()
                             }
                             .disabled(!isUserIdCheckingEnabled)
                             .frame(width: 100)
                             .padding()
-                            .background(isUserIdCheckingEnabled ? Color.blue : Color.gray.opacity(0.2))
+                            .background(isUserIdCheckingEnabled ? Color.init(hex: "#464646") : Color.gray.opacity(0.2))
                             .foregroundColor(isUserIdCheckingEnabled ? .white : .gray)
                             .cornerRadius(8)
                         }
-
+                        
                         if let error = userIdError {
                             Text(error)
                                 .font(.caption)
@@ -106,26 +103,35 @@ struct Sign_in_Page: View {
                                 .foregroundColor(.gray)
                         }
                     }
-
+                    
                     // 비밀번호
                     Group {
                         Text("비밀번호")
+
                         SecureField("비밀번호 입력", text: $password)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(passwordLengthError ? Color.red : Color.clear, lineWidth: 1)
+                            )
                             .cornerRadius(8)
                             .onChange(of: password) { _ in
                                 validatePassword()
                             }
-
+                        
                         SecureField("비밀번호 확인", text: $confirmPassword)
                             .padding()
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(passwordMismatchError ? Color.red : Color.clear, lineWidth: 1)
+                            )
                             .cornerRadius(8)
                             .onChange(of: confirmPassword) { _ in
                                 validatePassword()
                             }
-
+                        
                         if let error = passwordError {
                             Text(error)
                                 .font(.caption)
@@ -136,7 +142,7 @@ struct Sign_in_Page: View {
                                 .foregroundColor(.gray)
                         }
                     }
-
+                    
                     // 성별
                     Group {
                         Text("성별")
@@ -149,33 +155,35 @@ struct Sign_in_Page: View {
                             }
                         }
                     }
-
+                    
                     // 회원가입 버튼
                     Button(action: {
-                        navigateToWelcome = true
+                        showWelcome = true
                     }) {
                         Text("회원가입")
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(isFormValid ? Color.blue : Color.gray.opacity(0.2))
+                            .background(isFormValid ? Color.init(hex: "#FF632F") : Color.gray.opacity(0.2))
                             .cornerRadius(8)
                     }
                     .disabled(!isFormValid)
                     .padding(.top, 30)
                 }
+                .fullScreenCover(isPresented: $showWelcome) {
+                    WelcomePage()
+                }
                 .padding()
             }
             .navigationBarHidden(true)
             .ignoresSafeArea(.keyboard)
+            .background(Color(hex: "#F7F7F7"))
         }
-        .fullScreenCover(isPresented: $navigateToWelcome) {
-            WelcomePage()
-        }
+        
     }
-
+    
     // MARK: - 유효성 검사
-
+    
     func checkUserId() {
         if userId.count < 4 || userId.count > 12 {
             userIdError = "아이디는 4~12자여야 합니다"
@@ -191,12 +199,17 @@ struct Sign_in_Page: View {
             isUserIdChecked = true
         }
     }
-
+    
     func validatePassword() {
+        passwordLengthError = false
+        passwordMismatchError = false
+
         if password.count < 4 || password.count > 12 {
             passwordError = "비밀번호는 4~12자여야 합니다"
+            passwordLengthError = true
         } else if password != confirmPassword {
             passwordError = "비밀번호가 일치하지 않습니다"
+            passwordMismatchError = true
         } else {
             passwordError = nil
         }
@@ -208,14 +221,20 @@ struct GenderButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(isSelected ? .white : .gray)
+                .foregroundColor(isSelected ? Color(hex: "#FF632F") : .gray)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isSelected ? Color.blue : Color.gray.opacity(0.1))
+                .background(
+                    isSelected ? Color(hex: "#FFF1EC") : .white
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(isSelected ? Color(hex: "#FF632F") : Color.clear, lineWidth: 1)
+                )
                 .cornerRadius(8)
         }
     }

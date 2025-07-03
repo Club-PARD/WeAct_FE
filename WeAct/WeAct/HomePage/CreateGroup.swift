@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CreateGroup: View {
+    @ObservedObject var groupStore: GroupStore
     @Binding var navigationPath: NavigationPath
     
     @State private var name = ""
@@ -45,207 +46,247 @@ struct CreateGroup: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("우리 방만의\n규칙을 정해주세요")
-                .foregroundColor(Color(hex: "8691A2"))
-                .font(.system(size: 26, weight: .medium))
-                .padding(.bottom, 26)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("방 이름")
-                    .foregroundColor(Color(hex: "8691A2"))
-                    .font(.system(size: 16, weight: .medium))
+        ZStack {
+            Color(hex: "F7F7F7")
+                .edgesIgnoringSafeArea(.all)
+            VStack(alignment: .leading) {
+                Text("우리 그룹만의\n규칙을 정해주세요")
+                    .foregroundColor(Color(hex: "171717"))
+                    .font(.custom("Pretendard-SemiBold", size: 26))
+                    .padding(.bottom, 26)
                 
-                TextField("롱커톤 팀 모여~", text: $name)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color(hex: "EFF1F5"))
-                    .foregroundColor(.black)
-                    .cornerRadius(4)
-                    .padding(.bottom, 28)
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("기간")
-                    .foregroundColor(Color(hex: "8691A2"))
-                    .font(.system(size: 16, weight: .medium))
-                
-                HStack {
-                    TextField("날짜 추가", text: $period)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(Color(hex: "EFF1F5"))
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("그룹 이름")
+                        .foregroundColor(Color(hex: "858588"))
+                        .font(.custom("Pretendard-Medium", size: 16))
+                    
+                    TextField("롱커톤 팀 모여~", text: $name)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 16)
+                        .background(.white)
                         .foregroundColor(.black)
-                        .cornerRadius(4)
-                        .disabled(true) // 직접 입력 막기
-                    
-                    
-                    Button(action: {
-                        showDatePicker = true
-                    }) {
-                        Image(systemName: "calendar")
-                            .foregroundColor(.gray)
-                            .padding(12)
-                            .background(Color(hex: "EFF1F5"))
-                            .cornerRadius(4)
-                    }
+                        .cornerRadius(8)
+                        .padding(.bottom, 28)
                 }
-                .padding(.bottom, 28)
-            }
-            .sheet(isPresented: $showDatePicker) {
-                VStack(spacing: 20) {
-                    Text("기간 선택")
-                        .font(.title2)
-                        .fontWeight(.medium)
-                        .padding(.top)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("습관 인증 기간")
+                        .foregroundColor(Color(hex: "858588"))
+                        .font(.custom("Pretendard-Medium", size: 16))
                     
-                    // 현재 선택된 날짜 범위 표시
                     HStack {
-                        VStack {
-                            Text("시작일")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(DateFormatter.shortDate.string(from: startDate))
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(isSelectingStartDate ? .blue : .primary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(isSelectingStartDate ? Color.blue.opacity(0.1) : Color.clear)
-                                .cornerRadius(8)
-                                .onTapGesture {
-                                    isSelectingStartDate = true
-                                }
-                        }
+                        Text(period.isEmpty ? "날짜를 추가해주세요" : period)
+                            .foregroundColor(period.isEmpty ? Color(hex: "C6C6C6") : .black)
                         
-                        Text("~")
-                            .foregroundColor(.secondary)
+                        Spacer()
                         
-                        VStack {
-                            Text("종료일")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(DateFormatter.shortDate.string(from: endDate))
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(!isSelectingStartDate ? .blue : .primary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(!isSelectingStartDate ? Color.blue.opacity(0.1) : Color.clear)
-                                .cornerRadius(8)
-                                .onTapGesture {
-                                    isSelectingStartDate = false
-                                }
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // 하나의 DatePicker로 시작일/종료일 선택
-                    DatePicker(
-                        isSelectingStartDate ? "시작일 선택" : "종료일 선택",
-                        selection: isSelectingStartDate ? $startDate : $endDate,
-                        displayedComponents: [.date]
-                    )
-                    .datePickerStyle(.graphical)
-                    .onChange(of: startDate) { newStartDate in
-                        // 시작일이 종료일보다 늦으면 종료일을 시작일로 설정
-                        if newStartDate > endDate {
-                            endDate = newStartDate
-                        }
-                    }
-                    .onChange(of: endDate) { newEndDate in
-                        // 종료일이 시작일보다 이르면 시작일을 종료일로 설정
-                        if newEndDate < startDate {
-                            startDate = newEndDate
-                        }
-                    }
-                    
-                    Button("확인") {
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyy-MM-dd"
-                        
-                        let start = formatter.string(from: startDate)
-                        let end = formatter.string(from: endDate)
-                        
-                        period = "\(start) ~ \(end)"
-                        showDatePicker = false
-                    }
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    
-                    Spacer()
-                }
-                .presentationDetents([.height(500)])
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("주기")
-                    .foregroundColor(Color(hex: "8691A2"))
-                    .font(.system(size: 16, weight: .medium))
-                
-                HStack(spacing: 8) {
-                    ForEach(0..<weekdays.count, id: \.self) { index in
                         Button(action: {
-                            if selectedDays.contains(index) {
-                                selectedDays.remove(index)
-                            } else {
-                                selectedDays.insert(index)
-                            }
+                            showDatePicker = true
                         }) {
-                            Text(weekdays[index])
-                                .font(.system(size: 16, weight: .medium))
-                                .frame(width: 40, height: 40)
-                                .background(selectedDays.contains(index) ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
-                                .foregroundColor(selectedDays.contains(index) ? .white : Color(hex: "8691A2"))
-                                .cornerRadius(4)
+                            Image("calendar")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(Color(hex: "FF4B2F"))
+                                .frame(height: 24)
                         }
                     }
-                } // HStack
-            } // VStack
-            .padding(.bottom, 28)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("보상")
-                    .foregroundColor(Color(hex: "8691A2"))
-                    .font(.system(size: 16, weight: .medium))
-                
-                TextField("일일 노예, 아이스크림 쏘기", text: $reward)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color(hex: "EFF1F5"))
-                    .foregroundColor(.black)
-                    .cornerRadius(4)
-                    .padding(.bottom, 28)
-            }
-            
-            Spacer()
-            
-            Button(action: {
-                print("방 이름: \(name)")
-                print("기간: \(period)")
-                print("선택된 요일: \(SelectedDaysString())")
-                print("주 \(SelectedDaysCount())회")
-                print("보상: \(reward)")
-              
-                navigationPath.append(NavigationDestination.addPartner)
-            }) {
-                Text("다음")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(isFormValid ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 20)
+                    .frame(height: 44)
+                    .background(Color.white)
                     .cornerRadius(8)
-            }
-            .disabled(!isFormValid)
-            .padding(.bottom, 10)
-        } // VStack
-        .padding(.vertical, 18)
-        .padding(.horizontal, 18)
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: customBackButton)
-        .navigationTitle("방 만들기")
-        .navigationBarTitleDisplayMode(.inline)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 0)
+                    )
+                    
+                    .padding(.bottom, 28)
+                }
+                .sheet(isPresented: $showDatePicker) {
+                    VStack(alignment: .leading) {
+                        Text("기간을 선택해주세요")
+                            .font(.custom("Pretendard-Medium", size: 18))
+                            .foregroundColor(Color(hex: "464646"))
+                            .padding(.vertical, 20)
+                        Divider()
+                        // 현재 선택된 날짜 범위 표시
+                        HStack {
+                            VStack {
+                                Text("시작일")
+                                    .font(.custom("Pretendard-Medium", size: 14))
+                                    .foregroundColor(Color(hex: "C6C6C6"))
+                                Text(DateFormatter.shortDate.string(from: startDate))
+                                    .font(.custom("Pretendard-Medium", size: 18))
+                                    .foregroundColor(Color(hex: "464646"))
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 12)
+                                    .background(Color(hex: "F7F7F7"))
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        isSelectingStartDate = true
+                                    }
+                            }
+                            
+                            Text("_")
+                                .font(.custom("Pretendard-Medium", size: 22))
+                                .foregroundColor(Color(hex: "C6C6C6"))
+                            
+                            VStack {
+                                Text("종료일")
+                                    .font(.custom("Pretendard-Medium", size: 14))
+                                    .foregroundColor(Color(hex: "C6C6C6"))
+                                Text(DateFormatter.shortDate.string(from: endDate))
+                                    .font(.system(size: 18, weight: .medium))
+                                    .foregroundColor(Color(hex: "FF4B2F"))
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 12)
+                                    .background(Color(hex: "FFEDEA"))
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        isSelectingStartDate = false
+                                    }
+                            } // VStack
+                        } // HStack
+                        .padding(.horizontal, 90)
+                        .padding(.top, 18)
+                        
+                        
+                        // 하나의 DatePicker로 시작일/종료일 선택
+                        DatePicker(
+                            isSelectingStartDate ? "시작일 선택" : "종료일 선택",
+                            selection: isSelectingStartDate ? $startDate : $endDate,
+                            displayedComponents: [.date]
+                        )
+                        .datePickerStyle(.graphical)
+                        .accentColor(Color(hex: "FF4B2F"))
+                        .onChange(of: startDate) { newStartDate in
+                            // 시작일이 종료일보다 늦으면 종료일을 시작일로 설정
+                            if newStartDate > endDate {
+                                endDate = newStartDate
+                            }
+                        }
+                        .onChange(of: endDate) { newEndDate in
+                            // 종료일이 시작일보다 이르면 시작일을 종료일로 설정
+                            if newEndDate < startDate {
+                                startDate = newEndDate
+                            }
+                        }
+                        
+                        Button("선택 완료") {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy.MM.dd"
+                            
+                            let start = formatter.string(from: startDate)
+                            let end = formatter.string(from: endDate)
+                            
+                            period = "\(start) - \(end)"
+                            showDatePicker = false
+                        } //Button
+                        .frame(maxWidth: .infinity, maxHeight: 54)
+                        .padding(.horizontal, 16)
+                        .background(Color(hex: "FF4B2F"))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        
+                        Spacer()
+                    } // VStack
+                    .padding(.horizontal, 16)
+                    .presentationDetents([.height(590)])
+                } // Sheet
+                .cornerRadius(16)
+                
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("습관 인증 주기")
+                        .foregroundColor(Color(hex: "858588"))
+                        .font(.custom("Pretendard-Medium", size: 16))
+                    
+                    HStack(spacing: 8) {
+                        ForEach(0..<weekdays.count, id: \.self) { index in
+                            Button(action: {
+                                if selectedDays.contains(index) {
+                                    selectedDays.remove(index)
+                                } else {
+                                    selectedDays.insert(index)
+                                }
+                            }) {
+                                Text(weekdays[index])
+                                    .font(.system(size: 16, weight: .medium))
+                                    .frame(width: 40, height: 40)
+                                    .background(selectedDays.contains(index) ? Color(hex: "#F8E6E3") : .white)
+                                    .foregroundColor(selectedDays.contains(index) ? Color(hex: "FF4B2F") : Color(hex: "858588"))
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(selectedDays.contains(index) ? Color(hex: "FF4B2F") : Color.clear, lineWidth: 1)
+                                    )
+                            }
+                        }
+                    } // HStack
+                } // VStack
+                .padding(.bottom, 28)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("1등 보상")
+                        .foregroundColor(Color(hex: "858588"))
+                        .font(.custom("Pretendard-Medium", size: 16))
+                    
+                    TextField("소원 들어주기, 아이스크림 쏘기", text: $reward)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 16)
+                        .background(.white)
+                        .foregroundColor(.black)
+                        .cornerRadius(8)
+                        .padding(.bottom, 28)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    print("🟡 [디버그] isFormValid:", isFormValid)
+                       print("🟢 [디버그] 방 이름(name):", name)
+                       print("🔵 [디버그] 기간(period):", period)
+                       print("🟣 [디버그] 선택된 요일(selectedDays):", selectedDays)
+                       print("🟠 [디버그] 선택된 요일 개수:", selectedDays.count)
+                       print("🔴 [디버그] 보상(reward):", reward)
+                       
+                       if isFormValid {
+                           // 임시 데이터를 환경 객체에 저장
+                           CreateGroupData.shared.name = name
+                           CreateGroupData.shared.period = period
+                           CreateGroupData.shared.reward = reward
+                           CreateGroupData.shared.selectedDaysCount = selectedDays.count
+                           
+                           // 🔥 이 부분을 추가하세요!
+                           let selectedWeekdays = selectedDays.sorted().map { weekdays[$0] }
+                           CreateGroupData.shared.selectedDaysString = selectedWeekdays
+                           
+                           navigationPath.append(NavigationDestination.addPartner)
+                    } else {
+                        print("⚠️ [디버그] 입력 조건이 충족되지 않아 다음으로 넘어가지 않음")
+                    }
+                }) {
+                    Text("다음")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(isFormValid ? .white : Color(hex: "C6C6C6"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(isFormValid ? Color(hex: "FF4B2F") : Color(hex: "E7E7E7"))
+                        .cornerRadius(8)
+                }
+                .disabled(!isFormValid)
+                .padding(.bottom, 10)
+                
+                
+                
+            } // VStack
+            .padding(.vertical, 18)
+            .padding(.horizontal, 18)
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: customBackButton)
+            .navigationTitle("그룹 만들기")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
@@ -269,8 +310,29 @@ extension CreateGroup {
     }
 }
 
+// 그룹 생성 과정에서 임시 데이터를 저장하는 싱글톤
+class CreateGroupData: ObservableObject {
+    static let shared = CreateGroupData()
+    
+    @Published var name: String = ""
+    @Published var period: String = ""
+    @Published var reward: String = ""
+    @Published var selectedDaysString: [String] = [] // 빈 배열로 수정
+    @Published var selectedDaysCount: Int = 0
+    
+    private init() {}
+    
+    func reset() {
+        name = ""
+        period = ""
+        reward = ""
+        selectedDaysString = []
+        selectedDaysCount = 0
+    }
+}
 
 #Preview {
     @State var path = NavigationPath()
-    return CreateGroup(navigationPath: .constant(path))
+    let groupStore = GroupStore()
+    CreateGroup(groupStore: groupStore, navigationPath: .constant(path))
 }

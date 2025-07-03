@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
-    @State private var goToSignUp = false  // ✅ 네비게이션 상태
-
+    @State private var showSignUp = false
+    
     enum Field {
         case userId
         case password
@@ -23,16 +24,10 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
             VStack(spacing: 20) {
                 Spacer()
 
-                Text("서비스 로고")
-                    .font(.headline)
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
+                Image("logo")
 
                 Text("친구와 함께 하는 습관 형성 서비스")
                     .foregroundColor(.gray)
@@ -53,33 +48,35 @@ struct ContentView: View {
                     .focused($focusedField, equals: .password)
 
                 Button(action: {
-                    print("로그인 버튼 클릭됨")
+                    isLoggedIn = true
                 }) {
                     Text("로그인")
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isFormValid ? Color.blue : Color.gray.opacity(0.2))
+                        .background(isFormValid ? Color(hex: "#FF632F") : Color.gray.opacity(0.2))
                         .cornerRadius(8)
                 }
                 .disabled(!isFormValid)
                 .padding(.horizontal)
 
-                NavigationLink(destination: Sign_in_Page(), isActive: $goToSignUp) {
+             
                     Button(action: {
-                        goToSignUp = true
+                        showSignUp = true
                     }) {
                         Text("회원가입")
                             .foregroundColor(.gray)
-                            .underline()
                             .padding(.top, 10)
                     }
-                }
+                
                 .buttonStyle(.plain)
 
                 Spacer()
             }
             .padding()
+            .fullScreenCover(isPresented: $showSignUp) {
+                        Sign_in_Page()
+                    }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -87,7 +84,8 @@ struct ContentView: View {
                         focusedField = nil
                     }
                 }
-            }
-        }
+            }.background(Color(hex: "#F7F7F7"))
+
+        
     }
 }

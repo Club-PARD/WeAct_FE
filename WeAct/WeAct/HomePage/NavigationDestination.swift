@@ -10,9 +10,8 @@ import Foundation
 enum NavigationDestination: Hashable {
     case createGroup
     case addPartner
+    case groupBoard(GroupModel)
     case notification
     case myPage
     case nameEdit // myPage -> nameEdit
 }
-
-

@@ -10,8 +10,16 @@ import SwiftUI
 
 
 enum NotificationType: Identifiable {
-    var id: UUID { UUID() }
 
     case groupInvite(sender: String, groupName: String)
     case memberNoVerification(sender: String, groupName: String)
+    
+    var id: String {
+       switch self {
+       case let .groupInvite(sender, groupName):
+           return "invite-\(sender)-\(groupName)"
+       case let .memberNoVerification(sender, groupName):
+           return "verify-\(sender)-\(groupName)"
+       }
+   }
 }

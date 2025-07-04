@@ -26,14 +26,14 @@ class UserService {
     // PATCH: 사용자 이름 수정
     func updateUsername(_ name: String) async throws {
         // 예시 URL (실제 URL로 교체해야 함)
-        let url = URL(string: "https://example.com/api/updateUsername")!
+        let url = URL(string: "https://example.com/api/updateUsernameUsername")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "PATCH"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         // 사용자 이름을 JSON 형식으로 요청 본문에 포함
-        let body = ["username": name]
+        let body = ["userName": name]
         request.httpBody = try JSONEncoder().encode(body)
         
         // 요청 보내기

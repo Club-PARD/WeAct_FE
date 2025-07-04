@@ -17,7 +17,7 @@ struct NameEditView: View {
 
     private var isFormValid: Bool {
            !editedName.trimmingCharacters(in: .whitespaces).isEmpty &&
-            editedName != userViewModel.user.username
+            editedName != userViewModel.user.userName
        }
     
     // 커스텀 뒤로가기 버튼
@@ -48,7 +48,7 @@ struct NameEditView: View {
                         .background(.white)
                         .cornerRadius(8)
                         .onAppear {
-                            editedName = userViewModel.user.username
+                            editedName = userViewModel.user.userName
                         }
                     
                 }
@@ -62,7 +62,7 @@ struct NameEditView: View {
                         //await userViewModel.saveNewName(editedName: editedName)
                         
                         
-                        userViewModel.user.username = editedName
+                        userViewModel.user.userName = editedName
                         //임시
                         navigationPath.append(NavigationDestination.myPage)
                     }

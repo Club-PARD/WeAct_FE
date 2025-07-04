@@ -6,6 +6,7 @@ struct NotificationRow: View {
 
     var item: NotificationType
     @Binding var selectedImage: UIImage?
+    var onAccept: () -> Void = {}
     var onReject: () -> Void
     
     
@@ -13,18 +14,14 @@ struct NotificationRow: View {
             HStack {
                 VStack(alignment: .leading, spacing: 5){
                     Text(mainText)
-                        .font(.custom("Pretendard-Medium", size: 16)
-                        )
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    
                     
                     if let subtitle = subtitleText {
                         Text(subtitle)
-                            .font(.custom("Pretendard-Medium", size: 14)
-                            )
+                            .font(.custom("Pretendard-Medium", size: 14))
                             .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
                     }
-            
                 }//VStack
 
                 Spacer()
@@ -32,6 +29,7 @@ struct NotificationRow: View {
                 if case .groupInvite = item {
                     Button(action: {
                         print("그룹에 초대되셨습니다")
+                        onAccept()
                     }) {
                         Text("수락")
                             .font(.custom("Pretendard-Medium", size: 14))

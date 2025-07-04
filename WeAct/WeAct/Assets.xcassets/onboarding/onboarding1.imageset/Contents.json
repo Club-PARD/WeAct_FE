@@ -1,7 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "NoGroup.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -10,10 +9,7 @@
       "scale" : "2x"
     },
     {
-<<<<<<< HEAD:WeAct/WeAct/Resource/Assets.xcassets/NoGroup.imageset/Contents.json
-=======
-      "filename" : "logo1.png",
->>>>>>> hsh:WeAct/WeAct/Assets.xcassets/logo.imageset/Contents.json
+      "filename" : "illust_onboarding_1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

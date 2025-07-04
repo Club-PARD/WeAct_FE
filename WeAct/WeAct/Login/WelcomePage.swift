@@ -22,11 +22,8 @@ struct WelcomePage: View {
             // 일러스트 SVG 대체
             Rectangle()
                 .fill(Color.gray.opacity(0.1))
-                .frame(width: 120, height: 120)
                 .overlay(
-                    Text("일러스트 svg")
-                        .foregroundColor(.gray)
-                        .font(.caption)
+                    Image("StartingPage")
                 )
                 .cornerRadius(16)
                 .padding(.top, 20)

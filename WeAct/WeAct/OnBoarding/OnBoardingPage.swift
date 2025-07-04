@@ -5,9 +5,9 @@ struct OnBoardingPage: View {
     @Binding var isFirstLaunch: Bool
 
     let onboardingData: [OnboardingContent] = [
-        OnboardingContent(title: "그룹생성하기", sub: "함께 습관을 달성할 친구를 초대하고,\n1등보상도 정해보세요!", imageText: "온보딩 설명 관련\n일러스트 1"),
-        OnboardingContent(title: "습관 인증하기", sub: "사진과 메모로 오늘의 습관을 기록해주세요!\n인증한 내용은 그룹 보드에서 볼 수 있어요", imageText: "온보딩 설명 관련\n일러스트 2"),
-        OnboardingContent(title: "랭킹 공개", sub: "습관 인증률에 따라 랭킹이 정해져요! \n인증 기간 동안 중간/최종 랭킹이 발표 돼요.", imageText: "온보딩 설명 관련\n일러스트 3")
+        OnboardingContent(title: "그룹생성하기", sub: "함께 습관을 달성할 친구를 초대하고,\n1등보상도 정해보세요!", imageName: "onboarding1"),
+        OnboardingContent(title: "습관 인증하기", sub: "사진과 메모로 오늘의 습관을 기록해주세요!\n인증한 내용은 그룹 보드에서 볼 수 있어요", imageName: "onboarding2"),
+        OnboardingContent(title: "랭킹 공개", sub: "습관 인증률에 따라 랭킹이 정해져요! \n인증 기간 동안 중간/최종 랭킹이 발표 돼요.", imageName: "onboarding3")
     ]
 
     var body: some View {
@@ -29,14 +29,11 @@ struct OnBoardingPage: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
 
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.1))
+                        // ✅ 실제 이미지로 변경
+                        Image(onboardingData[index].imageName)
+                            .resizable()
+                            .scaledToFit()
                             .frame(width: 240, height: 240)
-                            .overlay(
-                                Text("온보딩 설명 관련\n일러스트")
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(.gray)
-                            )
                             .cornerRadius(16)
 
                         Spacer()
@@ -47,9 +44,7 @@ struct OnBoardingPage: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .frame(height: 480)
 
-            // 🔽 인디케이터 + 버튼 묶기
             VStack(spacing: 0) {
-                // 🔵 페이지 인디케이터
                 HStack(spacing: 8) {
                     ForEach(0..<onboardingData.count, id: \.self) { index in
                         Circle()
@@ -57,10 +52,8 @@ struct OnBoardingPage: View {
                             .frame(width: 8, height: 8)
                     }
                 }
-                //.padding(.top, 16)
                 .padding(.bottom, 92)
 
-                // 버튼 유무와 관계없이 공간 확보
                 if currentIndex == onboardingData.count - 1 {
                     Button(action: {
                         isFirstLaunch = false
@@ -76,12 +69,10 @@ struct OnBoardingPage: View {
                     }
                     .padding(.bottom, 36)
                 } else {
-                    // 버튼이 없는 경우에도 동일한 높이 확보 (빈 공간으로 대체)
                     Color.clear
-                        .frame(height: 52 + 36) // 버튼 높이 + padding.bottom과 동일하게
+                        .frame(height: 52 + 36)
                 }
             }
-
         }
         .background(Color(hex: "#F7F7F7"))
         .navigationBarBackButtonHidden(true)
@@ -91,5 +82,5 @@ struct OnBoardingPage: View {
 struct OnboardingContent {
     let title: String
     let sub: String
-    let imageText: String
+    let imageName: String  // ✅ imageText → imageName으로 변경
 }

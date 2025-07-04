@@ -46,32 +46,38 @@ struct CertificationView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(.systemGray6))
                         .frame(height: 54)
 
                     HStack {
-                        LimitedTextField(text: $message, placeholder: "오늘의인증합니다아아", characterLimit: 15).frame(height: 20) // 👈 텍스트 높이에 맞춰 조절
-                            .padding(.vertical, 10)
+                        LimitedTextField(text: $message, placeholder: "오늘의인증합니다아아", characterLimit: 15)
+                            .frame(height: 20)
+                            .padding(.vertical, 22)
                         Spacer()
-                        Text("\(message.count)/15")
-                            .foregroundColor(.gray)
-                            .font(.caption)
-                            .padding(.trailing, 8)
+                        (
+                            Text("\(message.count)")
+                                .foregroundColor(Color(hex: "FF4B2F"))
+                            +
+                            Text("/15")
+                                .foregroundColor(.gray)
+                        )
+                        .font(.caption)
+                        .padding(.trailing, 22)
                     }
                     .padding(.horizontal, 12)
                 }
             }
 
+            // ✅ 항상 공간 유지 + 숨기기만 (중요)
+            VStack(alignment: .leading, spacing: 17) {
+                Text("인증 사진을 등록해주세요")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
 
-            if selectedOption == "인증할래요" {
-                VStack(alignment: .leading) {
-                    Text("인증 사진을 등록해주세요")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-
+                HStack {
+                    Spacer()
                     Button(action: {
                         showingImagePicker = true
                     }) {
@@ -84,38 +90,38 @@ struct CertificationView: View {
                                 .clipped()
                         } else {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.systemGray6))
+                                .stroke(style: StrokeStyle(lineWidth: 2, dash: [6]))
+                                .foregroundColor(.gray)
                                 .frame(width: 181, height: 229)
                                 .overlay(
-                                    Image(systemName: "camera")
-                                        .font(.system(size: 24))
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 30, weight: .regular))
                                         .foregroundColor(.gray)
                                 )
                         }
                     }
+                    .sheet(isPresented: $showingImagePicker) {
+                        ImagePicker(image: $image)
+                    }
+                    Spacer()
                 }
             }
+            .opacity(selectedOption == "인증할래요" ? 1 : 0)  // ✅ 안 보이게만, 공간 유지
+            .allowsHitTesting(selectedOption == "인증할래요")  // ✅ 터치 막기
 
-
-            Spacer()
+            Spacer().frame(height: 73)
 
             Button(action: {
                 // 전송 로직
             }) {
-                Text("전송하기")
+                Text("게시하기")
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(.darkGray))
+                    .background(Color(hex: "FF4B2F"))
                     .cornerRadius(10)
             }
         }
         .padding()
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $image)
-        }
     }
-       // .background(Color(hex:"#FF632F"))
-
 }
-

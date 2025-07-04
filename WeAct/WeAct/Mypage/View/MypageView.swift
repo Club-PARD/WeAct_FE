@@ -68,7 +68,7 @@ struct MypageView: View {
                     .padding(.top, 39)
                     .padding(.bottom, 13)
                     
-                    Text(userViewModel.user.username)
+                    Text(userViewModel.user.userName)
                         .font(Font.custom("Pretendard", size: 22).weight(.medium))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     

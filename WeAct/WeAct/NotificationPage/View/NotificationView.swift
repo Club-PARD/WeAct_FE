@@ -24,7 +24,7 @@ struct NotificationView: View {
         }
     }
     
-    let mockItems: [NotificationType] = [
+    @State private var notificationItems: [NotificationType] = [
         .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
         .groupInvite(sender: "주현아", groupName: "숏커톤 모여라"),
         .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
@@ -42,12 +42,18 @@ struct NotificationView: View {
 
                     ScrollView{
                         VStack(spacing: 40) {
-                            ForEach(mockItems, id: \.id) { item in
+                            ForEach(notificationItems, id: \.id) { item in
                                 NotificationRow(
                                     item: item,
-                                    selectedImage: $selectedImage,onReject: {
+                                    selectedImage: $selectedImage,
+                                    onAccept: {
+                                        removeItem(item)
+                                    },
+                                    onReject: {
                                         showRejectToast()
+                                        removeItem(item)
                                     }
+                                    
                                 )
                             }
                         }
@@ -66,6 +72,7 @@ struct NotificationView: View {
                          ToastView(message: "그룹 초대를 거절했어요")
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
+//                             .frame(width: 22.15384, height: 22.15384)
                      }
                  }//isShowingRejectToast
             }//ZStack
@@ -82,6 +89,13 @@ struct NotificationView: View {
                isShowingRejectToast = false
        }
    }//showRejectToast
+    
+    
+    private func removeItem(_ item: NotificationType) {
+       if let index = notificationItems.firstIndex(where: { $0.id == item.id }) {
+           notificationItems.remove(at: index)
+       }
+   }//removeItem
 }
 
 #Preview {

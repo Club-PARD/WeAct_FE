@@ -7,7 +7,7 @@
 import SwiftUI
 
 class UserViewModel: ObservableObject {
-    @Published var user: User = .sampleUser
+    @Published var user: UserModel = .sampleUser
     @Published var isShowingImagePicker = false
     
     @Published var selectedImage: UIImage?{
@@ -45,7 +45,7 @@ class UserViewModel: ObservableObject {
         do {
             // 서버로 이름 업데이트 요청
             try await service.updateUsername(newName)
-            user.username = newName
+            user.userName = newName
         } catch {
             // 에러 처리
         }
@@ -55,7 +55,7 @@ class UserViewModel: ObservableObject {
     func saveNewName(editedName: String) async {
         do {
             try await service.updateUsername(editedName)
-            user.username = editedName  // 사용자 이름 업데이트
+            user.userName = editedName  // 사용자 이름 업데이트
         } catch {
             // 에러 처리 (예: 네트워크 오류)
         }

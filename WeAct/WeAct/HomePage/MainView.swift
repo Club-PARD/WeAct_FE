@@ -78,7 +78,6 @@ struct MainView: View {
                                 Image("NoGroup")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: .infinity)
                                     .padding(.bottom, 32)
                                     .padding(.top, UIScreen.main.bounds.height * 0.106)
                                 

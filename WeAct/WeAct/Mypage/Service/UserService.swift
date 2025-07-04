@@ -10,7 +10,7 @@ import SwiftUI
 class UserService {
     
     // GET: 사용자 데이터 가져오기
-    func fetchUser() async throws -> User {
+    func fetchUser() async throws -> UserModel {
         // 예시 URL (실제 URL로 교체해야 함)
         let url = URL(string: "https://example.com/api/user")!
         
@@ -18,7 +18,7 @@ class UserService {
         let (data, _) = try await URLSession.shared.data(from: url)
         
         // 데이터를 User 모델로 변환 (JSON -> User)
-        let user = try JSONDecoder().decode(User.self, from: data)
+        let user = try JSONDecoder().decode(UserModel.self, from: data)
         
         return user  // User 객체 반환
     }

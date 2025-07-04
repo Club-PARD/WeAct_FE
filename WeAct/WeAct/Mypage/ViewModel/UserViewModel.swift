@@ -7,7 +7,7 @@
 import SwiftUI
 
 class UserViewModel: ObservableObject {
-    @Published var user: User = .sampleUser
+    @Published var user: UserModel = .sampleUser
     @Published var isShowingImagePicker = false
     
     @Published var selectedImage: UIImage?{

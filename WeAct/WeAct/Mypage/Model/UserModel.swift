@@ -6,7 +6,7 @@
 //
 import UIKit
 
-struct User: Codable {
+struct UserModel: Codable {
     var username: String
     var profileImageURL: String?
     
@@ -20,7 +20,7 @@ struct User: Codable {
         // localProfileImage는 제외함
     }
 
-    static let sampleUser = User(
+    static let sampleUser = UserModel(
         username: "이주원",
         profileImageURL: nil,
         localProfileImage: UIImage(named: "profile")

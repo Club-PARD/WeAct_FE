@@ -26,19 +26,20 @@ struct NotificationView: View {
     
     let mockItems: [NotificationType] = [
         .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
-        .verificationRejected(sender: "이주원", reason: "다른 각도로 찍어줘...", image: UIImage(named: "example") ?? UIImage()),
+        .groupInvite(sender: "주현아", groupName: "숏커톤 모여라"),
         .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
     ]
     
     var body: some View {
         NavigationView{
             ZStack{
+                Color.white.edgesIgnoringSafeArea(.all)
                 VStack{
                     Rectangle()
-                        .foregroundColor(.clear)
-                        .frame(width: 375, height: 8)
-                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-                    
+                      .frame(height: 8)
+                      .padding(.top,9)
+                      .foregroundColor(Color(red: 0.97, green: 0.97, blue: 0.98))
+
                     ScrollView{
                         VStack(spacing: 40) {
                             ForEach(mockItems, id: \.id) { item in
@@ -47,12 +48,11 @@ struct NotificationView: View {
                                     selectedImage: $selectedImage,onReject: {
                                         showRejectToast()
                                     }
-                                   
                                 )
                             }
                         }
                         .padding(.top, 10)
-                        .padding(.horizontal, 16)
+                 
                         
                         Spacer()
                         
@@ -68,9 +68,7 @@ struct NotificationView: View {
                              .animation(.easeInOut, value: isShowingRejectToast)
                      }
                  }//isShowingRejectToast
-
             }//ZStack
-
         }//NavigationView
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
@@ -84,7 +82,6 @@ struct NotificationView: View {
                isShowingRejectToast = false
        }
    }//showRejectToast
-    
 }
 
 #Preview {

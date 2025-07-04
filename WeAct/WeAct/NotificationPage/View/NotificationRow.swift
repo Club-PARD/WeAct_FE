@@ -8,6 +8,7 @@ struct NotificationRow: View {
     @Binding var selectedImage: UIImage?
     var onReject: () -> Void
     
+    
     var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: 5){
@@ -17,6 +18,7 @@ struct NotificationRow: View {
                         .weight(.medium)
                         )
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                    
                     
                     if let subtitle = subtitleText {
                         Text(subtitle)
@@ -35,27 +37,32 @@ struct NotificationRow: View {
                     Button(action: {
                         print("그룹에 초대되셨습니다")
                     }) {
-                        Image(systemName: "checkmark")
+                        Text("수락")
+                            .font(Font.custom("Pretendard", size: 14).weight(.medium))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .foregroundColor(Color(red: 0.2, green: 0.44, blue: 0.87)) // 진한 파랑
+                            .background(Color(red: 0.9, green: 0.95, blue: 1.0)) // 연파랑 배경
+                            .cornerRadius(8)
                     }
-                    .style()
+                    
                     
                     Button(action: {
                         onReject()
                         print("그룹 초대를 거절하셨습니다")
                     }) {
-                        Image(systemName: "xmark")
+                        Text("거절")
+                            .font(Font.custom("Pretendard", size: 14).weight(.medium))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .foregroundColor(Color(red: 1, green: 0.36, blue: 0.35))
+                            .background(Color(red: 1, green: 0.92, blue: 0.92))
+
+                            .cornerRadius(8)
                     }
-                    .style()
+                    
                 }//groupInvite
-                else if case let .verificationRejected(_, _, image) = item {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 43, height: 43)
-                        .background(Color(red: 0.9, green: 0.93, blue: 0.96))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-//
-                }//verificationRejected
+         
             } //HStack
             .padding(.horizontal)
         }
@@ -64,8 +71,6 @@ struct NotificationRow: View {
             switch item {
             case .groupInvite(let sender, _):
                 return "\(sender)님이 보낸 그룹 초대"
-            case .verificationRejected(let sender, _, _):
-                return "\(sender)님의 인증이 거절되었어요"
             case .memberNoVerification(let sender, _):
                 return "\(sender)님이 오늘 인증하지 않았어요"
             }
@@ -76,22 +81,10 @@ struct NotificationRow: View {
            case .groupInvite(_, let groupName),
                 .memberNoVerification(_, let groupName):
                return groupName
-           case .verificationRejected(_, let reason, _):
-               return "이유  |  \(reason)"
            }
        }
     }
 
-
-private extension View {
-    func style() -> some View {
-        self
-            .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
-            .frame(width: 43, height: 43)
-            .background(Color(red: 0.9, green: 0.93, blue: 0.96))
-            .cornerRadius(50)
-    }
-}
 
 #Preview {
     @State var selectedImage: UIImage? = nil

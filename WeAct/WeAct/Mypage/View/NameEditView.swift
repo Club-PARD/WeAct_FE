@@ -40,7 +40,7 @@ struct NameEditView: View {
                 VStack(alignment: .leading){
                     Text("이름")
                         .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
-                    
+                        .padding()
                     TextField("이름 입력", text: $editedName)
                         .padding(.leading, 22)
                         .padding(.vertical, 16)
@@ -56,7 +56,14 @@ struct NameEditView: View {
                 
                 Button(action: {
                     Task{
-                        await userViewModel.saveNewName(editedName: editedName)
+                        
+                        
+                        //서버통신용
+                        //await userViewModel.saveNewName(editedName: editedName)
+                        
+                        
+                        userViewModel.user.username = editedName
+                        //임시
                         navigationPath.append(NavigationDestination.myPage)
                     }
                 }) {
@@ -65,10 +72,10 @@ struct NameEditView: View {
                         .foregroundColor(.white)
                 }
                 .foregroundColor(.white)
+                
                 .frame(width: 330, height: 56)
+                .background(Color(red: 1, green: 0.29, blue: 0.18))
                 .cornerRadius(8)
-                .disabled(!isFormValid)
-                .background(isFormValid ? (Color(red: 1, green: 0.39, blue: 0.18)): Color(red: 0.93, green: 0.95, blue: 0.96))
                 
             }
             .padding(.horizontal,17)

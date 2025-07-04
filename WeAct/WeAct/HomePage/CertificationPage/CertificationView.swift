@@ -12,8 +12,27 @@ struct CertificationView: View {
     @State private var message = ""
     @State private var image: UIImage? = nil
     @State private var showingImagePicker = false
-
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
+        ZStack {
+            Text("습관인증하기")
+                .font(.body)
+                .foregroundColor(.black)
+
+            HStack {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+                Spacer()
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 20)
+
         VStack(alignment: .leading, spacing: 20) {
             Text("오늘은 어떻게 인증할까요?")
                 .font(.subheadline)
@@ -70,7 +89,6 @@ struct CertificationView: View {
                 }
             }
 
-            // ✅ 항상 공간 유지 + 숨기기만 (중요)
             VStack(alignment: .leading, spacing: 17) {
                 Text("인증 사진을 등록해주세요")
                     .font(.subheadline)

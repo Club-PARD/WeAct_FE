@@ -74,39 +74,6 @@ struct GroupDetailBoard: View {
                             .font(.system(size: 14))
                             .foregroundColor(Color(hex: "8691A2"))
                     } // HStack
-                    
-                    //                // 참여자 목록
-                    //                HStack {
-                    //                    Text("참여자")
-                    //                        .font(.system(size: 16, weight: .medium))
-                    //                        .foregroundColor(Color(hex: "40444B"))
-                    //
-                    //                    Spacer()
-                    //
-                    //                    HStack(spacing: -8) {
-                    //                        ForEach(Array(group.partners.prefix(5)), id: \.self) { partner in
-                    //                            Circle()
-                    //                                .fill(Color(hex: "40444B"))
-                    //                                .frame(width: 32, height: 32)
-                    //                                .overlay(
-                    //                                    Image(systemName: "person")
-                    //                                        .font(.system(size: 12))
-                    //                                        .foregroundColor(.white)
-                    //                                )
-                    //                        }
-                    //
-                    //                        if group.partners.count > 5 {
-                    //                            Circle()
-                    //                                .fill(Color(hex: "8691A2"))
-                    //                                .frame(width: 32, height: 32)
-                    //                                .overlay(
-                    //                                    Text("+\(group.partners.count - 5)")
-                    //                                        .font(.system(size: 10, weight: .medium))
-                    //                                        .foregroundColor(.white)
-                    //                                )
-                    //                        }
-                    //                    }
-                    //                } // HStack
                 } // VStack
                 .padding(.horizontal, 18)
                 .padding(.vertical, 20)
@@ -191,83 +158,6 @@ struct GroupDetailBoard: View {
     }
 }
 
-// 그룹 카드 컴포넌트
-struct GroupCard: View {
-    let group: GroupModel
-    let onTap: () -> Void
-    
-    var body: some View {
-        ZStack {
-            
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text(group.name)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(hex: "40444B"))
-                    Spacer()
-                    Text("주 \(group.selectedDaysCount)회")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(hex: "8691A2"))
-                } // HStack
-                
-                Text("기간: \(group.period)")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "8691A2"))
-                
-                Text("보상: \(group.reward)")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "8691A2"))
-                
-                HStack {
-                    Text("참여자: \(group.partners.count)명")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "8691A2"))
-                    Spacer()
-                    
-                    // 참여자 아바타들
-                    HStack(spacing: -8) {
-                        ForEach(Array(group.partners.prefix(3)), id: \.self) { partner in
-                            Circle()
-                                .fill(Color(hex: "40444B"))
-                                .frame(width: 24, height: 24)
-                                .overlay(
-                                    Image(systemName: "person")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(.white)
-                                )
-                        }
-                        
-                        if group.partners.count > 3 {
-                            Circle()
-                                .fill(Color(hex: "8691A2"))
-                                .frame(width: 24, height: 24)
-                                .overlay(
-                                    Text("+\(group.partners.count - 3)")
-                                        .font(.system(size: 8, weight: .medium))
-                                        .foregroundColor(.white)
-                                )
-                        }
-                    } // HStack
-                } // HStack
-            } // VStack
-            .padding(16)
-            .background(Color(hex: "F8F9FA"))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(hex: "E9ECEF"), lineWidth: 1)
-            )
-            .contentShape(Rectangle())
-            .onTapGesture {
-                onTap()
-            }
-        }
-    }
-}
-
-
-
-
 #Preview {
     @State var path = NavigationPath()
     let groupStore = GroupStore()
@@ -278,7 +168,8 @@ struct GroupCard: View {
         reward: "스타벅스 기프티콘",
         partners: ["김철수", "이영희", "박민수", "최수진", "정다은", "홍길동"],
         selectedDaysString: ["월", "수", "금"],
-        selectedDaysCount: 3
+        selectedDaysCount: 3,
+        habitText:  "매일 아침 스트레칭"
     )
     
     GroupDetailBoard(navigationPath: .constant(path),group: group, groupStore: groupStore)

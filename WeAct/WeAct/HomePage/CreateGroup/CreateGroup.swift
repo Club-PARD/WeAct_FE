@@ -60,7 +60,7 @@ struct CreateGroup: View {
                         .foregroundColor(Color(hex: "858588"))
                         .font(.custom("Pretendard-Medium", size: 16))
                     
-                    TextField("롱커톤 팀 모여~", text: $name)
+                    TextField("우리 그룹의 이름을 정해주세요", text: $name)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 16)
                         .background(.white)
@@ -172,26 +172,29 @@ struct CreateGroup: View {
                             }
                         }
                         
-                        Button("선택 완료") {
-                            let formatter = DateFormatter()
+                        Button(action: {let formatter = DateFormatter()
                             formatter.dateFormat = "yyyy.MM.dd"
                             
                             let start = formatter.string(from: startDate)
                             let end = formatter.string(from: endDate)
                             
                             period = "\(start) - \(end)"
-                            showDatePicker = false
-                        } //Button
-                        .frame(maxWidth: .infinity, maxHeight: 54)
-                        .padding(.horizontal, 16)
-                        .background(Color(hex: "FF4B2F"))
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                            showDatePicker = false}) {
+                                Text("선택 완료")
+                                    .font(.custom("Pretendard-Medium", size: 16))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color(hex: "FF4B2F"))
+                                    .cornerRadius(8)
+                                
+                            } //Button
+                        
                         
                         Spacer()
                     } // VStack
                     .padding(.horizontal, 16)
-                    .presentationDetents([.height(590)])
+                    .presentationDetents([.height(UIScreen.main.bounds.height * 0.727)])
                 } // Sheet
                 .cornerRadius(16)
                 
@@ -243,25 +246,24 @@ struct CreateGroup: View {
                 Spacer()
                 
                 Button(action: {
-                    print("🟡 [디버그] isFormValid:", isFormValid)
-                       print("🟢 [디버그] 방 이름(name):", name)
-                       print("🔵 [디버그] 기간(period):", period)
-                       print("🟣 [디버그] 선택된 요일(selectedDays):", selectedDays)
-                       print("🟠 [디버그] 선택된 요일 개수:", selectedDays.count)
-                       print("🔴 [디버그] 보상(reward):", reward)
-                       
-                       if isFormValid {
-                           // 임시 데이터를 환경 객체에 저장
-                           CreateGroupData.shared.name = name
-                           CreateGroupData.shared.period = period
-                           CreateGroupData.shared.reward = reward
-                           CreateGroupData.shared.selectedDaysCount = selectedDays.count
-                           
-                           // 🔥 이 부분을 추가하세요!
-                           let selectedWeekdays = selectedDays.sorted().map { weekdays[$0] }
-                           CreateGroupData.shared.selectedDaysString = selectedWeekdays
-                           
-                           navigationPath.append(NavigationDestination.addPartner)
+//                    print("🟡 [디버그] isFormValid:", isFormValid)
+//                    print("🟢 [디버그] 방 이름(name):", name)
+//                    print("🔵 [디버그] 기간(period):", period)
+//                    print("🟣 [디버그] 선택된 요일(selectedDays):", selectedDays)
+//                    print("🟠 [디버그] 선택된 요일 개수:", selectedDays.count)
+//                    print("🔴 [디버그] 보상(reward):", reward)
+                    
+                    if isFormValid {
+                        // 임시 데이터를 환경 객체에 저장
+                        CreateGroupData.shared.name = name
+                        CreateGroupData.shared.period = period
+                        CreateGroupData.shared.reward = reward
+                        CreateGroupData.shared.selectedDaysCount = selectedDays.count
+                        
+                        let selectedWeekdays = selectedDays.sorted().map { weekdays[$0] }
+                        CreateGroupData.shared.selectedDaysString = selectedWeekdays
+                        
+                        navigationPath.append(NavigationDestination.addPartner)
                     } else {
                         print("⚠️ [디버그] 입력 조건이 충족되지 않아 다음으로 넘어가지 않음")
                     }
@@ -319,6 +321,7 @@ class CreateGroupData: ObservableObject {
     @Published var reward: String = ""
     @Published var selectedDaysString: [String] = [] // 빈 배열로 수정
     @Published var selectedDaysCount: Int = 0
+    @Published var habitText: String = ""
     
     private init() {}
     
@@ -328,6 +331,7 @@ class CreateGroupData: ObservableObject {
         reward = ""
         selectedDaysString = []
         selectedDaysCount = 0
+        habitText = ""
     }
 }
 

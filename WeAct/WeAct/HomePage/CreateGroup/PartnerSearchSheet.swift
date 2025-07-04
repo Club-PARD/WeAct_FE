@@ -116,7 +116,7 @@ struct PartnerSearchSheet: View {
         }
         .font(.custom("Pretendard-Medium", size: 18))
         .disabled(selectedPartners.isEmpty)
-        .foregroundColor(selectedPartners.isEmpty ? Color(hex: "FF4B2F") : Color(hex: "40444B"))
+        .foregroundColor(Color(hex: "FF4B2F"))
     }
     
     // MARK: - Actions

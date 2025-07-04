@@ -58,7 +58,9 @@ struct AddPartner: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingBottomSheet) {
                 PartnerSearchSheet(selectedPartners: $selectedPartners)
+                    .presentationDetents([.height(UIScreen.main.bounds.height * 0.576)])
             }
+            
         }
     }
     
@@ -86,14 +88,9 @@ struct AddPartner: View {
     private var partnerSelectionView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                // 추가 버튼
-                addButton
-                
-                // 내 프로필
-                myProfileView
-                
-                // 선택된 파트너들
-                selectedPartnersView
+                addButton // 추가 버
+                myProfileView // 내 프로필
+                selectedPartnersView // 선택된 파트너들
             }
             .padding(.vertical, 8)
         }
@@ -120,7 +117,7 @@ struct AddPartner: View {
     
     private var myProfileView: some View {
         VStack(spacing: 7) {
-            Image("profile")
+            Image("myprofile")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 70)
@@ -143,12 +140,10 @@ struct AddPartner: View {
                             .frame(width: 70, height: 70)
                             .clipShape(Circle())
                     } else {
-                        Image(systemName: "person")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(Color(hex: "464646"))
-                            .padding(25)
-                            .background(.white)
-                            .cornerRadius(20)
+                        Image("BasicProfile")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 70)
                     }
                     
                     Text(partner.name)
@@ -176,12 +171,12 @@ struct AddPartner: View {
     
     private var createRoomButton: some View {
         Button(action: createRoom) {
-            Text("방 생성하기")
+            Text("그룹 만들기")
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(isFormValid ? .white : Color(hex: "8691A2"))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isFormValid ? Color(hex: "40444B") : Color(hex: "EFF1F5"))
+                .background(isFormValid ? Color(hex: "FF4B2F") : Color(hex: "E7E7E7"))
                 .cornerRadius(8)
         }
         .disabled(!isFormValid)
@@ -200,7 +195,8 @@ struct AddPartner: View {
             reward: CreateGroupData.shared.reward,
             partners: selectedPartners.map { $0.name },
             selectedDaysString: CreateGroupData.shared.selectedDaysString,
-            selectedDaysCount: CreateGroupData.shared.selectedDaysCount
+            selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
+            habitText: CreateGroupData.shared.habitText
         )
         
         // 그룹 스토어에 추가
@@ -209,8 +205,8 @@ struct AddPartner: View {
         // 임시 데이터 초기화
         CreateGroupData.shared.reset()
         
-        // 메인 화면으로 돌아가기
-        navigationPath = NavigationPath()
+        // 습관 설정 페이지
+        navigationPath.append(NavigationDestination.setuphabit)
     }
 }
 

@@ -1,10 +1,3 @@
-//
-//  MainView.swift
-//  WeAct
-//
-//  Created by 최승아 on 6/30/25.
-//
-
 import SwiftUI
 
 struct MainView: View {
@@ -18,80 +11,99 @@ struct MainView: View {
             ZStack {
                 Color(hex: "F7F7F7")
                     .edgesIgnoringSafeArea(.all)
+                
                 VStack(alignment: .leading) {
+                    
                     HStack {
-                        //Image("로고이미지")
                         Text("로고")
-                        
                         Spacer()
                         Button {
                             navigationPath.append(NavigationDestination.notification)
                         } label: {
                             Image(systemName: "bell.fill")
                                 .font(.system(size: 20))
-                                .foregroundColor((Color(hex: "9FADBC")))
-                        } // Button
+                                .foregroundColor(Color(hex: "9FADBC"))
+                        }
                         .padding(.trailing, 7)
                         
                         Button {
                             navigationPath.append(NavigationDestination.myPage)
                         } label: {
-                            
                             Image(systemName: "person.fill")
                                 .font(.system(size: 20))
-                                .foregroundColor((Color(hex: "9FADBC")))
-                            
-                        } // Button
+                                .foregroundColor(Color(hex: "9FADBC"))
+                        }
                     } // HStack
-                    .padding(.bottom, 33)
                     
-                    HStack {
-                        // 월 숫자
-                        Text("\(Calendar.current.component(.month, from: TodayDate))")
-                            .font(.custom("Pretendard-SemiBold", size: 26))
-                            .foregroundColor(Color(hex: "FF4B2F"))
+                    ZStack(alignment: .leading) {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("\(Calendar.current.component(.month, from: TodayDate))")
+                                    .font(.custom("Pretendard-SemiBold", size: 26))
+                                    .foregroundColor(Color(hex: "FF4B2F"))
+                                
+                                Text("월")
+                                    .font(.custom("Pretendard-SemiBold", size: 26))
+                                    .foregroundColor(Color(hex: "171717"))
+                                
+                                Text("\(Calendar.current.component(.day, from: TodayDate))")
+                                    .font(.custom("Pretendard-SemiBold", size: 26))
+                                    .foregroundColor(Color(hex: "FF4B2F"))
+                                
+                                Text("일")
+                                    .font(.custom("Pretendard-SemiBold", size: 26))
+                                    .foregroundColor(Color(hex: "171717"))
+                            } // HStack
+                            
+                            Text("습관 인증 해볼까요?")
+                                .foregroundColor(Color(hex: "171717"))
+                                .font(.custom("Pretendard-SemiBold", size: 26))
+                        } // VStack
                         
-                        Text("월")
-                            .font(.custom("Pretendard-SemiBold", size: 26))
-                            .foregroundColor(Color(hex: "171717"))
-                        
-                        Text("\(Calendar.current.component(.day, from: TodayDate))")
-                            .font(.custom("Pretendard-SemiBold", size: 26))
-                            .foregroundColor(Color(hex: "FF4B2F"))
-                        
-                        Text("일")
-                            .font(.custom("Pretendard-SemiBold", size: 26))
-                            .foregroundColor(Color(hex: "171717"))
-                    }
+                        HStack {
+                            Spacer()
+                            Image("IllustHome")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 92)
+                        } // HStack
+                    } // HStack
+                    .padding(.top, 22)
                     
-                    Text("오늘도 습관 인증해요!")
-                        .foregroundColor(Color(hex: "171717"))
-                        .font(.custom("Pretendard-SemiBold", size: 26))
-                    
-                    Spacer()
+                    // 그룹 없을 때
                     if groupStore.groups.isEmpty {
                         HStack {
                             Spacer()
-                            Image("")
-                            
-                            Text("생성된 습관 그룹이 없어요\n    그룹을 추가해주세요")
-                                .foregroundColor(Color(hex: "C6C6C6"))
-                                .font(.custom("Pretendard-Medium", size: 20))
+                            VStack {
+                                Image("NoGroup")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: .infinity)
+                                    .padding(.bottom, 32)
+                                    .padding(.top, UIScreen.main.bounds.height * 0.106)
+                                
+                                Text("생성된 습관 그룹이 없어요\n 그룹을 추가해 주세요")
+                                    .foregroundColor(Color(hex: "C6C6C6"))
+                                    .font(.custom("Pretendard-Medium", size: 20))
+                                    .multilineTextAlignment(.center)
+                            } // VStack
                             Spacer()
                         } // HStack
-                    } else {
+                    }
+                    // 그룹 있을 때
+                    else {
                         ScrollView {
-                            LazyVStack(spacing: 16) {
+                            LazyVStack(spacing: 12) {
                                 ForEach(groupStore.groups) { group in
-                                    GroupCard(group: group) {
-                                        navigationPath.append(NavigationDestination.groupBoard(group))
-                                    }
+                                    GroupList(navigationPath: $navigationPath, group: group)
                                 }
                             }
-                            .padding(.top, 20)
                         }
                     }
+                    
                     Spacer()
+                    
+                    // 그룹 만들기 버튼
                     HStack {
                         Spacer()
                         Button {
@@ -109,20 +121,21 @@ struct MainView: View {
                             .padding(.horizontal, 18)
                             .background(Color(hex: "464646"))
                             .cornerRadius(30)
-                        } // Button
+                        }
                         .padding(.bottom, 42)
-                    } // HStack
-                    .padding(.horizontal, 19)
+                    }
+                    .padding(.horizontal, 4)
                     
-                } // VStack
-                .padding(.horizontal, 18)
+                }
+                .padding(.horizontal, 20)
+                
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     switch destination {
                     case .createGroup:
                         CreateGroup(groupStore: groupStore, navigationPath: $navigationPath)
                     case .addPartner:
                         AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
-                    case .groupBoard (let group):
+                    case .groupBoard(let group):
                         GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
                     case .notification:
                         NotificationView(navigationPath: $navigationPath)
@@ -130,7 +143,10 @@ struct MainView: View {
                         MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
                     case .nameEdit:
                         NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
-                        
+                    case .certification:
+                        CertificationView()
+                    case .setuphabit:
+                        SetUpHabbit(navigationPath: $navigationPath)
                     }
                 }
             }

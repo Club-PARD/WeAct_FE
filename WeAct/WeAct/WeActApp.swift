@@ -13,7 +13,8 @@ struct WeActApp: App {
         WindowGroup {
             NavigationStack {
                 //RootView()
-                CertificationView()
+                //CertificationView()
+                FinalResultButton()
             }
         }
     }

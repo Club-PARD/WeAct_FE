@@ -11,7 +11,7 @@ struct CelebratePage: View {
     @Environment(\.dismiss) var dismiss
     @State private var showToast = false
     @State private var imageToSave: UIImage?
-
+    @Binding var path: NavigationPath
     var body: some View {
         ZStack {
             Color(red: 239/255, green: 243/255, blue: 245/255)
@@ -88,6 +88,7 @@ struct CelebratePage: View {
 
                 // 저장 버튼
                 Button(action: {
+                    path.append("celebrate")
                     saveCaptureToPhotos()
                 }) {
                     Text("이미지 저장하기")

@@ -5,8 +5,9 @@
 import SwiftUI
 
 struct FinalResultPage_Rank1: View {
-    @Environment(\.presentationMode) var presentationMode
-    @State private var showConfetti = false
+    @Binding var path: NavigationPath
+        @Environment(\.presentationMode) var presentationMode
+        @State private var showConfetti = false
 
     struct UserResult: Identifiable {
         let id = UUID()
@@ -55,7 +56,7 @@ struct FinalResultPage_Rank1: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 12)
-
+                
                 // Mission Info
                 VStack(alignment: .leading, spacing: 8) {
                     Text("롱커톤 모여라")
@@ -87,14 +88,14 @@ struct FinalResultPage_Rank1: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(12)
                 .padding(.horizontal)
-
+                
                 // Final Ranking
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("최종 랭킹")
                             .font(.headline)
                             .padding(.horizontal)
-
+                        
                         ForEach(resultList) { user in
                             HStack {
                                 if user.rank <= 3 {
@@ -106,7 +107,7 @@ struct FinalResultPage_Rank1: View {
                                         .font(.headline)
                                         .frame(width: 28)
                                 }
-
+                                
                                 VStack(alignment: .leading, spacing: 2) {
                                     HStack(spacing: 4) {
                                         Text(user.name)
@@ -123,9 +124,9 @@ struct FinalResultPage_Rank1: View {
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
-
+                                
                                 Spacer()
-
+                                
                                 Text("달성률 \(user.achievement)")
                                     .font(.caption)
                                     .padding(.horizontal, 8)
@@ -135,9 +136,11 @@ struct FinalResultPage_Rank1: View {
                             }
                             .padding(.horizontal)
                         }
-
+                        
                         if isSelfFirst {
-                            NavigationLink(destination: CelebratePage()) {
+                            Button(action: {
+                                path.append("celebrate")
+                            }) {
                                 Text("🥇 1등 축하 이미지 저장하기")
                                     .font(.subheadline)
                                     .foregroundColor(.white)
@@ -151,7 +154,6 @@ struct FinalResultPage_Rank1: View {
                             .padding(.horizontal)
                         }
                     }
-                    .padding(.bottom, 20)
                 }
             }
 

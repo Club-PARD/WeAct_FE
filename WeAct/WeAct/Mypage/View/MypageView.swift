@@ -12,7 +12,7 @@ struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @ObservedObject var userViewModel: UserViewModel
     
-    @State private var isShowingImagePicker = false
+    //@State private var isShowingImagePicker = false
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     
@@ -39,16 +39,25 @@ struct MypageView: View {
                             .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                             .cornerRadius(20)
                         
-                        if let imageURLString = userViewModel.user.profileImageURL,
-                           let imageURL = URL(string: imageURLString),
-                           let data = try? Data(contentsOf: imageURL),
-                           let image = UIImage(data: data){
-                            Image(uiImage: image)
+                        if let localImage = userViewModel.user.localProfileImage {
+                            Image(uiImage: localImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 94, height: 94)
                                 .clipped()
-                        } else {
+                                .cornerRadius(20)
+                        } else if let imageURLString = userViewModel.user.profileImageURL,
+                                 let imageURL = URL(string: imageURLString),
+                                 let data = try? Data(contentsOf: imageURL),
+                                 let image = UIImage(data: data) {
+                           Image(uiImage: image)
+                               .resizable()
+                               .scaledToFill()
+                               .frame(width: 94, height: 94)
+                               .clipped()
+                               .cornerRadius(20)
+                       }else {
+                            
                             Text("프로필\n사진")
                                 .font(Font.custom("Pretendard", size: 16).weight(.medium))
                                 .multilineTextAlignment(.center)
@@ -137,7 +146,7 @@ struct MypageView: View {
                     
                 }//VStack
                 .background(Color(red: 0.97, green: 0.97, blue: 0.97))
-                .sheet(isPresented: $isShowingImagePicker) {
+                .sheet(isPresented: $userViewModel.isShowingImagePicker) {
                     ImagePicker(image: $userViewModel.selectedImage)
                 }
                 if isShowingLogoutModal {

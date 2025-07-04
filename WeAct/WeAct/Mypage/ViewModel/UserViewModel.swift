@@ -7,16 +7,19 @@
 import SwiftUI
 
 class UserViewModel: ObservableObject {
-    @Published var user: User = User(username: "", profileImageURL: nil)
+    @Published var user: User = .sampleUser
     @Published var isShowingImagePicker = false
-    @Published var selectedImage: UIImage?
     
-    //목데이터
-    init() {
-        self.user = User.sampleUser
+    @Published var selectedImage: UIImage?{
+        
+        didSet {
+            if let image = selectedImage {
+                // 이미지 선택 시 user에 반영
+                user.localProfileImage = image
+            }
+        }
     }
 
-    
     private let service = UserService()
     
     
@@ -26,8 +29,7 @@ class UserViewModel: ObservableObject {
        selectedImage = image
        
    }
-    
-    
+
     // 프로필사진 변경
     func changeProfileImage() {
         isShowingImagePicker = true

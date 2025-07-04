@@ -1,7 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "myprofile.png",
+<<<<<<<< HEAD:WeAct/WeAct/Assets.xcassets/RankPage/rank1.imageset/Contents.json
+      "filename" : "rank1.png",
+========
+      "filename" : "Group 38.svg",
+>>>>>>>> hyunah:WeAct/WeAct/Resource/Assets.xcassets/RedCheckMark.imageset/Contents.json
       "idiom" : "universal",
       "scale" : "1x"
     },

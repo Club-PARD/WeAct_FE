@@ -38,7 +38,7 @@ struct CustomModalView: View {
                 .fontWeight(.medium)
                 .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 18)
+                .padding(.bottom, 10)
 
             // 버튼들
             HStack(spacing: 12) {

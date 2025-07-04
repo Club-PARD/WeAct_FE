@@ -13,33 +13,33 @@ struct NotificationView: View {
     @State private var isShowingRejectToast = false
     
     private var customBackButton: some View {
-            Button(action: {
-                if !navigationPath.isEmpty {
-                    navigationPath.removeLast()
-                }
-            }) {
-                Image(systemName: "chevron.left")
-                    .frame(width: 12, height: 21)
-                    .foregroundColor(.black)
+        Button(action: {
+            if !navigationPath.isEmpty {
+                navigationPath.removeLast()
             }
+        }) {
+            Image(systemName: "chevron.left")
+                .frame(width: 12, height: 21)
+                .foregroundColor(.black)
         }
+    }
     
     let mockItems: [NotificationType] = [
         .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
-        .verificationRejected(sender: "이주원", reason: "다른 각도로 찍어줘...", image: UIImage(named: "example") ?? UIImage()),
+        .groupInvite(sender: "주현아", groupName: "숏커톤 모여라"),
         .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
     ]
     
     var body: some View {
         NavigationView{
             ZStack{
+                Color.white.edgesIgnoringSafeArea(.all)
                 VStack{
-                    //경계바
                     Rectangle()
-                        .foregroundColor(.clear)
-                        .frame(width: 375, height: 8)
-                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-                    
+                      .frame(height: 8)
+                      .padding(.top,9)
+                      .foregroundColor(Color(red: 0.97, green: 0.97, blue: 0.98))
+
                     ScrollView{
                         VStack(spacing: 40) {
                             ForEach(mockItems, id: \.id) { item in
@@ -48,18 +48,16 @@ struct NotificationView: View {
                                     selectedImage: $selectedImage,onReject: {
                                         showRejectToast()
                                     }
-                                   
                                 )
                             }
                         }
                         .padding(.top, 10)
-                        .padding(.horizontal, 5)
+                 
                         
                         Spacer()
                         
                     }//ScrollView
                 }//VStack
-                
                 .background(Color.white)
                 
                 if isShowingRejectToast {
@@ -68,10 +66,8 @@ struct NotificationView: View {
                          ToastView(message: "그룹 초대를 거절했어요")
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
-                         
                      }
                  }//isShowingRejectToast
-
             }//ZStack
         }//NavigationView
         .navigationBarBackButtonHidden(true)
@@ -86,7 +82,6 @@ struct NotificationView: View {
                isShowingRejectToast = false
        }
    }//showRejectToast
-    
 }
 
 #Preview {

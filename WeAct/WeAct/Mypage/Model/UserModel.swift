@@ -8,6 +8,7 @@ import UIKit
 import SwiftUI
 
 struct UserModel: Codable {
+    var id: Int?
     var userId: String?
     var pw: String?
     var userName: String
@@ -19,6 +20,7 @@ struct UserModel: Codable {
     
     // 필요한 경우에만 CodingKeys 선언
     private enum CodingKeys: String, CodingKey {
+        case id
         case userId
         case pw
         case userName
@@ -28,11 +30,13 @@ struct UserModel: Codable {
     }
 
     static let sampleUser = UserModel(
-        userId:nil,
-        pw:nil,
-        userName: "이주원",
-        gender:nil,
-        profileImageURL: nil,
-        localProfileImage: UIImage(named: "profile")
+        id : nil,
+        userId : nil,
+        pw : nil,
+        userName : "이주원",
+        gender : nil,
+        profileImageURL : nil,
+        localProfileImage : UIImage(named: "profile")
     )
+    
 }

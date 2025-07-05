@@ -68,4 +68,10 @@ class UserViewModel: ObservableObject {
     
     // 회원탈퇴
     
+    
+    func createUser(user: UserModel) async throws {
+            try await service.createUser(user: user)
+        }
+
+    
 }

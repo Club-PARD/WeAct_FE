@@ -82,7 +82,7 @@ struct ContentView: View {
         }
         .padding()
         .fullScreenCover(isPresented: $showSignUp) {
-            Sign_in_Page()
+            Sign_in_Page(userViewModel: UserViewModel())
         }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {

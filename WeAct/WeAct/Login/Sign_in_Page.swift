@@ -6,6 +6,7 @@
 import SwiftUI
 
 struct Sign_in_Page: View {
+    @ObservedObject var userViewModel: UserViewModel
     @Environment(\.dismiss) var dismiss
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showWelcome = false
@@ -158,6 +159,27 @@ struct Sign_in_Page: View {
                     
                     // 회원가입 버튼
                     Button(action: {
+                        //서버통신
+                        Task {
+                            let newUser = UserModel(
+                                userId: userId,
+                                pw: password,
+                                userName: name,
+                                gender: selectedGender,
+                                profileImageURL: nil
+                            )
+
+                            do {
+                                try await userViewModel.createUser(user: newUser)
+                                showWelcome = true
+                            } catch {
+                                print("❌ 회원가입 실패: \(error.localizedDescription)")
+                            }
+                        }
+                        
+                        
+                        
+                        
                         showWelcome = true
                     }) {
                         Text("회원가입")
@@ -238,4 +260,9 @@ struct GenderButton: View {
                 .cornerRadius(8)
         }
     }
+}
+
+
+#Preview {
+    Sign_in_Page(userViewModel: UserViewModel())
 }

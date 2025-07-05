@@ -6,6 +6,7 @@ struct NotificationRow: View {
 
     var item: NotificationType
     @Binding var selectedImage: UIImage?
+    var onAccept: () -> Void = {}
     var onReject: () -> Void
     
     
@@ -13,22 +14,14 @@ struct NotificationRow: View {
             HStack {
                 VStack(alignment: .leading, spacing: 5){
                     Text(mainText)
-                        .font(
-                        Font.custom("Pretendard", size: 16)
-                        .weight(.medium)
-                        )
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    
                     
                     if let subtitle = subtitleText {
                         Text(subtitle)
-                            .font(
-                            Font.custom("Pretendard", size: 14)
-                            .weight(.medium)
-                            )
+                            .font(.custom("Pretendard-Medium", size: 14))
                             .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
                     }
-            
                 }//VStack
 
                 Spacer()
@@ -36,9 +29,10 @@ struct NotificationRow: View {
                 if case .groupInvite = item {
                     Button(action: {
                         print("그룹에 초대되셨습니다")
+                        onAccept()
                     }) {
                         Text("수락")
-                            .font(Font.custom("Pretendard", size: 14).weight(.medium))
+                            .font(.custom("Pretendard-Medium", size: 14))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .foregroundColor(Color(red: 0.2, green: 0.44, blue: 0.87)) // 진한 파랑
@@ -52,7 +46,7 @@ struct NotificationRow: View {
                         print("그룹 초대를 거절하셨습니다")
                     }) {
                         Text("거절")
-                            .font(Font.custom("Pretendard", size: 14).weight(.medium))
+                            .font(.custom("Pretendard-Medium", size: 14))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .foregroundColor(Color(red: 1, green: 0.36, blue: 0.35))

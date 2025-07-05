@@ -84,3 +84,10 @@ struct OnboardingContent {
     let sub: String
     let imageName: String  // ✅ imageText → imageName으로 변경
 }
+
+
+#Preview {
+    StatefulPreviewWrapper(true) { isFirstLaunch in
+            OnBoardingPage(isFirstLaunch: isFirstLaunch)
+        }
+}

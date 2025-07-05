@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SideMenuViewContents: View {
     @Binding var presentSideMenu: Bool
+    @State var isDisplayTooltip: Bool = false
     
     // 샘플 데이터 - 실제로는 GroupModel에서 받아올 것
     let members = [
@@ -21,6 +22,7 @@ struct SideMenuViewContents: View {
     ]
     
     var body: some View {
+        ZStack {
             VStack {
                 // 상단 헤더
                 VStack(spacing: 16) {
@@ -36,12 +38,13 @@ struct SideMenuViewContents: View {
                         Spacer()
                         
                         Button(action: {
-                            // 정보 버튼 액션
+                            isDisplayTooltip = true
                         }) {
                             Image(systemName: "info.circle")
                                 .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(Color(hex: "858588"))
                         }
+                        
                         
                         Button(action: {
                             // 공유 버튼 액션
@@ -144,7 +147,7 @@ struct SideMenuViewContents: View {
                                             .font(.system(size: 14))
                                             .foregroundColor(Color(hex: "666666"))
                                     } // VStack
-
+                                    
                                     Spacer()
                                 } // HStack
                                 .padding(.horizontal, 20)
@@ -171,6 +174,30 @@ struct SideMenuViewContents: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
         
+            if isDisplayTooltip {
+                    TooltipView(isDisplayTooltip: $isDisplayTooltip)
+                    .offset(x: -30, y: -268)
+                }
+            
+        } // ZStack
+        .onTapGesture {
+            isDisplayTooltip = false
+        }
+    }
+}
+
+private struct TooltipView: View {
+    @Binding var isDisplayTooltip: Bool
+
+    var body: some View {
+        HStack {
+            Spacer()
+            
+            TooltipShapeView()
+                .onTapGesture {
+                    isDisplayTooltip = false
+                }
+        }
     }
 }
 

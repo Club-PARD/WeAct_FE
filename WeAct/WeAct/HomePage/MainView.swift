@@ -15,7 +15,10 @@ struct MainView: View {
                 VStack(alignment: .leading) {
                     
                     HStack {
-                        Text("로고")
+                        Image("logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 30)
                         Spacer()
                         Button {
                             navigationPath.append(NavigationDestination.notification)
@@ -34,6 +37,7 @@ struct MainView: View {
                                 .foregroundColor(Color(hex: "9FADBC"))
                         }
                     } // HStack
+                    .padding(.top, 22)
                     
                     ZStack(alignment: .leading) {
                         VStack(alignment: .leading) {
@@ -68,7 +72,7 @@ struct MainView: View {
                                 .frame(height: 92)
                         } // HStack
                     } // HStack
-                    .padding(.top, 22)
+                    .padding(.top, 25)
                     
                     // 그룹 없을 때
                     if groupStore.groups.isEmpty {

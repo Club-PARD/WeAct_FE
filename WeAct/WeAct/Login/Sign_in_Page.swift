@@ -47,10 +47,13 @@ struct Sign_in_Page: View {
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.black)
-                            Text("회원가입")
-                                .font(.headline)
-                                .foregroundColor(.black)
+                            
+                            
                         }
+                        Spacer()
+                        Text("회원가입")
+                            .font(.headline)
+                            .foregroundColor(.black)
                         Spacer()
                     }
                     .padding(.bottom, 10)

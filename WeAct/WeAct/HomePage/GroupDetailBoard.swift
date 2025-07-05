@@ -250,7 +250,7 @@ struct GroupDetailBoard: View {
                         // 선택된 날짜의 보드 내용 표시 (기간 내 날짜만)
                         if isCurrentDateInRange {
                             // 여기에 보드 내용 표시
-                            Text("선택된 날짜: \(displayDateFormatter.string(from: currentDate))")
+                            Text("선택된 날짜: \(displayDateFormatter.string(from: currentDate))\n         (확인용)")
                                 .font(.custom("Pretendard-Medium", size: 16))
                                 .foregroundColor(Color(hex: "464646"))
                                 .padding()

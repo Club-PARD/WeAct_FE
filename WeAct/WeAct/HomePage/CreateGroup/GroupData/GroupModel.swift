@@ -51,4 +51,20 @@ extension GroupModel {
 
         return "\(start) - \(end)"
     }
+    
+    var periodShort2: String {
+        let parts = period.components(separatedBy: " - ")
+        guard parts.count == 2 else { return period }
+
+        let start = parts[0]              // yyyy.MM.dd 전체
+        let endFull = parts[1]            // yyyy.MM.dd 전체
+
+        // 종료일에서 MM.dd 부분만 추출
+        let endParts = endFull.components(separatedBy: ".")
+        guard endParts.count == 3 else { return period }
+
+        let end = "\(endParts[1]).\(endParts[2])"
+
+        return "\(start) - \(end)"
+    }
 }

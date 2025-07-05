@@ -163,13 +163,13 @@ struct GroupDetailBoard: View {
                 VStack(alignment: .leading) {
                     HStack {
                         Text(group.name)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(Color(hex: "40444B"))
+                            .font(.custom("Pretendard-Bold", size: 22))
+                            .foregroundColor(Color(hex: "171717"))
                         Spacer()
                         
-                        Text(group.period)
-                            .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "8691A2"))
+                        Text(group.periodShort2)
+                            .font(.custom("Pretendard-Medium", size: 14))
+                            .foregroundColor(Color(hex: "858588"))
                     }
                     
                     HStack {
@@ -177,13 +177,13 @@ struct GroupDetailBoard: View {
                             .font(.system(size: 14))
                             .padding(.vertical, 3)
                             .padding(.horizontal, 8)
-                            .foregroundColor(Color(hex: "CFD7DE"))
-                            .background(Color(hex: "EFF1F5"))
+                            .foregroundColor(Color(hex: "858588"))
+                            .background(Color(hex: "F7F7F7"))
                             .cornerRadius(6)
                         
                         Text(group.selectedDaysString.joined(separator: ", "))
                             .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "8691A2"))
+                            .foregroundColor(Color(hex: "464646"))
                     }
                     
                     HStack {
@@ -191,19 +191,20 @@ struct GroupDetailBoard: View {
                             .font(.system(size: 14))
                             .padding(.vertical, 3)
                             .padding(.horizontal, 8)
-                            .foregroundColor(Color(hex: "CFD7DE"))
-                            .background(Color(hex: "EFF1F5"))
+                            .foregroundColor(Color(hex: "858588"))
+                            .background(Color(hex: "F7F7F7"))
                             .cornerRadius(6)
                         
                         Text(group.reward)
                             .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "8691A2"))
-                    }
+                            .foregroundColor(Color(hex: "464646"))
+                    } // HStack
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 22)
                 .padding(.vertical, 20)
-                .background(Color(hex: "F8F8F9"))
-                .cornerRadius(12)
+                .background(.white)
+                .cornerRadius(16)
+                .padding(.top, 20)
                 
                 
                 ZStack {
@@ -267,6 +268,7 @@ struct GroupDetailBoard: View {
                 
                 // 인증하기 버튼 (기간 내 날짜일 때만 표시)
                 if isCurrentDateInRange {
+                    // 그룹 만들기 버튼
                     HStack {
                         Spacer()
                         Button {
@@ -287,12 +289,11 @@ struct GroupDetailBoard: View {
                         }
                         .padding(.bottom, 42)
                     }
-                    .padding(.horizontal, 19)
+                    .padding(.horizontal, 4)
+                    
                 }
-                
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 12)
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {

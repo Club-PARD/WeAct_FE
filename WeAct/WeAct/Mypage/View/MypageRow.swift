@@ -15,7 +15,7 @@ struct MypageRow: View {
     var body: some View {
         HStack {
             Text(text)
-                .font(.custom("Pretendard", size: 16))
+                .font(.custom("Pretendard-Medium", size: 16))
                 .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
 
             Spacer()

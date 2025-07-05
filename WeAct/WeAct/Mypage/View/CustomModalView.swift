@@ -20,10 +20,7 @@ struct CustomModalView: View {
         VStack() {
             // 제목
             Text(title)
-                .font(
-                    Font.custom("Pretendard", size: 22)
-                        .weight(.medium)
-                )
+                .font(.custom("Pretendard-Medium", size: 22))
                 .background(Color.white)
                 .padding(.top, 26)
                 .padding(.bottom,8)
@@ -31,10 +28,7 @@ struct CustomModalView: View {
             
             // 본문
             Text(message)
-                .font(
-                Font.custom("Pretendard", size: 14)
-                .weight(.medium)
-                )
+                .font(.custom("Pretendard-Medium", size: 14))
                 .fontWeight(.medium)
                 .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
                 .multilineTextAlignment(.center)
@@ -55,7 +49,7 @@ struct CustomModalView: View {
 
                 Button(action: secondButtonAction) {
                     Text(secondButtonTitle)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(.white)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 16)

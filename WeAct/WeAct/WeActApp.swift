@@ -12,8 +12,8 @@ struct WeActApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                //RootView()
-                CertificationView()
+                RootView()
+                //CertificationView()
             }
         }
     }

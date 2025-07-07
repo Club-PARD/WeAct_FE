@@ -12,7 +12,7 @@ class UserService {
     
     // POST: 사용자 정보 생성
        func createUser(user: UserModel) async throws {
-           guard let url = URL(string: "http://192.168.0.7:8080/user/") else {
+           guard let url = URL(string: "https://naruto.asia/user/") else {
                throw URLError(.badURL)
            }
            

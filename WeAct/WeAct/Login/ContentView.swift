@@ -95,3 +95,7 @@ struct ContentView: View {
         .background(Color(hex: "#F7F7F7"))
     }
 }
+
+#Preview {
+   ContentView()
+}

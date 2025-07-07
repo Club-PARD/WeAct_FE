@@ -12,7 +12,7 @@ struct PartnerSearchSheet: View {
     @Binding var selectedPartners: Set<PartnerModel>
     @StateObject private var viewModel = UserSearchViewModel()
     @Environment(\.dismiss) private var dismiss
-    @State private var searchText = ""    
+    @State private var searchText = ""
 
     var body: some View {
         NavigationView {
@@ -61,7 +61,7 @@ struct PartnerSearchSheet: View {
                 Text(error).foregroundColor(.red)
             } else {
                 ForEach(viewModel.searchedUsers) { user in // ✅ 3. 서버 응답 사용
-                    let partner = PartnerModel(name: user.userId, profileImageName: nil)
+                    let partner = PartnerModel(id: user.id, name: user.userId, profileImageName: nil)
                     userRow(partner)
                 }
             }
@@ -98,7 +98,7 @@ struct PartnerSearchSheet: View {
             Button(action: {
                 toggleSelection(for: user)
             }) {
-                let isSelected = selectedPartners.contains(where: { $0.name == user.name })
+                let isSelected = selectedPartners.contains(where: { $0.id == user.id })
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(isSelected ? Color(hex: "FF4B2F") : Color(hex: "F7F7F7"))
                     .font(.system(size: 20))
@@ -119,7 +119,7 @@ struct PartnerSearchSheet: View {
     // MARK: - Actions
     
     private func toggleSelection(for user: PartnerModel) {
-        if let existingUser = selectedPartners.first(where: { $0.name == user.name }) {
+        if let existingUser = selectedPartners.first(where: { $0.id == user.id }) {
             selectedPartners.remove(existingUser)
         } else {
             selectedPartners.insert(user)

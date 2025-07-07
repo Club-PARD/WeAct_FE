@@ -188,25 +188,54 @@ struct AddPartner: View {
     private func createRoom() {
         print("선택된 파트너: \(selectedPartners)")
         
-        // 새로운 그룹 생성
-        let newGroup = GroupModel(
-            name: CreateGroupData.shared.name,
-            period: CreateGroupData.shared.period,
-            reward: CreateGroupData.shared.reward,
-            partners: selectedPartners.map { $0.name },
-            selectedDaysString: CreateGroupData.shared.selectedDaysString,
-            selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
-            habitText: CreateGroupData.shared.habitText
+        //서버통신 request 관련 코드
+        let invitedIds = selectedPartners.map { $0.id }
+        let creatorId = 1 // TODO: 실제 로그인된 사용자 ID 사용
+
+        let formatter = ISO8601DateFormatter()
+           formatter.formatOptions = [.withInternetDateTime]
+
+        let startDateString = formatter.string(from: CreateGroupData.shared.startDate)
+        let endDateString = formatter.string(from: CreateGroupData.shared.endDate)
+
+        let request = GroupRequest(
+           invitedIds: invitedIds,
+           roomName: CreateGroupData.shared.name,
+           startDate: startDateString,
+           endDate: endDateString,
+           reward: CreateGroupData.shared.reward,
+           dayCountByWeek: CreateGroupData.shared.selectedDaysCount,
+           creatorId: creatorId
         )
-        
-        // 그룹 스토어에 추가
-        groupStore.addGroup(newGroup)
-        
-        // 임시 데이터 초기화
-        CreateGroupData.shared.reset()
-        
-        // 습관 설정 페이지
-        navigationPath.append(NavigationDestination.setuphabit)
+
+        Task {
+            do {
+                try await GroupService.shared.createGroup(request: request)
+                print("✅ 서버에 그룹 생성 성공")
+                // 새로운 그룹 생성
+                let newGroup = GroupModel(
+                    name: CreateGroupData.shared.name,
+                    period: CreateGroupData.shared.period,
+                    reward: CreateGroupData.shared.reward,
+                    partners: selectedPartners.map { $0.name },
+                    selectedDaysString: CreateGroupData.shared.selectedDaysString,
+                    selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
+                    habitText: CreateGroupData.shared.habitText
+                )
+                
+                // 그룹 스토어에 추가
+                groupStore.addGroup(newGroup)
+                
+                // 임시 데이터 초기화
+                CreateGroupData.shared.reset()
+                
+                // 습관 설정 페이지
+                navigationPath.append(NavigationDestination.setuphabit)
+            } catch {
+                print("❌ 그룹 생성 실패: \(error.localizedDescription)")
+            }
+            
+        }//Task
     }
 }
 

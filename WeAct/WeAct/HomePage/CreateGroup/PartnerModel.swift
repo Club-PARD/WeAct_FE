@@ -7,7 +7,7 @@
 import Foundation
 
 struct PartnerModel: Hashable, Identifiable {
-    let id = UUID()
+    let id: Int 
     let name: String
     let profileImageName: String? // nil이면 기본 프로필 출력
     

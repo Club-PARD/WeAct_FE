@@ -50,7 +50,6 @@ struct NameEditView: View {
                         .onAppear {
                             editedName = userViewModel.user.userName
                         }
-                    
                 }
                 Spacer()
                 
@@ -89,4 +88,3 @@ struct NameEditView: View {
     let userViewModel = UserViewModel()
     return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
 }
-

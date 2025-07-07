@@ -13,8 +13,8 @@ struct HomeGroupResponse: Decodable {
     let roomInformationDtos: [HomeGroupModel]
 }
 
-struct HomeGroupModel: Identifiable, Decodable {
-    var id = UUID()  // 서버에 id 없으니 임시로 UUID 사용
+struct HomeGroupModel: Decodable {
+    var roomId: Int
     let roomName: String
     let habit: String
     let period: String
@@ -27,7 +27,7 @@ class HomeGroupService {
     
     private init() {}
     
-    func getHomeGroups(userId: Int) async throws -> HomeGroupResponse {
+    func getHomeGroups(userId: String) async throws -> HomeGroupResponse {
         guard let url = URL(string: "https://naruto.asia/user/home/\(userId)") else {
             print("❌ URL 생성 실패")
             throw URLError(.badURL)

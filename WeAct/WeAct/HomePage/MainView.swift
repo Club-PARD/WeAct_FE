@@ -4,7 +4,7 @@ struct MainView: View {
     @StateObject private var groupStore = GroupStore()
     @State private var homeGroups: [HomeGroupModel] = []
     @State private var navigationPath = NavigationPath()
-    @EnvironmentObject var userViewModel: UserViewModel
+    @StateObject private var userViewModel = UserViewModel()
     @State private var TodayDate = Date()
     
     
@@ -99,22 +99,16 @@ struct MainView: View {
                     else {
                         ScrollView {
                             LazyVStack(spacing: 12) {
-                                ForEach(homeGroups) { homeGroup in
-                                    GroupList(navigationPath: $navigationPath, homeGroup: homeGroup) {
-                                        // 상세 진입 시 변환해서 넘김
-                                        let convertedGroup = GroupModel(
-                                            id: Int.random(in: 0...9999),
-                                            name: homeGroup.roomName,
-                                            startDate: Date(),
-                                            endDate: Date(),
-                                            reward: "보상 미정",
-                                            partners: [], // 빈 배열
-                                            selectedDaysString: "",
-                                            selectedDaysCount: homeGroup.dayCountByWeek,
-                                            habitText: "" // 서버에 없으면 빈 문자열
-                                        )
-                                    }
-                                }
+                                ForEach(groupStore.groups) { group in
+                                    GroupList(
+                                                                           navigationPath: $navigationPath,
+                                                                           homeGroup: convertToHomeGroupModel(from: group),
+                                                                           group: group,
+                                                                           onTap: {
+                                                                               navigationPath.append(NavigationDestination.groupBoard(group))
+                                                                           }
+                                                                       )
+                                                }
                             }
                         }
                     }
@@ -153,14 +147,14 @@ struct MainView: View {
                             .environmentObject(userViewModel)
                     case .addPartner:
                         AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
-                            .environmentObject(userViewModel) 
+                            .environmentObject(userViewModel)
                     case .groupBoard(let group):
                         GroupDetailBoard(navigationPath: $navigationPath, groupResponse: nil, group: group, groupStore: groupStore)
                     case .notification:
                         NotificationView(navigationPath: $navigationPath)
                     case .myPage:
                         MypageView(navigationPath: $navigationPath)
-                            .environmentObject(userViewModel) 
+                            .environmentObject(userViewModel)
                     case .nameEdit:
                         NameEditView(navigationPath: $navigationPath)
                             .environmentObject(userViewModel)
@@ -172,42 +166,120 @@ struct MainView: View {
                 }
             } // ZStack
             .onAppear {
-                fetchHomeGroups()
-            }
+                            fetchHomeGroups()
+                        }
+                        .onChange(of: navigationPath) { oldValue, newValue in
+                            // 네비게이션 스택이 비어있을 때 (홈화면으로 돌아왔을 때) 그룹 목록 새로고침
+                            if newValue.isEmpty {
+                                print("🔄 홈화면으로 돌아옴 - 그룹 목록 새로고침")
+                                fetchHomeGroups()
+                            }
+                        }
         } // NavigationStack
         .navigationBarBackButtonHidden(true)
     }
-    private func fetchHomeGroups() {
-        Task {
-            do {
-                if let userIdString = userViewModel.user.userId,
-                   let userId = Int(userIdString) {
-                    
-                    print("✅ 변환된 userId: \(userId)")
-                    
-                    let homeGroupResponse = try await HomeGroupService.shared.getHomeGroups(userId: userId)
-                    
-                    if let date = Calendar.current.date(from: DateComponents(month: homeGroupResponse.month, day: homeGroupResponse.day)) {
-                        self.TodayDate = date
+    
+    // MARK: - Helpers
+        
+        private func convertToHomeGroupModel(from group: GroupModel) -> HomeGroupModel {
+            // GroupModel → HomeGroupModel 변환 (필요한 경우)
+            return HomeGroupModel(
+                roomId: 1,
+                roomName: group.name,
+                habit: group.habitText,
+                period: datePeriodString(from: group.startDate, to: group.endDate),
+                dayCountByWeek: group.selectedDaysCount,
+                percent: 0 // 아직 달성률이 없으면 0으로 처리
+            )
+        }
+        
+        private func datePeriodString(from startDate: Date, to endDate: Date) -> String {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd"
+            return "\(formatter.string(from: startDate)) ~ \(formatter.string(from: endDate))"
+        }
+        
+        // MARK: - 데이터 요청
+        private func fetchHomeGroups() {
+            Task {
+                do {
+                    // 🔧 개선된 userId 검증 로직
+                    guard let userId = userViewModel.user.userId else {
+                        
+                        print("❌ 현재 사용자 상태 - userId: \(userViewModel.user.userId ?? "없음")")
+                      
+                        return
                     }
                     
-                    self.homeGroups = homeGroupResponse.roomInformationDtos
+                    print("📡 [요청 시작] userId: \(userId)")
                     
-                } else {
-                    print("❌ userId 값이 없거나 변환 실패")
-                    // 필요한 경우: 팝업 띄우기, 기본값 세팅 등 처리
+                    let response = try await HomeGroupService.shared.getHomeGroups(userId: userId)
+                    
+                    print("📡 [요청 URL] https://naruto.asia/user/home/\(userId)")
+                    print("✅ [서버 응답 성공] 받은 그룹 수: \(response.roomInformationDtos.count)")
+                    
+                    // 메인 스레드에서 UI 업데이트
+                    await MainActor.run {
+                        // 서버 응답에서 날짜 정보 업데이트
+                        if let date = Calendar.current.date(from: DateComponents(month: response.month, day: response.day)) {
+                            self.TodayDate = date
+                        }
+                        
+                        // 서버에서 받은 데이터 배열 업데이트
+                        self.homeGroups = response.roomInformationDtos
+                        
+                        // 화면에서 실제 쓰는 groups 배열 업데이트
+                        self.groupStore.groups = response.roomInformationDtos.map { homeGroup in
+                            GroupModel(
+                                id: homeGroup.roomId ?? Int.random(in: 0...9999), // 서버에서 roomId 제공시 사용
+                                name: homeGroup.roomName,
+                                startDate: parseDate(from: homeGroup.period) ?? Date(),
+                                endDate: parseEndDate(from: homeGroup.period) ?? Date(),
+                                reward: "보상 미정", // 서버에서 제공하지 않으면 기본값
+                                partners: [], // 서버에 데이터 없으면 빈 배열
+                                selectedDaysString: "", // 서버에서 제공하지 않으면 빈 문자열
+                                selectedDaysCount: homeGroup.dayCountByWeek,
+                                habitText: homeGroup.habit
+                            )
+                        }
+                        
+                        print("✅ [UI 업데이트 완료] 표시할 그룹 수: \(self.groupStore.groups.count)")
+                    }
+                    
+                } catch {
+                    print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+                    
+                    // 오류 발생시 디버깅 정보 추가 출력
+                    await MainActor.run {
+                        print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+                    }
                 }
-            } catch {
-                print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
             }
+        }
+        
+        // MARK: - 날짜 파싱 헬퍼 함수들
+        private func parseDate(from period: String) -> Date? {
+            let components = period.components(separatedBy: " ~ ")
+            guard let startString = components.first else { return nil }
+            
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd"
+            return formatter.date(from: startString)
+        }
+        
+        private func parseEndDate(from period: String) -> Date? {
+            let components = period.components(separatedBy: " ~ ")
+            guard components.count > 1 else { return nil }
+            
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd"
+            return formatter.date(from: components[1])
         }
     }
 
 
-}
-
 #Preview {
     let testUserModel = UserViewModel()
-    return MainView()
+     MainView()
         .environmentObject(testUserModel)
 }

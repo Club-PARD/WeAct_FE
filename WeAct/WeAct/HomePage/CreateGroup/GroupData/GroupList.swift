@@ -3,6 +3,7 @@ import SwiftUI
 struct GroupList: View {
     @Binding var navigationPath: NavigationPath
     var homeGroup: HomeGroupModel
+    var group: GroupModel
     var onTap: () -> Void
     
     var body: some View {
@@ -89,19 +90,20 @@ struct GroupList: View {
         }
     }
 }
-
-#Preview {
-    StatefulPreviewWrapper(NavigationPath()) { path in
-        GroupList(
-            navigationPath: path,
-            homeGroup: HomeGroupModel(
-                roomName: "아침 운동 챌린지",
-                habit: "스트레칭하기",
-                period: "2025.07.01 - 2025.07.31",
-                dayCountByWeek: 3,
-                percent: 58
-            ),
-            onTap: { }
-        )
-    }
-}
+//
+//#Preview {
+//    StatefulPreviewWrapper(NavigationPath()) { path in
+//        GroupList(
+//            navigationPath: path,
+//            homeGroup: HomeGroupModel(
+//                roomName: "아침 운동 챌린지",
+//                habit: "스트레칭하기",
+//                period: "2025.07.01 - 2025.07.31",
+//                dayCountByWeek: 3,
+//                percent: 58
+//            ),
+//            group: GroupModel,
+//            onTap: { }
+//        )
+//    }
+//}

@@ -11,51 +11,56 @@ struct CelebratePage: View {
     @Environment(\.dismiss) var dismiss
     @State private var showToast = false
     @State private var imageToSave: UIImage?
-
+    @Binding var path: NavigationPath
     var body: some View {
         ZStack {
-            Color(red: 239/255, green: 243/255, blue: 245/255)
+            // ✅ 배경 이미지 → SafeArea 무시 (전체 화면 덮기)
+            Image("result_Back")
+                .resizable()
+                .scaledToFill()
                 .ignoresSafeArea()
 
-            VStack(spacing: 40) {
-                // 상단 커스텀 뒤로 버튼
-                HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        HStack(spacing: 4) {
+            VStack {
+                // ✅ SafeArea 안의 상단 영역
+                VStack(spacing: 0) {
+                    Spacer().frame(height: 32)
+                    HStack {
+                        Button(action: {
+                            dismiss()
+                        }) {
                             Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                            Text("뒤로")
-                                .foregroundColor(.black)
-                                .font(.body)
+                                .foregroundColor(.white)
+                                .padding(.top)
                         }
+                        
+                        Spacer(minLength: 30)  // ✅ 여기서 최소 간격 조절 가능
+                        
+                        Text("자랑하기")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                            .padding(.top)
+                        
+                        Spacer()  // 나머지 공간 다 차지 → 오른쪽 정렬 맞춤
                     }
-                    Spacer()
+                    .padding(.top)
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-                .padding(.top, 20)
 
+                Spacer().frame(height: 94)
+                
+                
                 // 캡처 대상
                 CaptureArea {
                     VStack(spacing: 16) {
-                        Text("습관 랭킹 1등")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .padding(.top, 16)
-
                         // 일러스트
-                        Circle()
-                            .fill(Color(.systemGray4))
-                            .frame(width: 100, height: 100)
-                            .overlay(Text("일러스트 svg").font(.caption).foregroundColor(.gray))
-
+                        Image("result_rank1").resizable().frame(width: 276, height:  228)
+                        
                         Text("이주원")
                             .font(.title2)
                             .fontWeight(.semibold)
-
+                        
                         Divider()
-
+                        
                         VStack(spacing: 8) {
                             HStack {
                                 LabelBox(title: "방 명")
@@ -71,13 +76,10 @@ struct CelebratePage: View {
                             }
                         }
                         .padding(.horizontal)
-
+                        
                         Spacer(minLength: 0)
-
-                        Text("앱 로고")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 16)
+                        
+                        Image("logo").resizable().frame(width: 90, height: 30)
                     }
                     .padding()
                     .frame(width: 280)
@@ -85,19 +87,19 @@ struct CelebratePage: View {
                     .cornerRadius(24)
                 }
                 .frame(height: 380) // 캡처 대상 크기
-
+                Spacer()
                 // 저장 버튼
                 Button(action: {
                     saveCaptureToPhotos()
                 }) {
-                    Text("이미지 저장하기")
+                    Text("이미지 저장")
                         .foregroundColor(.white)
                         .padding(.horizontal, 32)
                         .padding(.vertical, 12)
-                        .background(Color(.darkGray))
+                        .background(Color(.blue))
                         .clipShape(Capsule())
                 }
-
+                
                 Spacer()
             }
 
@@ -105,15 +107,20 @@ struct CelebratePage: View {
             if showToast {
                 VStack {
                     Spacer()
-                    Text("저장되었습니다")
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(Color.black.opacity(0.7))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .padding(.bottom, 40)
+                    HStack {
+                        Image("RedCheckmark")
+                        Spacer().frame(width: 10)
+                        Text("이미지가 저장되었어요!")
+                            .foregroundColor(.white)
+                            .font(.body)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color(.darkGray))
+                    .cornerRadius(12)
+                    .padding(.bottom, 40)
+                    .transition(.opacity)
                 }
-                .transition(.opacity)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -205,3 +212,6 @@ struct LabelBox: View {
             .cornerRadius(6)
     }
 }
+
+
+

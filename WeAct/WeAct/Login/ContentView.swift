@@ -19,12 +19,13 @@ struct ContentView: View {
         case userId
         case password
     }
-
+    
     var isFormValid: Bool {
         !userId.isEmpty && !password.isEmpty
     }
-
+    
     var body: some View {
+
         ZStack {
             Color(hex: "F7F7F7")
                 .edgesIgnoringSafeArea(.all)
@@ -72,6 +73,9 @@ struct ContentView: View {
                         .background(Color(hex: "FF4B2F"))
                         .cornerRadius(8)
                 }
+
+                .padding(.horizontal)
+
                 .alert("로그인 실패", isPresented: $showAlert) {
                     Button("확인", role: .cancel) {}
                 } message: {
@@ -89,7 +93,9 @@ struct ContentView: View {
                 
                 Spacer()
             }
+
             .padding(.horizontal, 17)
+
             .fullScreenCover(isPresented: $showSignUp) {
                 Sign_in_Page(userViewModel: UserViewModel())
             }
@@ -105,8 +111,6 @@ struct ContentView: View {
     }
 }
 
-
-
 #Preview {
-    ContentView()
+   ContentView()
 }

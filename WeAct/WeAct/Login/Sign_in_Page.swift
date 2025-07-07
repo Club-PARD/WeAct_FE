@@ -179,10 +179,7 @@ struct Sign_in_Page: View {
                                 print("❌ 회원가입 실패: \(error.localizedDescription)")
                             }
                         }
-                        
-                        
-                        
-                        
+
                         showWelcome = true
                     }) {
                         Text("회원가입")
@@ -263,9 +260,4 @@ struct GenderButton: View {
                 .cornerRadius(8)
         }
     }
-}
-
-
-#Preview {
-    Sign_in_Page(userViewModel: UserViewModel())
 }

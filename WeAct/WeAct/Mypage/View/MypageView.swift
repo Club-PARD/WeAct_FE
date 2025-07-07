@@ -59,7 +59,7 @@ struct MypageView: View {
                        }else {
                             
                             Text("프로필\n사진")
-                                .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                               .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                         }
@@ -69,7 +69,7 @@ struct MypageView: View {
                     .padding(.bottom, 13)
                     
                     Text(userViewModel.user.userName)
-                        .font(Font.custom("Pretendard", size: 22).weight(.medium))
+                        .font(.custom("Pretendard-Medium", size: 22))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     
                     
@@ -78,13 +78,10 @@ struct MypageView: View {
                             userViewModel.changeProfileImage()
                         }) {
                             Text("프로필 사진 변경")
-                                .font(
-                                    Font.custom("Pretendard", size: 16)
-                                        .weight(.medium)
-                                )
+                                .font(.custom("Pretendard-Medium", size: 16))
                                 .foregroundColor(Color(red: 0.27, green: 0.27, blue: 0.27))
                         }
-                        .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(.white)
                         .frame(width: 146, height: 46)
                         .background(.white)
@@ -101,13 +98,10 @@ struct MypageView: View {
                             navigationPath.append(NavigationDestination.nameEdit)
                         }) {
                             Text("이름 변경")
-                                .font(
-                                    Font.custom("Pretendard", size: 16)
-                                        .weight(.medium)
-                                )
+                                .font(.custom("Pretendard-Medium", size: 16))
                                 .foregroundColor(Color(red: 0.27, green: 0.27, blue: 0.27))
                         }
-                        .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(.white)
                         .frame(width: 146, height: 46)
                         .background(.white)

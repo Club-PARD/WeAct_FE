@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 enum NotificationType: Identifiable {
 
     case groupInvite(sender: String, groupName: String)

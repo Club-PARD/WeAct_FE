@@ -50,25 +50,18 @@ struct NameEditView: View {
                         .onAppear {
                             editedName = userViewModel.user.userName
                         }
-                    
                 }
                 Spacer()
                 
                 Button(action: {
                     Task{
-                        
-                        
-                        //서버통신용
-                        //await userViewModel.saveNewName(editedName: editedName)
-                        
-                        
                         userViewModel.user.userName = editedName
                         //임시
                         navigationPath.append(NavigationDestination.myPage)
                     }
                 }) {
                     Text("저장하기")
-                        .font(Font.custom("Pretendard", size: 16).weight(.medium))
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(.white)
                 }
                 .foregroundColor(.white)
@@ -95,4 +88,3 @@ struct NameEditView: View {
     let userViewModel = UserViewModel()
     return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
 }
-

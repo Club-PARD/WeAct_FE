@@ -25,35 +25,39 @@ struct ContentView: View {
     }
     
     var body: some View {
-        ZStack
-        {
-            Color(hex: "#F7F7F7")
-            .ignoresSafeArea()
-            
-            VStack() {
+
+        ZStack {
+            Color(hex: "F7F7F7")
+                .edgesIgnoringSafeArea(.all)
+           
+            VStack {
                 Spacer()
                 
                 Image("logo")
                     .resizable()
-                    .frame(width: 148, height: 40)
+                    .scaledToFit()
+                    .frame(height: 40)
+                
                 Text("친구와 함께 하는 습관 형성 서비스")
-                    .foregroundColor(.gray)
-                    .font(.subheadline)
-                Spacer()
-                    .frame(height: 62)
+                    .font(.custom("Pretendard-Medium", size: 16))
+                    .foregroundColor(Color(hex: "464646"))
+                    .padding(.bottom, 62)
+                
+          
+                
                 TextField("아이디 입력", text: $userId)
                     .padding()
-                    .background(Color.white)
+                    .background(.white)
                     .cornerRadius(8)
-                    .padding(.horizontal)
                     .focused($focusedField, equals: .userId)
+                    .padding(.bottom, 12)
                 
                 SecureField("비밀번호 입력", text: $password)
                     .padding()
-                    .background(Color.white)
+                    .background(.white)
                     .cornerRadius(8)
-                    .padding(.horizontal)
                     .focused($focusedField, equals: .password)
+                    .padding(.bottom, 18)
                 
                 Button(action: {
                     if isFormValid {
@@ -69,7 +73,9 @@ struct ContentView: View {
                         .background(Color(hex: "FF4B2F"))
                         .cornerRadius(8)
                 }
+
                 .padding(.horizontal)
+
                 .alert("로그인 실패", isPresented: $showAlert) {
                     Button("확인", role: .cancel) {}
                 } message: {
@@ -87,7 +93,9 @@ struct ContentView: View {
                 
                 Spacer()
             }
-            .padding()
+
+            .padding(.horizontal, 17)
+
             .fullScreenCover(isPresented: $showSignUp) {
                 Sign_in_Page(userViewModel: UserViewModel())
             }
@@ -101,4 +109,10 @@ struct ContentView: View {
             }
         }
     }
+}
+
+
+
+#Preview {
+    ContentView()
 }

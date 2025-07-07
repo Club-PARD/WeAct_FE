@@ -91,8 +91,7 @@ struct CreateGroup: View {
                         }
                     }
                     .padding(.horizontal, 22)
-                    .padding(.vertical, 20)
-                    .frame(height: 44)
+                    .padding(.vertical, 14)
                     .background(Color.white)
                     .cornerRadius(8)
                     .overlay(

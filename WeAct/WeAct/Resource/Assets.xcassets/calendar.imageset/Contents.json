@@ -1,9 +1,7 @@
 {
   "images" : [
     {
-
-      "filename" : "logo.png",
-
+      "filename" : "calendar.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

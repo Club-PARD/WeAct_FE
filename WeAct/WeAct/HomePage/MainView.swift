@@ -3,7 +3,7 @@ import SwiftUI
 struct MainView: View {
     @StateObject private var groupStore = GroupStore()
     @State private var navigationPath = NavigationPath()
-    @ObservedObject var userViewModel: UserViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
     
     var body: some View {
@@ -143,9 +143,11 @@ struct MainView: View {
                     case .notification:
                         NotificationView(navigationPath: $navigationPath)
                     case .myPage:
-                        MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                        MypageView(navigationPath: $navigationPath)
+                            .environmentObject(userViewModel) 
                     case .nameEdit:
-                        NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                        NameEditView(navigationPath: $navigationPath)
+                            .environmentObject(userViewModel)
                     case .certification:
                         CertificationView()
                     case .setuphabit:
@@ -160,5 +162,6 @@ struct MainView: View {
 
 #Preview {
     let testUserModel = UserViewModel()
-    MainView(userViewModel: testUserModel)
+    return MainView()
+        .environmentObject(testUserModel)
 }

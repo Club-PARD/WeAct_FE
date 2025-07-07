@@ -29,14 +29,5 @@ struct UserModel: Codable {
         // localProfileImage는 제외함
     }
 
-    static let sampleUser = UserModel(
-        id : nil,
-        userId : nil,
-        pw : nil,
-        userName : "이주원",
-        gender : nil,
-        profileImageURL : nil,
-        localProfileImage : UIImage(named: "profile")
-    )
     
 }

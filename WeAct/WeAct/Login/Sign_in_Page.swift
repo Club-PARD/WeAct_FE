@@ -10,12 +10,7 @@ struct Sign_in_Page: View {
     @Environment(\.dismiss) var dismiss
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showWelcome = false
-    
-    @State private var name = ""
-    @State private var userId = ""
-    @State private var password = ""
     @State private var confirmPassword = ""
-    @State private var selectedGender: String? = nil
     
     // 상태 관리
     @State private var userIdError: String?
@@ -28,11 +23,11 @@ struct Sign_in_Page: View {
     // @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
     
     var isFormValid: Bool {
-        !name.isEmpty &&
+        !userViewModel.user.userName.isEmpty &&
         userIdError == nil &&
         passwordError == nil &&
         isUserIdChecked &&
-        selectedGender != nil
+        userViewModel.user.gender != nil
     }
     
     var body: some View {
@@ -61,101 +56,26 @@ struct Sign_in_Page: View {
                     // 이름
                     Group {
                         Text("이름")
-                        TextField("이름 입력", text: $name)
+                        TextField("이름 입력", text: $userViewModel.user.userName)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
                     }
                     
-                    // 아이디
-                    Group {
-                        Text("아이디")
-                        HStack {
-                            TextField("아이디 입력", text: $userId)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .onChange(of: userId) { newValue in
-                                    isUserIdCheckingEnabled = !newValue.isEmpty
-                                    isUserIdChecked = false
-                                    userIdError = nil
-                                    userIdStatus = nil
-                                }
-                            
-                            Button("중복 확인") {
-                                checkUserId()
-                            }
-                            .disabled(!isUserIdCheckingEnabled)
-                            .frame(width: 100)
-                            .padding()
-                            .background(isUserIdCheckingEnabled ? Color.init(hex: "#464646") : Color.gray.opacity(0.2))
-                            .foregroundColor(isUserIdCheckingEnabled ? .white : .gray)
-                            .cornerRadius(8)
-                        }
-                        
-                        if let error = userIdError {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        } else if let status = userIdStatus {
-                            Text(status)
-                                .font(.caption)
-                                .foregroundColor(.green)
-                        } else {
-                            Text("아이디 입력 조건 (ex. 4~12자 등)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
+                    //아이디
+                    userIdField
                     
-                    // 비밀번호
-                    Group {
-                        Text("비밀번호")
-
-                        SecureField("비밀번호 입력", text: $password)
-                            .padding()
-                            .background(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(passwordLengthError ? Color.red : Color.clear, lineWidth: 1)
-                            )
-                            .cornerRadius(8)
-                            .onChange(of: password) { _ in
-                                validatePassword()
-                            }
-                        
-                        SecureField("비밀번호 확인", text: $confirmPassword)
-                            .padding()
-                            .background(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(passwordMismatchError ? Color.red : Color.clear, lineWidth: 1)
-                            )
-                            .cornerRadius(8)
-                            .onChange(of: confirmPassword) { _ in
-                                validatePassword()
-                            }
-                        
-                        if let error = passwordError {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        } else {
-                            Text("비밀번호 입력 조건 (ex. 4~12자 등)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    
+                    //비밀번호
+                    passwordFields
                     // 성별
                     Group {
                         Text("성별")
                         HStack {
-                            GenderButton(title: "남자", isSelected: selectedGender == "남자") {
-                                selectedGender = "남자"
+                            GenderButton(title: "남자", isSelected: userViewModel.user.gender == "남자") {
+                                userViewModel.user.gender = "남자"
                             }
-                            GenderButton(title: "여자", isSelected: selectedGender == "여자") {
-                                selectedGender = "여자"
+                            GenderButton(title: "여자", isSelected: userViewModel.user.gender == "여자") {
+                                userViewModel.user.gender = "여자"
                             }
                         }
                     }
@@ -164,22 +84,17 @@ struct Sign_in_Page: View {
                     Button(action: {
                         //서버통신
                         Task {
-                            let newUser = UserModel(
-                                userId: userId,
-                                pw: password,
-                                userName: name,
-                                gender: selectedGender,
-                                profileImageURL: nil
-                            )
-
                             do {
-                                try await userViewModel.createUser(user: newUser)
+                                let response = try await userViewModel.createUser(user: userViewModel.user)
+                                userViewModel.user.id = response.id  // 🔑 서버에서 받은 id만 업데이트
+                                print("✅ 회원가입 성공")
+                                print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+                                print("🧠 ViewModel (회원가입 페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
                                 showWelcome = true
                             } catch {
                                 print("❌ 회원가입 실패: \(error.localizedDescription)")
                             }
                         }
-
                         showWelcome = true
                     }) {
                         Text("회원가입")
@@ -207,11 +122,13 @@ struct Sign_in_Page: View {
     // MARK: - 유효성 검사
     
     func checkUserId() {
-        if userId.count < 4 || userId.count > 12 {
+        guard let id = userViewModel.user.userId else { return }
+        
+        if id.count < 4 || id.count > 12 {
             userIdError = "아이디는 4~12자여야 해요"
             userIdStatus = nil
             isUserIdChecked = false
-        } else if userId.lowercased() == "2weeksone" {
+        } else if id.lowercased() == "2weeksone" {
             userIdError = "중복되는 아이디에요. 다시 시도 해주세요"
             userIdStatus = nil
             isUserIdChecked = false
@@ -222,10 +139,106 @@ struct Sign_in_Page: View {
         }
     }
     
+    
+    // 아이디
+    private var userIdField: some View {
+        Group {
+            Text("아이디")
+            HStack {
+                TextField("아이디 입력", text: Binding(
+                    get: { userViewModel.user.userId ?? "" },
+                    set: {
+                        userViewModel.user.userId = $0
+                        isUserIdCheckingEnabled = !$0.isEmpty
+                        isUserIdChecked = false
+                        userIdError = nil
+                        userIdStatus = nil
+                    }
+                ))
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+                
+                Button("중복 확인") {
+                    checkUserId()
+                }
+                .disabled(!isUserIdCheckingEnabled)
+                .frame(width: 100)
+                .padding()
+                .background(isUserIdCheckingEnabled ? Color.init(hex: "#464646") : Color.gray.opacity(0.2))
+                .foregroundColor(isUserIdCheckingEnabled ? .white : .gray)
+                .cornerRadius(8)
+            }//HStack
+            
+            if let error = userIdError {
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.red)
+            } else if let status = userIdStatus {
+                Text(status)
+                    .font(.caption)
+                    .foregroundColor(.green)
+            } else {
+                Text("아이디 입력 조건 (ex. 4~12자 등)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }//Group
+    }//userIdField
+    
+    
+    // 비밀번호
+    private var passwordFields: some View {
+        Group {
+            Text("비밀번호")
+            SecureField("비밀번호 입력", text: Binding(
+                get: { userViewModel.user.pw ?? "" },
+                set: {
+                    userViewModel.user.pw = $0
+                    validatePassword()
+                }
+            ))
+            .padding()
+            .background(Color.white)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(passwordLengthError ? Color.red : Color.clear, lineWidth: 1)
+            )
+            .cornerRadius(8)
+            //                            .onChange(of: password) { _ in
+            //                                validatePassword()
+            //                            }
+            
+            SecureField("비밀번호 확인", text: $confirmPassword)
+                .padding()
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(passwordMismatchError ? Color.red : Color.clear, lineWidth: 1)
+                )
+                .cornerRadius(8)
+                .onChange(of: confirmPassword) { _ in
+                    validatePassword()
+                }
+            
+            if let error = passwordError {
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.red)
+            } else {
+                Text("비밀번호 입력 조건 (ex. 4~12자 등)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+    }// passwordFields
+    
     func validatePassword() {
         passwordLengthError = false
         passwordMismatchError = false
 
+        guard let password = userViewModel.user.pw else { return }
+        
         if password.count < 4 || password.count > 12 {
             passwordError = "비밀번호는 4~12자여야 해요"
             passwordLengthError = true
@@ -261,4 +274,3 @@ struct GenderButton: View {
         }
     }
 }
-

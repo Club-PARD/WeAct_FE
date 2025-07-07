@@ -4,7 +4,7 @@ struct RootView: View {
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isFirstLaunch") private var isFirstLaunch = true
     @State private var showSplash = true
-    @StateObject private var userViewModel = UserViewModel()
+    @EnvironmentObject var userViewModel: UserViewModel
     
     var body: some View {
         ZStack {
@@ -12,7 +12,8 @@ struct RootView: View {
                 Splash()
             } else {
                 if isLoggedIn {
-                    MainView(userViewModel: userViewModel)
+                    MainView()
+                        .environmentObject(userViewModel)
                 } else {
                     if isFirstLaunch {
                         OnBoardingPage(isFirstLaunch: $isFirstLaunch)
@@ -29,9 +30,10 @@ struct RootView: View {
                 }
             }
         }
+        .environmentObject(userViewModel)
     }
 }
 
-#Preview {
-    RootView()
-}
+//#Preview {
+//    RootView()
+//}

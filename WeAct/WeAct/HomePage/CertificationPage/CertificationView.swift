@@ -13,11 +13,14 @@ struct CertificationView: View {
     @State private var image: UIImage? = nil
     @State private var showingImagePicker = false
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         ZStack {
             Text("습관인증하기")
-                .font(.body)
+                .font(
+                    Font.custom("Pretendard", size: 18)
+                        .weight(.medium)
+                )
                 .foregroundColor(.black)
 
             HStack {
@@ -35,9 +38,12 @@ struct CertificationView: View {
 
         VStack(alignment: .leading, spacing: 20) {
             Text("오늘은 어떻게 인증할까요?")
-                .font(.subheadline)
+                .font(
+                    Font.custom("Pretendard", size: 16)
+                        .weight(.medium)
+                )
                 .foregroundColor(.gray)
-            
+
             HStack(spacing: 10) {
                 Button(action: {
                     selectedOption = "인증할래요"
@@ -47,6 +53,10 @@ struct CertificationView: View {
                         .padding()
                         .background(selectedOption == "인증할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
                         .cornerRadius(8)
+                        .font(
+                            Font.custom("Pretendard", size: 16)
+                                .weight(.medium)
+                        )
                 }
 
                 Button(action: {
@@ -57,12 +67,19 @@ struct CertificationView: View {
                         .padding()
                         .background(selectedOption == "해명할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
                         .cornerRadius(8)
+                        .font(
+                            Font.custom("Pretendard", size: 16)
+                                .weight(.medium)
+                        )
                 }
             }
 
             VStack(alignment: .leading) {
                 Text(selectedOption == "인증할래요" ? "한 마디를 작성해주세요" : "친구에게 해명 한마디를 전해주세요")
-                    .font(.subheadline)
+                    .font(
+                        Font.custom("Pretendard", size: 16)
+                            .weight(.medium)
+                    )
                     .foregroundColor(.gray)
 
                 ZStack {
@@ -82,7 +99,10 @@ struct CertificationView: View {
                             Text("/15")
                                 .foregroundColor(.gray)
                         )
-                        .font(.caption)
+                        .font(
+                            Font.custom("Pretendard", size: 14)
+                                .weight(.medium)
+                        )
                         .padding(.trailing, 22)
                     }
                     .padding(.horizontal, 12)
@@ -91,7 +111,10 @@ struct CertificationView: View {
 
             VStack(alignment: .leading, spacing: 17) {
                 Text("인증 사진을 등록해주세요")
-                    .font(.subheadline)
+                    .font(
+                        Font.custom("Pretendard", size: 16)
+                            .weight(.medium)
+                    )
                     .foregroundColor(.gray)
 
                 HStack {
@@ -124,8 +147,8 @@ struct CertificationView: View {
                     Spacer()
                 }
             }
-            .opacity(selectedOption == "인증할래요" ? 1 : 0)  // ✅ 안 보이게만, 공간 유지
-            .allowsHitTesting(selectedOption == "인증할래요")  // ✅ 터치 막기
+            .opacity(selectedOption == "인증할래요" ? 1 : 0)
+            .allowsHitTesting(selectedOption == "인증할래요")
 
             Spacer().frame(height: 73)
 
@@ -138,6 +161,10 @@ struct CertificationView: View {
                     .padding()
                     .background(Color(hex: "FF4B2F"))
                     .cornerRadius(10)
+                    .font(
+                        Font.custom("Pretendard", size: 18)
+                            .weight(.medium)
+                    )
             }
         }
         .padding()

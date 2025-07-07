@@ -10,11 +10,14 @@ import Photos
 struct CelebratePage: View {
     @Environment(\.dismiss) var dismiss
     @State private var showToast = false
-    @State private var imageToSave: UIImage?
     @Binding var path: NavigationPath
+
+    // ✅ 저장 & 표시 둘 다에 동일한 뷰 사용
+    @State private var captureContent = CelebrateCardContent()
+
     var body: some View {
         ZStack {
-            // ✅ 배경 이미지 → SafeArea 무시 (전체 화면 덮기)
+            // ✅ 배경 이미지 → SafeArea 무시
             Image("result_Back")
                 .resizable()
                 .scaledToFill()
@@ -32,63 +35,31 @@ struct CelebratePage: View {
                                 .foregroundColor(.white)
                                 .padding(.top)
                         }
-                        
-                        Spacer(minLength: 30)  // ✅ 여기서 최소 간격 조절 가능
-                        
+
+                        Spacer(minLength: 30)
+
                         Text("자랑하기")
                             .foregroundColor(.white)
                             .font(.headline)
                             .padding(.top)
-                        
-                        Spacer()  // 나머지 공간 다 차지 → 오른쪽 정렬 맞춤
+
+                        Spacer()
                     }
                     .padding(.top)
                     .padding(.horizontal)
                 }
 
                 Spacer().frame(height: 94)
-                
-                
-                // 캡처 대상
+
+                // ✅ 캡처 대상 (실제 화면 표시)
                 CaptureArea {
-                    VStack(spacing: 16) {
-                        // 일러스트
-                        Image("result_rank1").resizable().frame(width: 276, height:  228)
-                        
-                        Text("이주원")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Divider()
-                        
-                        VStack(spacing: 8) {
-                            HStack {
-                                LabelBox(title: "방 명")
-                                Spacer()
-                                Text("롱커톤 모여라")
-                                    .font(.caption)
-                            }
-                            HStack {
-                                LabelBox(title: "기 간")
-                                Spacer()
-                                Text("2025.6.3 - 6.9")
-                                    .font(.caption)
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        Spacer(minLength: 0)
-                        
-                        Image("logo").resizable().frame(width: 90, height: 30)
-                    }
-                    .padding()
-                    .frame(width: 280)
-                    .background(Color.white)
-                    .cornerRadius(24)
+                    captureContent
                 }
-                .frame(height: 380) // 캡처 대상 크기
+                .frame(height: 380)
+
                 Spacer()
-                // 저장 버튼
+
+                // ✅ 저장 버튼
                 Button(action: {
                     saveCaptureToPhotos()
                 }) {
@@ -96,10 +67,10 @@ struct CelebratePage: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 32)
                         .padding(.vertical, 12)
-                        .background(Color(.blue))
+                        .background(Color.blue)
                         .clipShape(Capsule())
                 }
-                
+
                 Spacer()
             }
 
@@ -126,12 +97,10 @@ struct CelebratePage: View {
         .navigationBarBackButtonHidden(true)
     }
 
-    // MARK: - 이미지 저장 함수
+    // ✅ 이미지 저장 함수 (화면에 보인 뷰 그대로 저장)
     func saveCaptureToPhotos() {
-        // capture 대상 뷰를 이미지로 변환
-        let renderer = ImageRenderer(content: CaptureArea {
-            CelebrateCardContent()
-        })
+        let renderer = ImageRenderer(content: captureContent)
+        renderer.scale = 20.0
         if let uiImage = renderer.uiImage {
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             showToast = true
@@ -142,19 +111,14 @@ struct CelebratePage: View {
     }
 }
 
-// MARK: - 캡처 대상 콘텐츠 따로 분리
+// ✅ 캡처 대상 뷰
 struct CelebrateCardContent: View {
     var body: some View {
         VStack(spacing: 16) {
-            Text("습관 랭킹 1등")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.top, 16)
-
-            Circle()
-                .fill(Color(.systemGray4))
-                .frame(width: 100, height: 100)
-                .overlay(Text("일러스트 svg").font(.caption).foregroundColor(.gray))
+            // ✅ 일러스트
+            Image("result_rank1")
+                .resizable()
+                .frame(width: 276, height: 228)
 
             Text("이주원")
                 .font(.title2)
@@ -180,10 +144,9 @@ struct CelebrateCardContent: View {
 
             Spacer(minLength: 0)
 
-            Text("앱 로고")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.bottom, 16)
+            Image("logo")
+                .resizable()
+                .frame(width: 90, height: 30)
         }
         .padding()
         .frame(width: 280)
@@ -192,7 +155,6 @@ struct CelebrateCardContent: View {
     }
 }
 
-// MARK: - 캡처용 컨테이너 뷰
 struct CaptureArea<Content: View>: View {
     let content: () -> Content
     var body: some View {
@@ -200,7 +162,6 @@ struct CaptureArea<Content: View>: View {
     }
 }
 
-// MARK: - 라벨 박스
 struct LabelBox: View {
     let title: String
     var body: some View {
@@ -212,6 +173,3 @@ struct LabelBox: View {
             .cornerRadius(6)
     }
 }
-
-
-

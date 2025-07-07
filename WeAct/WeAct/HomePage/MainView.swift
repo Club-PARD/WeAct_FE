@@ -15,7 +15,7 @@ struct MainView: View {
                 VStack(alignment: .leading) {
                     
                     HStack {
-                        Text("로고")
+                        Image("logo").resizable().frame(width:90, height: 30)
                         Spacer()
                         Button {
                             navigationPath.append(NavigationDestination.notification)

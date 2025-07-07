@@ -10,8 +10,7 @@ import SwiftUI
 struct NameEditView: View {
     // 새로 입력한 이름
     @Binding var navigationPath: NavigationPath
-    //@ObservedObject var userModel: UserModel
-    @ObservedObject var userViewModel: UserViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
     // 이름이 변경되었고 공백이 아닌지 확인
     @State private var editedName: String = ""
 
@@ -83,8 +82,8 @@ struct NameEditView: View {
     }
 }
 
-#Preview {
-    @State var path = NavigationPath()
-    let userViewModel = UserViewModel()
-    return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
-}
+//#Preview {
+//    @State var path = NavigationPath()
+//    let userViewModel = UserViewModel()
+//    return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
+//}

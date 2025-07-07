@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddPartner: View {
     @ObservedObject var groupStore: GroupStore
+    @EnvironmentObject var userViewModel: UserViewModel
     @Binding var navigationPath: NavigationPath
     @State private var selectedPartners: Set<PartnerModel> = []
     @State private var showingBottomSheet = false
@@ -59,6 +60,7 @@ struct AddPartner: View {
             .sheet(isPresented: $showingBottomSheet) {
                 PartnerSearchSheet(selectedPartners: $selectedPartners)
                     .presentationDetents([.height(UIScreen.main.bounds.height * 0.576)])
+                    .environmentObject(userViewModel) 
             }
             
         }
@@ -117,14 +119,28 @@ struct AddPartner: View {
     
     private var myProfileView: some View {
         VStack(spacing: 7) {
-            Image("myprofile")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 70)
-            
-            Text("나")
-                .font(.custom("Pretendard-Medium", size: 14))
-                .foregroundColor(Color(hex: "464646"))
+            AsyncImage(url: URL(string: userViewModel.user.profileImageURL ?? "")) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 70, height: 70)
+                    .clipShape(Circle())
+            } placeholder: {
+                Image("myprofile") // 기본 이미지
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 70)
+            }
+       
+            if let userId = userViewModel.user.userId {
+                Text(userId)
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .foregroundColor(Color(hex: "464646"))
+            } else {
+                Text("나")
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .foregroundColor(Color(hex: "464646"))
+            }
         }
     }
     
@@ -189,9 +205,11 @@ struct AddPartner: View {
         print("선택된 파트너: \(selectedPartners)")
         
         //서버통신 request 관련 코드
+        guard let creatorId = userViewModel.user.id else {
+           print("❌ 유저 ID 없음 - 방 생성 불가")
+           return
+       }
         let invitedIds = selectedPartners.map { $0.id }
-        let creatorId = 1 // TODO: 실제 로그인된 사용자 ID 사용
-
         let formatter = ISO8601DateFormatter()
            formatter.formatOptions = [.withInternetDateTime]
 
@@ -242,8 +260,8 @@ struct AddPartner: View {
     }
 }
 
-#Preview {
-    @State var path = NavigationPath()
-    let groupStore = GroupStore()
-    AddPartner(groupStore: groupStore, navigationPath: .constant(path))
-}
+//#Preview {
+//    @State var path = NavigationPath()
+//    let groupStore = GroupStore()
+//    AddPartner(groupStore: groupStore, navigationPath: .constant(path))
+//}

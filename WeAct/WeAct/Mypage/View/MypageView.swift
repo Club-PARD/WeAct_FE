@@ -10,24 +10,24 @@ import SwiftUI
 
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
-    @ObservedObject var userViewModel: UserViewModel
-    
-    //@State private var isShowingImagePicker = false
+    @EnvironmentObject var userViewModel: UserViewModel
+
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     
     private var customBackButton: some View {
-            Button(action: {
-                if !navigationPath.isEmpty {
-                    navigationPath.removeLast()
-                }
-            }) {
-                Image(systemName: "chevron.left")
-                    .frame(width: 12, height: 21)
-                    .foregroundColor(.black)
+        Button(action: {
+            if !navigationPath.isEmpty {
+                navigationPath.removeLast()
             }
+        }) {
+            Image(systemName: "chevron.left")
+                .frame(width: 12, height: 21)
+                .foregroundColor(.black)
         }
-    
+    }
+  
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -57,7 +57,7 @@ struct MypageView: View {
                                .clipped()
                                .cornerRadius(20)
                        }else {
-                            
+//                            
                             Text("프로필\n사진")
                                .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)
@@ -180,6 +180,11 @@ struct MypageView: View {
                 
             }//ZStack
         }//NavigationView
+        .onAppear {
+            print("📍 MypageView 진입")
+            print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
+            print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+        }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("마이페이지")
@@ -187,8 +192,3 @@ struct MypageView: View {
     }
 }
 
-#Preview {
-    @State var path = NavigationPath()
-    let userViewModel = UserViewModel()  // userModel -> userViewModel
-    MypageView(navigationPath: .constant(path), userViewModel: userViewModel)
-}

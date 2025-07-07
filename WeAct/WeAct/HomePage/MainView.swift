@@ -4,7 +4,7 @@ struct MainView: View {
     @StateObject private var groupStore = GroupStore()
     @State private var homeGroups: [HomeGroupModel] = []
     @State private var navigationPath = NavigationPath()
-    @ObservedObject var userViewModel: UserViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
     
     
@@ -150,16 +150,20 @@ struct MainView: View {
                     switch destination {
                     case .createGroup:
                         CreateGroup(groupStore: groupStore, navigationPath: $navigationPath)
+                            .environmentObject(userViewModel)
                     case .addPartner:
                         AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
+                            .environmentObject(userViewModel) 
                     case .groupBoard(let group):
                         GroupDetailBoard(navigationPath: $navigationPath, groupResponse: nil, group: group, groupStore: groupStore)
                     case .notification:
                         NotificationView(navigationPath: $navigationPath)
                     case .myPage:
-                        MypageView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                        MypageView(navigationPath: $navigationPath)
+                            .environmentObject(userViewModel) 
                     case .nameEdit:
-                        NameEditView(navigationPath: $navigationPath, userViewModel: userViewModel)
+                        NameEditView(navigationPath: $navigationPath)
+                            .environmentObject(userViewModel)
                     case .certification:
                         CertificationView()
                     case .setuphabit:
@@ -204,5 +208,6 @@ struct MainView: View {
 
 #Preview {
     let testUserModel = UserViewModel()
-    MainView(userViewModel: testUserModel)
+    return MainView()
+        .environmentObject(testUserModel)
 }

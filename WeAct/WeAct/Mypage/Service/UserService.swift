@@ -8,31 +8,39 @@
 import SwiftUI
 import Foundation
 
+// MARK: user-post response
+struct PartialUserResponse: Codable {
+    let id: Int
+    let userId: String
+}
+
 class UserService {
     
-    // POST: 사용자 정보 생성
-       func createUser(user: UserModel) async throws {
-           guard let url = URL(string: "https://naruto.asia/user/") else {
-               throw URLError(.badURL)
-           }
-           
-           var request = URLRequest(url: url)
-           request.httpMethod = "POST"  // ✅ POST 방식
-           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-           
-           // JSON 데이터로 변환
-           let encoder = JSONEncoder()
-           request.httpBody = try encoder.encode(user)
-           
-           let (_, response) = try await URLSession.shared.data(for: request)
-           
-           guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
-               throw NSError(domain: "", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create user"])
-           }
-           
-           print("✅ 사용자 정보가 성공적으로 전송되었습니다.")
-       }
-    
+    // 사용자 정보 생성
+    func createUser(user: UserModel) async throws -> PartialUserResponse {
+        guard let url = URL(string: "https://naruto.asia/user/") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let encoder = JSONEncoder()
+        request.httpBody = try encoder.encode(user)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
+            throw NSError(domain: "", code: 1, userInfo: [NSLocalizedDescriptionKey: "❌ 사용자 생성 실패"])
+        }
+
+        let partialUser = try JSONDecoder().decode(PartialUserResponse.self, from: data)
+        print("✅ 서버 응답 디코딩 성공: \(partialUser)")
+        return partialUser
+    }
+
+
     
     // GET: 사용자 데이터 가져오기
     func fetchUsers() async throws -> [UserModel] {

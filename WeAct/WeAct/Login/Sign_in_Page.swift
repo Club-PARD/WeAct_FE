@@ -261,8 +261,3 @@ struct GenderButton: View {
         }
     }
 }
-
-
-#Preview {
-    Sign_in_Page(userViewModel: UserViewModel())
-}

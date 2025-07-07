@@ -25,10 +25,12 @@ struct FinalResultButton: View {
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 24)
-                    .background(Color(.darkGray))
                     .clipShape(Capsule())
                 }
+                .background(Color(hex: "FF4B2F"))
+                .cornerRadius(30)
             }
+
             .navigationDestination(for: String.self) { value in
                 if value == "final" {
                     FinalResultPage_Rank1(path: $path)

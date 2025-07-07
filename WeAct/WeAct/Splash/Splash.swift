@@ -5,9 +5,10 @@ struct Splash: View {
         ZStack {
             Color(hex: "FF4B2F")
                 .edgesIgnoringSafeArea(.all)
-            Image(systemName: "globe")
-                .font(.system(size: 100))
-                .foregroundColor(.white)
+            
+            Image("splash")
+                .resizable()
+                .frame(width:180, height: 100)
         }
     }
 }

@@ -136,8 +136,10 @@ struct MainView: View {
                     switch destination {
                     case .createGroup:
                         CreateGroup(groupStore: groupStore, navigationPath: $navigationPath)
+                            .environmentObject(userViewModel)
                     case .addPartner:
                         AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
+                            .environmentObject(userViewModel) 
                     case .groupBoard(let group):
                         GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
                     case .notification:

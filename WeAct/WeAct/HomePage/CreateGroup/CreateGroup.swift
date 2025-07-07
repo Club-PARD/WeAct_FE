@@ -10,6 +10,7 @@ import SwiftUI
 struct CreateGroup: View {
     @ObservedObject var groupStore: GroupStore
     @Binding var navigationPath: NavigationPath
+    @EnvironmentObject var userViewModel: UserViewModel
     
     @State private var name = ""
     @State private var reward = ""
@@ -326,9 +327,8 @@ class CreateGroupData: ObservableObject {
     @Published var selectedDaysCount: Int = 0
     @Published var habitText: String = ""
     @Published var startDate: Date = Date()
-   @Published var endDate: Date = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+    @Published var endDate: Date = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
 
-    
     private init() {}
     
     func reset() {
@@ -343,8 +343,8 @@ class CreateGroupData: ObservableObject {
     }
 }
 
-#Preview {
-    @State var path = NavigationPath()
-    let groupStore = GroupStore()
-    CreateGroup(groupStore: groupStore, navigationPath: .constant(path))
-}
+//#Preview {
+//    @State var path = NavigationPath()
+//    let groupStore = GroupStore()
+//    CreateGroup(groupStore: groupStore, navigationPath: .constant(path))
+//}

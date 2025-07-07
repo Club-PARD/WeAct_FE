@@ -11,6 +11,7 @@ import SwiftUI
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var userViewModel: UserViewModel
+
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     

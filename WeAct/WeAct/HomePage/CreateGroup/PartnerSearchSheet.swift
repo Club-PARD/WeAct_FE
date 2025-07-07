@@ -12,6 +12,7 @@ struct PartnerSearchSheet: View {
     @Binding var selectedPartners: Set<PartnerModel>
     @StateObject private var viewModel = UserSearchViewModel()
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var searchText = ""
 
     var body: some View {

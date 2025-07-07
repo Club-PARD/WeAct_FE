@@ -9,11 +9,13 @@ import SwiftUI
 
 @main
 struct WeActApp: App {
+    @StateObject var userViewModel = UserViewModel()
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 RootView()
-                //CertificationView()
+                    .environmentObject(userViewModel)
             }
         }
     }

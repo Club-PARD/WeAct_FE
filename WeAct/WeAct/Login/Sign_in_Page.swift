@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct Sign_in_Page: View {
-    @ObservedObject var userViewModel: UserViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
     @Environment(\.dismiss) var dismiss
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showWelcome = false
@@ -261,3 +261,4 @@ struct GenderButton: View {
         }
     }
 }
+

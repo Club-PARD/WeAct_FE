@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		4D823B172E180EF300E1FECE /* WeAct-Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4D823AF72E180EF000E1FECE /* WeAct-Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		4D153EF32E126A5D00AFA2BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -25,27 +21,6 @@
 			remoteGlobalIDString = 4D153EE42E126A5700AFA2BF;
 			remoteInfo = WeAct;
 		};
-		4D823B042E180EF300E1FECE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4D153EDD2E126A5700AFA2BF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4D823AF62E180EF000E1FECE;
-			remoteInfo = "WeAct-Watch Watch App";
-		};
-		4D823B0E2E180EF300E1FECE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4D153EDD2E126A5700AFA2BF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4D823AF62E180EF000E1FECE;
-			remoteInfo = "WeAct-Watch Watch App";
-		};
-		4D823B152E180EF300E1FECE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4D153EDD2E126A5700AFA2BF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4D823AF62E180EF000E1FECE;
-			remoteInfo = "WeAct-Watch Watch App";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,7 +30,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				4D823B172E180EF300E1FECE /* WeAct-Watch Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -66,19 +40,9 @@
 		4D153EE52E126A5700AFA2BF /* WeAct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeAct.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D153EF22E126A5D00AFA2BF /* WeActTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeActTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D153EFC2E126A5D00AFA2BF /* WeActUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeActUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D823AF72E180EF000E1FECE /* WeAct-Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WeAct-Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D823B032E180EF300E1FECE /* WeAct-Watch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WeAct-Watch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D823B0D2E180EF300E1FECE /* WeAct-Watch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WeAct-Watch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4D823B242E1812E800E1FECE /* Exceptions for "WeAct-Watch Watch App" folder in "WeAct-Watch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				scheduleNotification.swift,
-			);
-			target = 4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */;
-		};
 		510606722E164D19000C37B9 /* Exceptions for "WeAct" folder in "WeAct" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -87,16 +51,6 @@
 			target = 4D153EE42E126A5700AFA2BF /* WeAct */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		4D823B252E1812E800E1FECE /* Exceptions for "WeAct-Watch Watch App" folder in "Copy Bundle Resources" phase from "WeAct-Watch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 4D823AF52E180EF000E1FECE /* Resources */;
-			membershipExceptions = (
-				scheduleNotification.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D153EF52E126A5D00AFA2BF /* WeActTests */ = {
@@ -107,25 +61,6 @@
 		4D153EFF2E126A5D00AFA2BF /* WeActUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = WeActUITests;
-			sourceTree = "<group>";
-		};
-		4D823AF82E180EF000E1FECE /* WeAct-Watch Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				4D823B242E1812E800E1FECE /* Exceptions for "WeAct-Watch Watch App" folder in "WeAct-Watch Watch App" target */,
-				4D823B252E1812E800E1FECE /* Exceptions for "WeAct-Watch Watch App" folder in "Copy Bundle Resources" phase from "WeAct-Watch Watch App" target */,
-			);
-			path = "WeAct-Watch Watch App";
-			sourceTree = "<group>";
-		};
-		4D823B062E180EF300E1FECE /* WeAct-Watch Watch AppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "WeAct-Watch Watch AppTests";
-			sourceTree = "<group>";
-		};
-		4D823B102E180EF300E1FECE /* WeAct-Watch Watch AppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "WeAct-Watch Watch AppUITests";
 			sourceTree = "<group>";
 		};
 		E52F3F3A2E12714900B2E885 /* WeAct */ = {
@@ -160,27 +95,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4D823AF42E180EF000E1FECE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823B002E180EF300E1FECE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823B0A2E180EF300E1FECE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -190,9 +104,6 @@
 				E52F3F3A2E12714900B2E885 /* WeAct */,
 				4D153EF52E126A5D00AFA2BF /* WeActTests */,
 				4D153EFF2E126A5D00AFA2BF /* WeActUITests */,
-				4D823AF82E180EF000E1FECE /* WeAct-Watch Watch App */,
-				4D823B062E180EF300E1FECE /* WeAct-Watch Watch AppTests */,
-				4D823B102E180EF300E1FECE /* WeAct-Watch Watch AppUITests */,
 				4D153EE62E126A5700AFA2BF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -203,9 +114,6 @@
 				4D153EE52E126A5700AFA2BF /* WeAct.app */,
 				4D153EF22E126A5D00AFA2BF /* WeActTests.xctest */,
 				4D153EFC2E126A5D00AFA2BF /* WeActUITests.xctest */,
-				4D823AF72E180EF000E1FECE /* WeAct-Watch Watch App.app */,
-				4D823B032E180EF300E1FECE /* WeAct-Watch Watch AppTests.xctest */,
-				4D823B0D2E180EF300E1FECE /* WeAct-Watch Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -225,7 +133,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				4D823B162E180EF300E1FECE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E52F3F3A2E12714900B2E885 /* WeAct */,
@@ -283,74 +190,6 @@
 			productReference = 4D153EFC2E126A5D00AFA2BF /* WeActUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4D823B182E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch App" */;
-			buildPhases = (
-				4D823AF32E180EF000E1FECE /* Sources */,
-				4D823AF42E180EF000E1FECE /* Frameworks */,
-				4D823AF52E180EF000E1FECE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				4D823AF82E180EF000E1FECE /* WeAct-Watch Watch App */,
-			);
-			name = "WeAct-Watch Watch App";
-			packageProductDependencies = (
-			);
-			productName = "WeAct-Watch Watch App";
-			productReference = 4D823AF72E180EF000E1FECE /* WeAct-Watch Watch App.app */;
-			productType = "com.apple.product-type.application";
-		};
-		4D823B022E180EF300E1FECE /* WeAct-Watch Watch AppTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4D823B1C2E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch AppTests" */;
-			buildPhases = (
-				4D823AFF2E180EF300E1FECE /* Sources */,
-				4D823B002E180EF300E1FECE /* Frameworks */,
-				4D823B012E180EF300E1FECE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4D823B052E180EF300E1FECE /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4D823B062E180EF300E1FECE /* WeAct-Watch Watch AppTests */,
-			);
-			name = "WeAct-Watch Watch AppTests";
-			packageProductDependencies = (
-			);
-			productName = "WeAct-Watch Watch AppTests";
-			productReference = 4D823B032E180EF300E1FECE /* WeAct-Watch Watch AppTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		4D823B0C2E180EF300E1FECE /* WeAct-Watch Watch AppUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4D823B1F2E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch AppUITests" */;
-			buildPhases = (
-				4D823B092E180EF300E1FECE /* Sources */,
-				4D823B0A2E180EF300E1FECE /* Frameworks */,
-				4D823B0B2E180EF300E1FECE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4D823B0F2E180EF300E1FECE /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4D823B102E180EF300E1FECE /* WeAct-Watch Watch AppUITests */,
-			);
-			name = "WeAct-Watch Watch AppUITests";
-			packageProductDependencies = (
-			);
-			productName = "WeAct-Watch Watch AppUITests";
-			productReference = 4D823B0D2E180EF300E1FECE /* WeAct-Watch Watch AppUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -372,17 +211,6 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 4D153EE42E126A5700AFA2BF;
 					};
-					4D823AF62E180EF000E1FECE = {
-						CreatedOnToolsVersion = 16.4;
-					};
-					4D823B022E180EF300E1FECE = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 4D823AF62E180EF000E1FECE;
-					};
-					4D823B0C2E180EF300E1FECE = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 4D823AF62E180EF000E1FECE;
-					};
 				};
 			};
 			buildConfigurationList = 4D153EE02E126A5700AFA2BF /* Build configuration list for PBXProject "WeAct" */;
@@ -402,9 +230,6 @@
 				4D153EE42E126A5700AFA2BF /* WeAct */,
 				4D153EF12E126A5D00AFA2BF /* WeActTests */,
 				4D153EFB2E126A5D00AFA2BF /* WeActUITests */,
-				4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */,
-				4D823B022E180EF300E1FECE /* WeAct-Watch Watch AppTests */,
-				4D823B0C2E180EF300E1FECE /* WeAct-Watch Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -425,27 +250,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4D153EFA2E126A5D00AFA2BF /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823AF52E180EF000E1FECE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823B012E180EF300E1FECE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823B0B2E180EF300E1FECE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -476,27 +280,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4D823AF32E180EF000E1FECE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823AFF2E180EF300E1FECE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D823B092E180EF300E1FECE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -509,21 +292,6 @@
 			isa = PBXTargetDependency;
 			target = 4D153EE42E126A5700AFA2BF /* WeAct */;
 			targetProxy = 4D153EFD2E126A5D00AFA2BF /* PBXContainerItemProxy */;
-		};
-		4D823B052E180EF300E1FECE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */;
-			targetProxy = 4D823B042E180EF300E1FECE /* PBXContainerItemProxy */;
-		};
-		4D823B0F2E180EF300E1FECE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */;
-			targetProxy = 4D823B0E2E180EF300E1FECE /* PBXContainerItemProxy */;
-		};
-		4D823B162E180EF300E1FECE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4D823AF62E180EF000E1FECE /* WeAct-Watch Watch App */;
-			targetProxy = 4D823B152E180EF300E1FECE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -675,7 +443,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -705,7 +473,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -781,144 +549,6 @@
 			};
 			name = Release;
 		};
-		4D823B192E180EF300E1FECE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "WeAct-Watch";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Seunghun.WeAct;
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Seunghun.WeAct.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 11.0;
-			};
-			name = Debug;
-		};
-		4D823B1A2E180EF300E1FECE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "WeAct-Watch";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Seunghun.WeAct;
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Seunghun.WeAct.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 11.0;
-			};
-			name = Release;
-		};
-		4D823B1D2E180EF300E1FECE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Seunghun.WeAct-Watch-Watch-AppTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WeAct-Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WeAct-Watch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 11.5;
-			};
-			name = Debug;
-		};
-		4D823B1E2E180EF300E1FECE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Seunghun.WeAct-Watch-Watch-AppTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WeAct-Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WeAct-Watch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 11.5;
-			};
-			name = Release;
-		};
-		4D823B202E180EF300E1FECE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Seunghun.WeAct-Watch-Watch-AppUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "WeAct-Watch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 11.5;
-			};
-			name = Debug;
-		};
-		4D823B212E180EF300E1FECE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BS6FMWVMX4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Seunghun.WeAct-Watch-Watch-AppUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "WeAct-Watch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 11.5;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -954,33 +584,6 @@
 			buildConfigurations = (
 				4D153F0D2E126A5D00AFA2BF /* Debug */,
 				4D153F0E2E126A5D00AFA2BF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4D823B182E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D823B192E180EF300E1FECE /* Debug */,
-				4D823B1A2E180EF300E1FECE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4D823B1C2E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch AppTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D823B1D2E180EF300E1FECE /* Debug */,
-				4D823B1E2E180EF300E1FECE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4D823B1F2E180EF300E1FECE /* Build configuration list for PBXNativeTarget "WeAct-Watch Watch AppUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D823B202E180EF300E1FECE /* Debug */,
-				4D823B212E180EF300E1FECE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

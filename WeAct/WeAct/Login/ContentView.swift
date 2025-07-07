@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var showSignUp = false
     @State private var showAlert = false  // ✅ 경고 팝업 상태 추가
     
@@ -97,7 +98,7 @@ struct ContentView: View {
             .padding(.horizontal, 17)
 
             .fullScreenCover(isPresented: $showSignUp) {
-                Sign_in_Page(userViewModel: UserViewModel())
+                Sign_in_Page().environmentObject(userViewModel)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {

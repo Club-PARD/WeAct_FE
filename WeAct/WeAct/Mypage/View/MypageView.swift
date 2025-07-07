@@ -10,9 +10,7 @@ import SwiftUI
 
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
-    @ObservedObject var userViewModel: UserViewModel
-    
-    //@State private var isShowingImagePicker = false
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     
@@ -189,6 +187,8 @@ struct MypageView: View {
 
 #Preview {
     @State var path = NavigationPath()
-    let userViewModel = UserViewModel()  // userModel -> userViewModel
-    MypageView(navigationPath: .constant(path), userViewModel: userViewModel)
+    let userViewModel = UserViewModel()
+    
+    MypageView(navigationPath: .constant(path))
+        .environmentObject(userViewModel)
 }

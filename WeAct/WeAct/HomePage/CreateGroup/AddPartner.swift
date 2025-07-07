@@ -204,18 +204,21 @@ struct AddPartner: View {
            startDate: startDateString,
            endDate: endDateString,
            reward: CreateGroupData.shared.reward,
+           days: CreateGroupData.shared.selectedDaysString,
            dayCountByWeek: CreateGroupData.shared.selectedDaysCount,
            creatorId: creatorId
         )
 
         Task {
             do {
-                try await GroupService.shared.createGroup(request: request)
+                let response = try await GroupService.shared.createGroup(request: request)
                 print("✅ 서버에 그룹 생성 성공")
                 // 새로운 그룹 생성
                 let newGroup = GroupModel(
+                    id: response.roomId,
                     name: CreateGroupData.shared.name,
-                    period: CreateGroupData.shared.period,
+                    startDate: CreateGroupData.shared.startDate,
+                                           endDate: CreateGroupData.shared.endDate,
                     reward: CreateGroupData.shared.reward,
                     partners: selectedPartners.map { $0.name },
                     selectedDaysString: CreateGroupData.shared.selectedDaysString,

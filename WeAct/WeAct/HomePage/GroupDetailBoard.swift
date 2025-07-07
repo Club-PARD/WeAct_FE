@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GroupDetailBoard: View {
     @Binding var navigationPath: NavigationPath
+    let groupResponse: GroupResponse?
     let group: GroupModel
     @ObservedObject var groupStore: GroupStore
     @State var presentSideMenu = false
@@ -57,7 +58,7 @@ struct GroupDetailBoard: View {
     private var isCurrentDateInRange: Bool {
         let calendar = Calendar.current
         return calendar.compare(currentDate, to: groupStartDate, toGranularity: .day) != .orderedAscending &&
-               calendar.compare(currentDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
+        calendar.compare(currentDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
     }
     
     // 이전 날짜로 갈 수 있는지 확인
@@ -181,7 +182,7 @@ struct GroupDetailBoard: View {
                             .background(Color(hex: "F7F7F7"))
                             .cornerRadius(6)
                         
-                        Text(group.selectedDaysString.joined(separator: ", "))
+                        Text(group.selectedDaysString.toDisplayDays())
                             .font(.system(size: 14))
                             .foregroundColor(Color(hex: "464646"))
                     }
@@ -293,7 +294,7 @@ struct GroupDetailBoard: View {
                     
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
@@ -309,19 +310,9 @@ struct GroupDetailBoard: View {
     }
 }
 
-#Preview {
-    @State var path = NavigationPath()
-    let groupStore = GroupStore()
-    
-    let group = GroupModel(
-        name: "아침 운동 챌린지",
-        period: "2024.07.01 - 2024.07.31",
-        reward: "스타벅스 기프티콘",
-        partners: ["김철수", "이영희", "박민수", "최수진", "정다은", "홍길동"],
-        selectedDaysString: ["월", "수", "금"],
-        selectedDaysCount: 3,
-        habitText: "매일 아침 스트레칭"
-    )
-    
-    GroupDetailBoard(navigationPath: .constant(path), group: group, groupStore: groupStore)
+extension String {
+    // "월화수" -> "월, 화, 수"
+    func toDisplayDays() -> String {
+        return self.map { String($0) }.joined(separator: ", ")
+    }
 }

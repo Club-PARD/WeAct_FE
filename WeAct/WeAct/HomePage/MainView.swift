@@ -2,9 +2,11 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var groupStore = GroupStore()
+    @State private var homeGroups: [HomeGroupModel] = []
     @State private var navigationPath = NavigationPath()
     @ObservedObject var userViewModel: UserViewModel
     @State private var TodayDate = Date()
+    
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -75,7 +77,7 @@ struct MainView: View {
                     .padding(.top, 25)
                     
                     // 그룹 없을 때
-                    if groupStore.groups.isEmpty {
+                    if homeGroups.isEmpty {
                         HStack {
                             Spacer()
                             VStack {
@@ -97,8 +99,21 @@ struct MainView: View {
                     else {
                         ScrollView {
                             LazyVStack(spacing: 12) {
-                                ForEach(groupStore.groups) { group in
-                                    GroupList(navigationPath: $navigationPath, group: group)
+                                ForEach(homeGroups) { homeGroup in
+                                    GroupList(navigationPath: $navigationPath, homeGroup: homeGroup) {
+                                        // 상세 진입 시 변환해서 넘김
+                                        let convertedGroup = GroupModel(
+                                            id: Int.random(in: 0...9999),
+                                            name: homeGroup.roomName,
+                                            startDate: Date(),
+                                            endDate: Date(),
+                                            reward: "보상 미정",
+                                            partners: [], // 빈 배열
+                                            selectedDaysString: "",
+                                            selectedDaysCount: homeGroup.dayCountByWeek,
+                                            habitText: "" // 서버에 없으면 빈 문자열
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -119,19 +134,18 @@ struct MainView: View {
                                 Text("그룹 만들기")
                                     .foregroundColor(.white)
                                     .font(.custom("Pretendard-Medium", size: 16))
-                            }
+                            } // HStack
                             .padding(.vertical, 11)
                             .padding(.horizontal, 18)
                             .background(Color(hex: "464646"))
                             .cornerRadius(30)
-                        }
+                        } // Button
                         .padding(.bottom, 42)
-                    }
+                    } // HStack
                     .padding(.horizontal, 4)
                     
                 }
                 .padding(.horizontal, 20)
-                
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     switch destination {
                     case .createGroup:
@@ -139,7 +153,7 @@ struct MainView: View {
                     case .addPartner:
                         AddPartner(groupStore: groupStore, navigationPath: $navigationPath)
                     case .groupBoard(let group):
-                        GroupDetailBoard(navigationPath: $navigationPath, group: group, groupStore: groupStore)
+                        GroupDetailBoard(navigationPath: $navigationPath, groupResponse: nil, group: group, groupStore: groupStore)
                     case .notification:
                         NotificationView(navigationPath: $navigationPath)
                     case .myPage:
@@ -152,10 +166,40 @@ struct MainView: View {
                         SetUpHabbit(navigationPath: $navigationPath)
                     }
                 }
+            } // ZStack
+            .onAppear {
+                fetchHomeGroups()
             }
-        }
+        } // NavigationStack
         .navigationBarBackButtonHidden(true)
     }
+    private func fetchHomeGroups() {
+        Task {
+            do {
+                if let userIdString = userViewModel.user.userId,
+                   let userId = Int(userIdString) {
+                    
+                    print("✅ 변환된 userId: \(userId)")
+                    
+                    let homeGroupResponse = try await HomeGroupService.shared.getHomeGroups(userId: userId)
+                    
+                    if let date = Calendar.current.date(from: DateComponents(month: homeGroupResponse.month, day: homeGroupResponse.day)) {
+                        self.TodayDate = date
+                    }
+                    
+                    self.homeGroups = homeGroupResponse.roomInformationDtos
+                    
+                } else {
+                    print("❌ userId 값이 없거나 변환 실패")
+                    // 필요한 경우: 팝업 띄우기, 기본값 세팅 등 처리
+                }
+            } catch {
+                print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+            }
+        }
+    }
+
+
 }
 
 #Preview {

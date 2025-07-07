@@ -22,7 +22,7 @@ class UserSearchService {
     // 사용자 검색 (userId 포함 필터)
     func searchUsers(containing keyword: String) async throws -> [UserSearchResponse] {
         guard let encodedKeyword = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "http://192.168.0.7:8080/user/search/\(encodedKeyword)") else {
+              let url = URL(string: "https://naruto.asia/user/search/\(encodedKeyword)") else {
             throw URLError(.badURL)
         }
 

@@ -18,10 +18,7 @@ struct ToastView: View {
 
             Text(message)
                 .foregroundColor(.white)
-                .font(
-                    Font.custom("Pretendard", size: 16)
-                        .weight(.medium)
-                )
+                .font(.custom("Pretendard-Medium", size: 16))
         }//HStack
         .padding(.horizontal, 28)
         .padding(.vertical, 14)

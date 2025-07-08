@@ -33,7 +33,3 @@ struct RootView: View {
         .environmentObject(userViewModel)
     }
 }
-
-//#Preview {
-//    RootView()
-//}

@@ -1,9 +1,8 @@
 //
-//  ContentView.swift
+//  MypageRow.swift
 //  WeAct
 //
-//  Created by 현승훈 on 6/30/25.
-//
+
 
 import SwiftUI
 

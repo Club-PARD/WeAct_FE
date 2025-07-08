@@ -1,13 +1,15 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/4c7d6080-9d05-4d64-a882-3e84258ad27e" width="200" style="border-radius: 15px; margin-bottom: 20px;">
   <h1 style="font-size: 2.5rem;">WeAct</h1>
-  <p style="font-size: 1.3rem; color: #555;">~~~~~~~~</p>
+  <p style="font-size: 1.3rem; color: #555;">WeAct 친구와 함께하는 습관 달성 플랫폼</p>
 </div>
 
 ---
 
 <p style="font-size: 1.3rem; line-height: 1.8; color: #444;">
-~~~~~
+사람들은 더 나은 내일을 꿈꾸며 좋은 습관을 만들고자 하지만, 혼자서는 포기하기 쉽습니다. 
+
+WeAct는 친구와 함께 습관을 인증하며 꾸준히 이어나갈 수 있도록 돕는 서비스입니다.
 </p>
 
 ---

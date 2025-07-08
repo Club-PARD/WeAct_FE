@@ -2,9 +2,9 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var groupStore = GroupStore()
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var homeGroups: [HomeGroupModel] = []
     @State private var navigationPath = NavigationPath()
-    @StateObject private var userViewModel = UserViewModel()
     @State private var TodayDate = Date()
     
     

@@ -11,7 +11,7 @@ import SwiftUI
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var userViewModel: UserViewModel
-
+    @AppStorage("isLoggedIn") private var isLoggedIn = true
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     
@@ -124,6 +124,7 @@ struct MypageView: View {
                         MypageRow(navigationPath: $navigationPath, text: "로그아웃"){
                             print("로그아웃되었습니다.")
                             isShowingLogoutModal = true
+                            isLoggedIn = false
                         }
                         
                         MypageRow(navigationPath: $navigationPath, text: "회원 탈퇴")

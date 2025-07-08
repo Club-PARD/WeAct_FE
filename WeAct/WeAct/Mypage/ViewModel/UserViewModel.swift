@@ -30,6 +30,17 @@ class UserViewModel: ObservableObject {
 
     private let service = UserService()
     
+    // MARK: - 아이디 중복 확인
+    func isUserIdDuplicated(_ userId: String) async -> Bool? {
+        do {
+            return try await service.checkUserIdDuplicate(userId: userId)
+        } catch {
+            print("❌ 중복 확인 에러: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    
     // MARK: - 회원가입 (POST)
     func createUser(user: UserModel) async throws -> PartialUserResponse {
         let response = try await service.createUser(user: user)

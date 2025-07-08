@@ -16,8 +16,47 @@ struct PartialUserResponse: Codable {
 
 class UserService {
     
+    // MARK: - 아이디 중복 확인 (Boolean 응답 버전)
+    func checkUserIdDuplicate(userId: String) async throws -> Bool {
+        guard let url = URL(string: "http://172.18.130.119:8080/user/checkDuplicated/\(userId)") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        print("🌐 [중복확인 요청] \(url.absoluteString)")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("❌ HTTP 응답 아님")
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 응답 상태코드: \(httpResponse.statusCode)")
+        print("📄 응답 원시 데이터: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        guard httpResponse.statusCode == 200 else {
+            throw NSError(domain: "", code: 1, userInfo: [NSLocalizedDescriptionKey: "❌ 아이디 중복 확인 실패 (코드 \(httpResponse.statusCode))"])
+        }
+
+        do {
+            let isDuplicated = try JSONDecoder().decode(Bool.self, from: data)
+            print("🔍 최종 파싱 결과: \(isDuplicated)")
+            return isDuplicated  // true면 중복, false면 사용 가능
+        } catch {
+            print("❌ Boolean 디코딩 실패: \(error)")
+            throw error
+        }
+    }
+
+    
     // 사용자 정보 생성
     func createUser(user: UserModel) async throws -> PartialUserResponse {
+
+        //guard let url = URL(string: "http://172.18.130.119:8080/user/") else {
+            
         guard let url = URL(string: "https://naruto.asia/user/") else {
             throw URLError(.badURL)
         }
@@ -40,7 +79,6 @@ class UserService {
         return partialUser
     }
 
-
     
     // GET: 사용자 데이터 가져오기
     func fetchUsers() async throws -> [UserModel] {
@@ -56,6 +94,9 @@ class UserService {
           let users = try JSONDecoder().decode([UserModel].self, from: data)
           return users
       }
+    
+    
+    
     
     // PATCH: 사용자 이름 수정
     func updateUsername(_ name: String) async throws {

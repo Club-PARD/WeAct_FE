@@ -124,7 +124,6 @@ struct MypageView: View {
                         MypageRow(navigationPath: $navigationPath, text: "로그아웃"){
                             print("로그아웃되었습니다.")
                             isShowingLogoutModal = true
-                            isLoggedIn = false
                         }
                         
                         MypageRow(navigationPath: $navigationPath, text: "회원 탈퇴")
@@ -157,6 +156,8 @@ struct MypageView: View {
                        },
                        secondButtonAction: {
                            isShowingLogoutModal=false
+                           isLoggedIn = false
+                           navigationPath = NavigationPath()
                            print("로그아웃 버튼 클릭")
                        }
                    )

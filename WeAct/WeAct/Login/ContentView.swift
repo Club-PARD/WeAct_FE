@@ -44,8 +44,6 @@ struct ContentView: View {
                     .foregroundColor(Color(hex: "464646"))
                     .padding(.bottom, 62)
                 
-          
-                
                 TextField("아이디 입력", text: $userId)
                     .padding()
                     .background(.white)
@@ -66,6 +64,21 @@ struct ContentView: View {
                     } else {
                         showAlert = true  // ✅ 입력 안했을 때 경고 표시
                     }
+                    Task {
+                       if isFormValid {
+                           userViewModel.user.userId = userId
+                           userViewModel.user.pw = password
+
+                           let success = await userViewModel.login()
+                           if success {
+                               isLoggedIn = true
+                           } else {
+                               showAlert = true
+                           }
+                       } else {
+                           showAlert = true
+                       }
+                   }
                 }) {
                     Text("로그인")
                         .foregroundColor(.white)

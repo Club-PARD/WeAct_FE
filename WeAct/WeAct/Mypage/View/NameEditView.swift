@@ -32,7 +32,6 @@ struct NameEditView: View {
             }
         }
     
-    
     var body: some View {
         NavigationView {
             VStack{
@@ -82,8 +81,3 @@ struct NameEditView: View {
     }
 }
 
-//#Preview {
-//    @State var path = NavigationPath()
-//    let userViewModel = UserViewModel()
-//    return NameEditView(navigationPath: .constant(path), userViewModel: userViewModel)
-//}

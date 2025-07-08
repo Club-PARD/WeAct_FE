@@ -20,43 +20,42 @@
   <tr>
     <td align="center" style="padding: 20px;">
       <img src="https://github.com/user-attachments/assets/82a75fb8-2c31-4a09-820f-f82f55bac10d" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🐣 이단진</h3>
+      <h3 style="font-size: 1.3rem;">� 이단진</h3>
       <p style="color: #555;">PM</p>
     </td>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/5f108553-5e85-4b5a-a1e5-9c7316015d57
-" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🐭 김수빈</h3>
-      <p style="color: #555;">기획</p>
+      <img src="https://github.com/user-attachments/assets/5f108553-5e85-4b5a-a1e5-9c7316015d57" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;"> 이주원</h3>
+      <p style="color: #555;">디자인</p>
     </td>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/a5c9307a-f93f-4d7b-8449-c2858419d429" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🦉 강서영</h3>
-      <p style="color: #555;">디자인</p>
+      <img src="https://github.com/user-attachments/assets/142257e4-369b-44d9-8b6a-1693c86aa3b3" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;"> 현승훈</h3>
+      <p style="color: #555;">iOS(프론트엔드)</p>
     </td>
   </tr>
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/9f581a97-3cac-42ee-9158-e8d818ee0c99" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🧑🏻‍🦰 조성준</h3>
-      <p style="color: #555;">백엔드</p>
+      <img src="https://github.com/user-attachments/assets/fbb42471-ceb4-4b5b-a155-aa7827261c45" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;"> 최승아</h3>
+      <p style="color: #555;">iOS(프론트엔드)</p>
     </td>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/673ef3e1-3ed1-44f7-aadc-54262c0e0165" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🧑🏼‍🦱 도현학</h3>
-      <p style="color: #555;">프론트엔드</p>
+      <img src="https://github.com/user-attachments/assets/395d6c70-668f-4d47-9554-95e29d693d38" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;"> 주현아</h3>
+      <p style="color: #555;">iOS(프론트엔드)</p>
     </td>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/e5989ac1-3536-4453-94f5-35dd9f2c17f6" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">👹 김지원</h3>
-      <p style="color: #555;">프론트엔드</p>
+      <img src="https://github.com/user-attachments/assets/a26be3d5-8e7a-4fbe-94be-b496ad2e470d" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;"> 빈지성</h3>
+      <p style="color: #555;">서버(백엔드)</p>
     </td>
   </tr>
   <tr>
     <td colspan="3" align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/0a0a3872-54ab-4096-94b0-a8cb932a52e0" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🙀 현승훈</h3>
-      <p style="color: #555;">프론트엔드</p>
+      <img src="https://github.com/user-attachments/assets/4519b4a3-c412-4ba9-a484-ae2e5da5e884" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;">김종언</h3>
+      <p style="color: #555;">서버(백엔드)</p>
     </td>
   </tr>
 </table>

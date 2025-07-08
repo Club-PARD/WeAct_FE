@@ -40,14 +40,14 @@ class CheckPointService {
         print("🔍 [중간점검] fetchCheckPoint 호출됨")
         print("📡 [중간점검] roomId: \(roomId)")
         
-//        guard let url = URL(string: "https://naruto.asia/room/checkPoint/\(roomId)") else {
-//            print("❌ [중간점검] URL 생성 실패")
-//            throw URLError(.badURL)
-//        }
-        guard let url = URL(string: "http://172.18.130.119:8080/room/checkPoint/\(roomId)") else {
-                    print("❌ [중간점검] URL 생성 실패")
-                    throw URLError(.badURL)
-                }
+        guard let url = URL(string: "https://naruto.asia/room/checkPoint/\(roomId)") else {
+            print("❌ [중간점검] URL 생성 실패")
+            throw URLError(.badURL)
+        }
+//        guard let url = URL(string: "http://172.18.130.119:8080/room/checkPoint/\(roomId)") else {
+//                    print("❌ [중간점검] URL 생성 실패")
+//                    throw URLError(.badURL)
+//                }
         
         
         print("📡 [중간점검] API URL: \(url.absoluteString)")

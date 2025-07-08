@@ -25,6 +25,8 @@ struct GroupDetailBoard: View {
     @State private var showImagePicker = false
     
     @State private var isAllCompleted = false // 모든 멤버가 인증했는지
+    @State private var canCertifyToday = false // 오늘 인증 가능한지 (선택한 요일인지)
+    
     // 날짜 포맷터
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -81,6 +83,116 @@ struct GroupDetailBoard: View {
         guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else { return false }
         return calendar.compare(nextDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
     }
+    
+    // checkDays API 호출 함수 (Path parameter 사용 - 서버 API 명세에 맞춤)
+    private func checkDays() {
+        print("🔍 [checkDays] =================")
+        print("🔍 [checkDays] 함수 호출됨")
+        print("🔍 [checkDays] 그룹 ID: \(group.id)")
+        print("🔍 [checkDays] 현재 날짜: \(displayDateFormatter.string(from: currentDate))")
+        print("🔍 [checkDays] 그룹 선택 요일: \(group.selectedDaysString)")
+        print("🔍 [checkDays] 현재 canCertifyToday 상태: \(canCertifyToday)")
+        print("🔍 [checkDays] =================")
+        
+        // API URL 구성 - Path parameter 사용 (서버 API 명세에 맞춤)
+        let baseURL = "https://naruto.asia"
+        let endpoint = "/room/checkDays/\(group.id)"
+        let urlString = "\(baseURL)\(endpoint)"
+        
+        print("📡 [checkDays] API URL: \(urlString)")
+        print("🏠 [checkDays] 그룹 ID: \(group.id)")
+        print("⚠️ [checkDays] 참고: 이 API는 서버에서 현재 날짜를 기준으로 판단합니다")
+        
+        guard let url = URL(string: urlString) else {
+            print("❌ [checkDays] URL 생성 실패")
+            return
+        }
+        
+        print("🚀 [checkDays] API 요청 시작...")
+        
+        // URLSession을 사용한 API 호출
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            DispatchQueue.main.async {
+                print("📥 [checkDays] API 응답 받음")
+                
+                // HTTP 응답 상태 코드 확인
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("📊 [checkDays] 응답 상태 코드: \(httpResponse.statusCode)")
+                    
+                    if httpResponse.statusCode == 500 {
+                        print("❌ [checkDays] 서버 오류 발생 (500)")
+                        print("❌ [checkDays] 그룹의 days 필드가 설정되지 않았을 수 있습니다")
+                        canCertifyToday = false
+                        print("🔄 [checkDays] canCertifyToday -> false (서버 오류)")
+                        return
+                    }
+                    
+                    if httpResponse.statusCode != 200 {
+                        print("❌ [checkDays] 예상치 못한 상태 코드: \(httpResponse.statusCode)")
+                        canCertifyToday = false
+                        print("🔄 [checkDays] canCertifyToday -> false (비정상 응답)")
+                        return
+                    }
+                }
+                
+                if let error = error {
+                    print("❌ [checkDays] 네트워크 오류: \(error.localizedDescription)")
+                    canCertifyToday = false
+                    print("🔄 [checkDays] canCertifyToday -> false (네트워크 오류)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("❌ [checkDays] 응답 데이터 없음")
+                    canCertifyToday = false
+                    print("🔄 [checkDays] canCertifyToday -> false (데이터 없음)")
+                    return
+                }
+                
+                print("📦 [checkDays] 응답 데이터 크기: \(data.count) bytes")
+                
+                // 원시 응답 데이터 출력
+                if let rawString = String(data: data, encoding: .utf8) {
+                    print("📝 [checkDays] 원시 응답: '\(rawString)'")
+                } else {
+                    print("❌ [checkDays] 응답을 문자열로 변환 실패")
+                }
+                
+                do {
+                    // JSON 파싱 시도
+                    let jsonObject = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])
+                    print("✅ [checkDays] JSON 파싱 성공")
+                    print("📋 [checkDays] 파싱된 객체: \(jsonObject)")
+                    print("📋 [checkDays] 객체 타입: \(type(of: jsonObject))")
+                    
+                    if let result = jsonObject as? Bool {
+                        print("✅ [checkDays] Boolean 파싱 성공: \(result)")
+                        print("🔄 [checkDays] canCertifyToday: \(canCertifyToday) -> \(result)")
+                        canCertifyToday = result
+                        print("🎯 [checkDays] 최종 인증 가능 여부: \(canCertifyToday)")
+                        
+                        // UI 업데이트 확인을 위한 추가 로그
+                        print("🖼️ [checkDays] UI 업데이트 예정 - 인증 버튼 표시 여부: \(isCurrentDateInRange && canCertifyToday)")
+                        
+                    } else {
+                        print("❌ [checkDays] Boolean 타입 변환 실패")
+                        print("❌ [checkDays] 실제 받은 타입: \(type(of: jsonObject))")
+                        print("❌ [checkDays] 실제 받은 값: \(jsonObject)")
+                        canCertifyToday = false
+                        print("🔄 [checkDays] canCertifyToday -> false (타입 변환 실패)")
+                    }
+                } catch {
+                    print("❌ [checkDays] JSON 파싱 오류: \(error.localizedDescription)")
+                    print("❌ [checkDays] 파싱 오류 상세: \(error)")
+                    canCertifyToday = false
+                    print("🔄 [checkDays] canCertifyToday -> false (파싱 오류)")
+                }
+                
+                print("🔍 [checkDays] 처리 완료 =================")
+            }
+        }.resume()
+    }
+
     
     // oneDayCount API 호출 함수 (서버 데이터 수집용)
     private func checkOneDayCount() {
@@ -362,8 +474,8 @@ struct GroupDetailBoard: View {
                 
                 Spacer()
                 
-                // 인증하기 버튼 (기간 내 날짜일 때만 표시)
-                if isCurrentDateInRange {
+                // 인증하기 버튼 (기간 내 날짜이면서 선택한 요일일 때만 표시)
+                                if isCurrentDateInRange && canCertifyToday {
                     // 그룹 만들기 버튼
                     HStack {
                         Spacer()
@@ -395,6 +507,7 @@ struct GroupDetailBoard: View {
             .onAppear {
                 // 초기 날짜를 그룹 시작 날짜로 설정
                 currentDate = groupStartDate
+                checkDays() // 선택한 요일 확인
                 checkOneDayCount()
             }
             .onChange(of: currentDate) { _ in

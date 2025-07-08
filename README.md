@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/861fc1d5-dd31-4a9a-816a-68fb44ee94e9" width="200" style="border-radius: 15px; margin-bottom: 20px;">
+  <img src="https://github.com/user-attachments/assets/4c7d6080-9d05-4d64-a882-3e84258ad27e" width="200" style="border-radius: 15px; margin-bottom: 20px;">
   <h1 style="font-size: 2.5rem;">WeAct</h1>
   <p style="font-size: 1.3rem; color: #555;">~~~~~~~~</p>
 </div>

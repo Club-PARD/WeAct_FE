@@ -7,6 +7,8 @@ struct MainView: View {
     @StateObject private var userViewModel = UserViewModel()
     @State private var TodayDate = Date()
     
+    // 각 그룹별 오늘 인증 가능 여부를 저장하는 딕셔너리
+    @State private var canCertifyToday: [Int: Bool] = [:]
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -104,6 +106,7 @@ struct MainView: View {
                                         navigationPath: $navigationPath,
                                         homeGroup: convertToHomeGroupModel(from: group),
                                         group: group,
+                                        canCertifyToday: canCertifyToday[group.id] ?? false,
                                         onTap: {
                                             navigationPath.append(NavigationDestination.groupBoard(group))
                                         }

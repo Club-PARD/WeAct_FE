@@ -4,6 +4,7 @@ struct GroupList: View {
     @Binding var navigationPath: NavigationPath
     var homeGroup: HomeGroupModel
     var group: GroupModel
+    let canCertifyToday: Bool // 오늘 인증 가능 여부
     var onTap: () -> Void
     
     var body: some View {
@@ -40,28 +41,34 @@ struct GroupList: View {
                             .foregroundColor(Color(hex: "939393"))
                             .background(Color(hex: "F7F7F7"))
                             .cornerRadius(6)
-                    }
-                }
-                Spacer()
+                    } // HStack
+                } // VStack
                 
-                Button {
-                    navigationPath.append(NavigationDestination.certification)
-                } label: {
-                    VStack {
-                        Image(systemName: "camera.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 22, height: 22)
-                            .foregroundColor(.white)
-                        Text("인증하기")
-                            .font(.custom("Pretendard-Regular", size: 14))
-                            .foregroundColor(.white)
+                // 인증하기 버튼 (오늘 인증 가능한 경우에만 표시)
+                if canCertifyToday {
+                    HStack {
+                        Spacer()
+                        
+                        Button {
+                            navigationPath.append(NavigationDestination.certification)
+                        } label: {
+                            VStack {
+                                Image(systemName: "camera.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 22, height: 22)
+                                    .foregroundColor(.white)
+                                Text("인증하기")
+                                    .font(.custom("Pretendard-Regular", size: 14))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(10)
+                            .background(Color(hex: "FF4B2F"))
+                            .cornerRadius(18)
+                        } // Button
                     }
-                    .padding(10)
-                    .background(Color(hex: "FF4B2F"))
-                    .cornerRadius(18)
                 }
-            }
+            } // HStack
             
             Divider()
             
@@ -78,8 +85,8 @@ struct GroupList: View {
                 Text("\(homeGroup.percent)%")
                     .font(.custom("Pretendard-Medium", size: 14))
                     .foregroundColor(Color(hex: "FF4B2F"))
-            }
-        }
+            } // HStack
+        } // VStack
         .padding(.vertical, 16)
         .padding(.horizontal, 22)
         .background(.white)

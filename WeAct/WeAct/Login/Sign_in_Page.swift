@@ -120,7 +120,6 @@ struct Sign_in_Page: View {
     }
     
     // MARK: - 유효성 검사
-    
     func checkUserId() {
         guard let id = userViewModel.user.userId else { return }
         
@@ -128,17 +127,27 @@ struct Sign_in_Page: View {
             userIdError = "아이디는 4~12자여야 해요"
             userIdStatus = nil
             isUserIdChecked = false
-        } else if id.lowercased() == "2weeksone" {
-            userIdError = "중복되는 아이디에요. 다시 시도 해주세요"
-            userIdStatus = nil
-            isUserIdChecked = false
-        } else {
-            userIdError = nil
-            userIdStatus = "사용 가능한 아이디에요"
-            isUserIdChecked = true
+            return
+        }
+        
+        Task {
+            if let isDuplicated = await userViewModel.isUserIdDuplicated(id) {
+                if isDuplicated {
+                    userIdError = "중복되는 아이디에요. 다시 시도 해주세요"
+                    userIdStatus = nil
+                    isUserIdChecked = false
+                } else {
+                    userIdError = nil
+                    userIdStatus = "사용 가능한 아이디에요"
+                    isUserIdChecked = true
+                }
+            } else {
+        
+                userIdStatus = nil
+                isUserIdChecked = false
+            }
         }
     }
-    
     
     // 아이디
     private var userIdField: some View {
@@ -205,9 +214,6 @@ struct Sign_in_Page: View {
                     .stroke(passwordLengthError ? Color.red : Color.clear, lineWidth: 1)
             )
             .cornerRadius(8)
-            //                            .onChange(of: password) { _ in
-            //                                validatePassword()
-            //                            }
             
             SecureField("비밀번호 확인", text: $confirmPassword)
                 .padding()
@@ -272,5 +278,13 @@ struct GenderButton: View {
                 )
                 .cornerRadius(8)
         }
+    }
+}
+
+
+struct Sign_in_Page_Previews: PreviewProvider {
+    static var previews: some View {
+        Sign_in_Page()
+            .environmentObject(UserViewModel())  // 💡 EnvironmentObject 주입
     }
 }

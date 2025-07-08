@@ -13,6 +13,7 @@ struct RootView: View {
             } else {
                 if isLoggedIn {
                     MainView()
+                        .environmentObject(userViewModel)
                 } else {
                     if isFirstLaunch {
                         OnBoardingPage(isFirstLaunch: $isFirstLaunch)
@@ -29,6 +30,7 @@ struct RootView: View {
                 }
             }
         }
+        .environmentObject(userViewModel)
     }
 }
 

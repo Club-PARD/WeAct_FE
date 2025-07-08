@@ -24,6 +24,7 @@ struct GroupDetailBoard: View {
     
     @State private var showImagePicker = false
     
+    @State private var isAllCompleted = false // 모든 멤버가 인증했는지
     // 날짜 포맷터
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -34,6 +35,12 @@ struct GroupDetailBoard: View {
     private let displayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "M월 d일"
+        return formatter
+    }()
+    
+    private let apiDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
     
@@ -73,6 +80,80 @@ struct GroupDetailBoard: View {
         let calendar = Calendar.current
         guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else { return false }
         return calendar.compare(nextDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
+    }
+    
+    // oneDayCount API 호출 함수 (서버 데이터 수집용)
+    private func checkOneDayCount() {
+        print("🔍 [DEBUG] checkOneDayCount 호출됨")
+        
+        guard isCurrentDateInRange else {
+            print("❌ [DEBUG] 현재 날짜가 그룹 기간 외입니다.")
+            return
+        }
+        
+        // API URL 구성
+        let baseURL = "https://naruto.asia"
+        let endpoint = "/room/oneDayCount"
+        let dateString = apiDateFormatter.string(from: currentDate)
+        let urlString = "\(baseURL)\(endpoint)?roomId=\(group.id)&date=\(dateString)"
+        
+        print("📡 [DEBUG] API URL: \(urlString)")
+        print("📅 [DEBUG] 요청 날짜: \(dateString)")
+        print("🏠 [DEBUG] 그룹 ID: \(group.id)")
+        
+        guard let url = URL(string: urlString) else {
+            print("❌ [DEBUG] URL 생성 실패")
+            return
+        }
+        
+        print("🚀 [DEBUG] API 요청 시작...")
+        
+        // URLSession을 사용한 API 호출
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            DispatchQueue.main.async {
+                print("📥 [DEBUG] API 응답 받음")
+                
+                // HTTP 응답 상태 코드 확인
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("📊 [DEBUG] 응답 상태 코드: \(httpResponse.statusCode)")
+                    print("📋 [DEBUG] 응답 헤더: \(httpResponse.allHeaderFields)")
+                }
+                
+                if let error = error {
+                    print("❌ [DEBUG] API 호출 오류: \(error.localizedDescription)")
+                    print("❌ [DEBUG] 에러 상세: \(error)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("❌ [DEBUG] 응답 데이터가 없습니다")
+                    return
+                }
+                
+                // 원시 응답 데이터 출력
+                print("📦 [DEBUG] 원시 응답 데이터 크기: \(data.count) bytes")
+                if let rawString = String(data: data, encoding: .utf8) {
+                    print("📝 [DEBUG] 원시 응답 내용: '\(rawString)'")
+                }
+                
+                do {
+                    // JSON 파싱 시도
+                    let jsonObject = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])
+                    print("✅ [DEBUG] JSON 파싱 성공: \(jsonObject)")
+                    
+                    if let result = jsonObject as? Bool {
+                        isAllCompleted = result
+                        print("✅ [DEBUG] Boolean 파싱 성공: \(result)")
+                        print("🎯 [DEBUG] 해당 날짜 모든 멤버 인증 완료: \(result)")
+                    } else {
+                        print("❌ [DEBUG] Boolean 타입이 아닙니다. 실제 타입: \(type(of: jsonObject))")
+                    }
+                } catch {
+                    print("❌ [DEBUG] JSON 파싱 오류: \(error.localizedDescription)")
+                    print("❌ [DEBUG] 파싱 에러 상세: \(error)")
+                }
+            }
+        }.resume()
     }
     
     var customBackButton: some View {
@@ -135,6 +216,10 @@ struct GroupDetailBoard: View {
                             )
                             .datePickerStyle(.graphical)
                             .accentColor(Color(hex: "FF4B2F"))
+                            .onChange(of: currentDate) { _ in
+                                // 날짜가 변경될 때 API 호출
+                                checkOneDayCount()
+                            }
                             
                             Button(action: {
                                 showDatePicker = false
@@ -208,6 +293,14 @@ struct GroupDetailBoard: View {
                 .padding(.top, 20)
                 
                 
+                // 중간 랭킹 추가
+                VStack(alignment: .leading) {
+                    CheckPointRankingView(roomId: group.id)
+                }
+                //.padding(.horizontal, 22)
+                .padding(.vertical, 20)
+                
+                
                 ZStack {
                     // 날짜 네비게이션 (그룹 정보 아래로 이동)
                     HStack {
@@ -215,6 +308,7 @@ struct GroupDetailBoard: View {
                         Button(action: {
                             if canGoPrevious {
                                 currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+                                checkOneDayCount()
                             }
                         }) {
                             Image(systemName: "chevron.left")
@@ -233,6 +327,7 @@ struct GroupDetailBoard: View {
                         Button(action: {
                             if canGoNext {
                                 currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+                                checkOneDayCount()
                             }
                         }) {
                             Image(systemName: "chevron.right")
@@ -300,6 +395,11 @@ struct GroupDetailBoard: View {
             .onAppear {
                 // 초기 날짜를 그룹 시작 날짜로 설정
                 currentDate = groupStartDate
+                checkOneDayCount()
+            }
+            .onChange(of: currentDate) { _ in
+                // 날짜가 변경될 때마다 API 호출
+                checkOneDayCount()
             }
             
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
@@ -314,5 +414,38 @@ extension String {
     // "월화수" -> "월, 화, 수"
     func toDisplayDays() -> String {
         return self.map { String($0) }.joined(separator: ", ")
+    }
+}
+
+#Preview {
+    // 테스트용
+    let calendar = Calendar.current
+    let startDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 8)) ?? Date()
+    let endDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 9)) ?? Date()
+    let testGroup = GroupModel(
+        id: 1,
+        name: "아침 운동 챌린지",
+        startDate: startDate,
+        endDate: endDate,
+        reward: "맛있는 브런치 먹기",
+        partners: [],
+        selectedDaysString: "월화수목금",
+        selectedDaysCount: 5,
+        habitText: "스트레칭하기",
+    )
+    
+    // 테스트용 GroupStore 생성
+    let testGroupStore = GroupStore()
+    
+    // StatefulPreviewWrapper를 사용하여 NavigationPath 상태 관리
+    StatefulPreviewWrapper(NavigationPath()) { path in
+        NavigationStack(path: path) {
+            GroupDetailBoard(
+                navigationPath: path,
+                groupResponse: nil,
+                group: testGroup,
+                groupStore: testGroupStore
+            )
+        }
     }
 }

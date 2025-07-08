@@ -22,6 +22,26 @@ struct HomeGroupModel: Decodable {
     let percent: Int
 }
 
+extension HomeGroupModel {
+    var isCheckPointTime: Bool {
+        let result = percent >= 50 && percent < 60
+        print("🔍 [중간점검] roomId=\(roomId), 진행률=\(percent)%, 중간점검시점=\(result)")
+        return result
+    }
+    
+    var isCheckPointPassed: Bool {
+        let result = percent >= 60
+        print("🔍 [중간점검] roomId=\(roomId), 진행률=\(percent)%, 중간점검완료=\(result)")
+        return result
+    }
+    
+    var isBeforeCheckPoint: Bool {
+        let result = percent < 50
+        print("🔍 [중간점검] roomId=\(roomId), 진행률=\(percent)%, 중간점검전=\(result)")
+        return result
+    }
+}
+
 class HomeGroupService {
     static let shared = HomeGroupService()
     

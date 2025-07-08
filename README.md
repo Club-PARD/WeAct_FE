@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=![WeAct_symbol_logo](https://github.com/user-attachments/assets/861fc1d5-dd31-4a9a-816a-68fb44ee94e9), width="200" style="border-radius: 15px; margin-bottom: 20px;">
+  <img src="https://github.com/user-attachments/assets/861fc1d5-dd31-4a9a-816a-68fb44ee94e9" width="200" style="border-radius: 15px; margin-bottom: 20px;">
   <h1 style="font-size: 2.5rem;">WeAct</h1>
   <p style="font-size: 1.3rem; color: #555;">~~~~~~~~</p>
 </div>
@@ -19,13 +19,13 @@
 <table align="center" style="width: 90%; margin: auto; font-size: 1.2rem;">
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://www.notion.so/image/attachment%3Ae1742e84-89fc-4ca6-a177-0665549eb8e1%3Aimage.png?table=block&id=2166acfd-d23a-8094-bcfb-d174a8aacaea&spaceId=ae86acfd-d23a-81fa-8b3b-00037d7b1d87&width=500&userId=e60cdcd0-def6-4aa4-ba39-31a8a865b706&cache=v2![image](https://github.com/user-attachments/assets/82a75fb8-2c31-4a09-820f-f82f55bac10d)
-" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">🐣 김지안</h3>
+      <img src="https://github.com/user-attachments/assets/82a75fb8-2c31-4a09-820f-f82f55bac10d" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <h3 style="font-size: 1.3rem;">🐣 이단진</h3>
       <p style="color: #555;">PM</p>
     </td>
     <td align="center" style="padding: 20px;">
-      <img src="https://github.com/user-attachments/assets/0386d661-9d47-4a61-b4f1-b39b5925b796" width="120" style="border-radius: 15px; margin-bottom: 10px;">
+      <img src="https://github.com/user-attachments/assets/5f108553-5e85-4b5a-a1e5-9c7316015d57
+" width="120" style="border-radius: 15px; margin-bottom: 10px;">
       <h3 style="font-size: 1.3rem;">🐭 김수빈</h3>
       <p style="color: #555;">기획</p>
     </td>

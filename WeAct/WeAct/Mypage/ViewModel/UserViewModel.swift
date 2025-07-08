@@ -46,21 +46,26 @@ class UserViewModel: ObservableObject {
         let response = try await service.createUser(user: user)
             return response
     }
-
     
-    // MARK: - 이름 수정 (PATCH)
-    func updateUsername(newName: String) async {
+    // MARK: - 로그인
+    func login() async -> Bool {
+        guard let userId = user.userId, let pw = user.pw else { return false }
+
         do {
-            try await service.updateUsername(newName)
-            user.userName = newName
+            let token = try await service.login(userId: userId, password: pw)
+            print("✅ 로그인 성공 - 토큰: \(token)")
+
+            // TODO: Token 저장 (UserDefaults, Keychain 등)
+            // 예시:
+            UserDefaults.standard.set(token, forKey: "accessToken")
+
+            return true
         } catch {
-            // 에러 처리 (예: alert 표시 등)
+            print("❌ 로그인 실패: \(error.localizedDescription)")
+            return false
         }
     }
     
-    func saveNewName(editedName: String) async {
-        await updateUsername(newName: editedName)
-    }
     
     // MARK: - 프로필 이미지 관련
     func updateProfileImage(image: UIImage) {

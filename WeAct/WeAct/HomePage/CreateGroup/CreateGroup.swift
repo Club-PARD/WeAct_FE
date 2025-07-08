@@ -246,13 +246,7 @@ struct CreateGroup: View {
                 Spacer()
                 
                 Button(action: {
-//                    print("🟡 [디버그] isFormValid:", isFormValid)
-//                    print("🟢 [디버그] 방 이름(name):", name)
-//                    print("🔵 [디버그] 기간(period):", period)
-//                    print("🟣 [디버그] 선택된 요일(selectedDays):", selectedDays)
-//                    print("🟠 [디버그] 선택된 요일 개수:", selectedDays.count)
-//                    print("🔴 [디버그] 보상(reward):", reward)
-                    
+               
                     if isFormValid {
                     
                         CreateGroupData.shared.startDate = startDate
@@ -264,8 +258,8 @@ struct CreateGroup: View {
                         CreateGroupData.shared.reward = reward
                         CreateGroupData.shared.selectedDaysCount = selectedDays.count
                         
-                        let selectedWeekdays = selectedDays.sorted().map { weekdays[$0] }
-                        CreateGroupData.shared.selectedDaysString = selectedWeekdays
+            
+                        CreateGroupData.shared.selectedDaysString = SelectedDaysString()
                         
                         navigationPath.append(NavigationDestination.addPartner)
                     } else {
@@ -306,9 +300,9 @@ extension DateFormatter {
 
 // 선택된 요일들을 문자열로 변환
 extension CreateGroup {
-    private func SelectedDaysString() -> String { // 선택된 요일들을 "월, 화, 수" 형태
+    private func SelectedDaysString() -> String {
         let selectedWeekdays = selectedDays.sorted().map { weekdays[$0] }
-        return selectedWeekdays.joined(separator: ", ")
+           return selectedWeekdays.joined(separator: "") // 쉼표와 공백 제거
     }
     
     private func SelectedDaysCount() -> Int { // 선택된 요일의 개수 반환
@@ -323,7 +317,7 @@ class CreateGroupData: ObservableObject {
     @Published var name: String = ""
     @Published var period: String = ""
     @Published var reward: String = ""
-    @Published var selectedDaysString: [String] = [] // 빈 배열로 수정
+    @Published var selectedDaysString: String = ""
     @Published var selectedDaysCount: Int = 0
     @Published var habitText: String = ""
     @Published var startDate: Date = Date()
@@ -335,7 +329,7 @@ class CreateGroupData: ObservableObject {
         name = ""
         period = ""
         reward = ""
-        selectedDaysString = []
+        selectedDaysString = ""
         selectedDaysCount = 0
         habitText = ""
         startDate = Date()

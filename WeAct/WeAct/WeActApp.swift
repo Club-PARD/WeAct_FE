@@ -9,13 +9,12 @@ import SwiftUI
 
 @main
 struct WeActApp: App {
-    @StateObject var userViewModel = UserViewModel()
-    
+    @StateObject private var userViewModel = UserViewModel()
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 RootView()
-                     .environmentObject(userViewModel)
+                    .environmentObject(userViewModel)
             }
         }
     }

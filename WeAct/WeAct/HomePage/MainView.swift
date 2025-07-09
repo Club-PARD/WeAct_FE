@@ -173,18 +173,18 @@ struct MainView: View {
                 }
             } // ZStack
             .onAppear {
-                // 처음 진입할 때만 호출
-                if let userId = userViewModel.user.userId, !isLoading {
+                guard !isLoading else { return }
+                if let userId = userViewModel.user.userId {
                     print("✅ [onAppear] 유저 ID 확인됨: \(userId)")
+                    isLoading = true
                     fetchHomeGroups()
-                } else {
-                    print("❌ [onAppear] 유저 ID가 nil이거나 이미 로딩 중")
                 }
             }
             .onChange(of: userViewModel.user.userId) { newUserId in
-                // 유저 ID가 변경될 때만 호출
-                if let id = newUserId, !isLoading {
+                guard !isLoading else { return }
+                if let id = newUserId {
                     print("🔄 [onChange] 유저 ID 감지됨: \(id) → 그룹 새로 요청")
+                    isLoading = true
                     fetchHomeGroups()
                 }
             }
@@ -206,7 +206,6 @@ struct MainView: View {
         return HomeGroupModel(
             roomId: 1,
             roomName: group.name,
-            habit: group.habitText,
             period: datePeriodString(from: group.startDate, to: group.endDate),
             dayCountByWeek: group.selectedDaysCount,
             percent: 0 // 아직 달성률이 없으면 0으로 처리
@@ -223,11 +222,9 @@ struct MainView: View {
     private func fetchHomeGroups() {
         Task {
             do {
-                
                 guard let token = TokenManager.shared.getToken() else { return }
                 let response = try await HomeGroupService.shared.getHomeGroups(token: token)
                 
-                // ✅ 3. UI 업데이트
                 await MainActor.run {
                     if let date = Calendar.current.date(from: DateComponents(month: response.month, day: response.day)) {
                         self.TodayDate = date
@@ -245,14 +242,16 @@ struct MainView: View {
                             partners: [],
                             selectedDaysString: "",
                             selectedDaysCount: homeGroup.dayCountByWeek,
-                            habitText: homeGroup.habit
                         )
                     }
-                    
                     print("✅ [UI 업데이트 완료] 표시할 그룹 수: \(self.groupStore.groups.count)")
+                    isLoading = false // 호출 종료 후 반드시 false로 해제
                 }
             } catch {
                 print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+                await MainActor.run {
+                    isLoading = false
+                }
             }
         }
     }

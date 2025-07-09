@@ -14,7 +14,8 @@ struct ContentView: View {
     @FocusState private var focusedField: Field?
     @EnvironmentObject var userViewModel: UserViewModel
     @State private var showSignUp = false
-    @State private var showAlert = false  // ✅ 경고 팝업 상태 추가
+    @State private var showAlert = false  // 경고 팝업 상태 추가
+    @State private var alertMessage = "아이디와 비밀번호를 모두 입력해주세요."
     
     enum Field {
         case userId
@@ -26,11 +27,11 @@ struct ContentView: View {
     }
     
     var body: some View {
-
+        
         ZStack {
             Color(hex: "F7F7F7")
                 .edgesIgnoringSafeArea(.all)
-           
+            
             VStack {
                 Spacer()
                 
@@ -60,13 +61,12 @@ struct ContentView: View {
                 
                 Button(action: {
                     if isFormValid {
-                        isLoggedIn = true
-                        
                         Task {
-                                            await login()
-                                        }
+                            await login()
+                        }
                     } else {
-                        showAlert = true  // ✅ 입력 안했을 때 경고 표시
+                        alertMessage = "아이디와 비밀번호를 모두 입력해주세요."
+                        showAlert = true
                     }
                 }) {
                     Text("로그인")
@@ -76,13 +76,12 @@ struct ContentView: View {
                         .background(Color(hex: "FF4B2F"))
                         .cornerRadius(8)
                 }
-
                 .padding(.horizontal)
-
+                
                 .alert("로그인 실패", isPresented: $showAlert) {
                     Button("확인", role: .cancel) {}
                 } message: {
-                    Text("아이디와 비밀번호를 모두 입력해주세요.")
+                    Text(alertMessage)
                 }
                 
                 Button(action: {
@@ -96,9 +95,9 @@ struct ContentView: View {
                 
                 Spacer()
             }
-
+            
             .padding(.horizontal, 17)
-
+            
             .fullScreenCover(isPresented: $showSignUp) {
                 Sign_in_Page().environmentObject(userViewModel)
             }
@@ -112,42 +111,58 @@ struct ContentView: View {
             }
         }
     }
-
-//    func login() async {
-//        do {
-//            let token = try await UserService().login(userId: userId, password: password)
-//            TokenManager.shared.saveToken(token)
-//            userViewModel.token = token
-//            isLoggedIn = true
-//            
-//            // ✅ 여기서 사용자 정보 요청
-//            let userInfo = try await UserService().getUserInfo(token: token)
-//            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
-//            
-//            print("✅ 로그인 후 사용자 정보: \(userInfo)")
-//            print("🧠 userId: \(userInfo.userId ?? "없음")")
-//            print("🧠 id: \(userInfo.id ?? -1)")
-//            
-//        } catch {
-//            print("❌ 로그인 에러: \(error)")
-//        }
-//    }
+    
+    //    func login() async {
+    //        do {
+    //            let token = try await UserService().login(userId: userId, password: password)
+    //            TokenManager.shared.saveToken(token)
+    //            userViewModel.token = token
+    //            isLoggedIn = true
+    //
+    //            // ✅ 여기서 사용자 정보 요청
+    //            let userInfo = try await UserService().getUserInfo(token: token)
+    //            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
+    //
+    //            print("✅ 로그인 후 사용자 정보: \(userInfo)")
+    //            print("🧠 userId: \(userInfo.userId ?? "없음")")
+    //            print("🧠 id: \(userInfo.id ?? -1)")
+    //
+    //        } catch {
+    //            print("❌ 로그인 에러: \(error)")
+    //        }
+    //    }
     func login() async {
         do {
             let token = try await UserService().login(userId: userId, password: password)
             TokenManager.shared.saveToken(token)
-
-            // ✅ 유저 정보 받아오기
+            
             let userInfo = try await UserService().getUserInfo(token: token)
             userViewModel.user = userInfo
-
-            isLoggedIn = true
+            
             print("✅ 로그인 성공, 유저 ID: \(userInfo.id ?? -1)")
+            isLoggedIn = true
         } catch {
-            print("❌ 로그인 에러: \(error)")
+            if let nsError = error as NSError? {
+                print("❌ 로그인 실패: code=\(nsError.code), message=\(nsError.localizedDescription)")
+                
+                switch nsError.code {
+                case 401:
+                    alertMessage = "아이디 또는 비밀번호가 올바르지 않습니다."
+                case 404:
+                    alertMessage = "존재하지 않는 계정입니다."
+                case 500:
+                    alertMessage = "서버 오류입니다. 잠시 후 다시 시도해주세요."
+                default:
+                    alertMessage = nsError.localizedDescription
+                }
+            } else {
+                alertMessage = "알 수 없는 오류가 발생했습니다."
+            }
+            showAlert = true
         }
     }
 
+    
 }
 
 #Preview {

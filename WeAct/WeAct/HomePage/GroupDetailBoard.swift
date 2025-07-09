@@ -492,7 +492,6 @@ extension String {
         partners: [],
         selectedDaysString: "월화수목금",
         selectedDaysCount: 5,
-        habitText: "스트레칭하기",
     )
     
     // 테스트용 GroupStore 생성

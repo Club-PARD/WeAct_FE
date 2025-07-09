@@ -21,10 +21,10 @@ struct GroupList: View {
                     } // HStack
                     
                     
-                    Text(homeGroup.habit)
-                        .font(.custom("Pretendard-Medium", size: 16))
-                        .foregroundColor(Color(hex: "171717"))
-                    
+//                    Text(homeGroup.habit)
+//                        .font(.custom("Pretendard-Medium", size: 16))
+//                        .foregroundColor(Color(hex: "171717"))
+//                    
                     HStack {
                         Text(homeGroup.period)
                             .font(.custom("Pretendard-Medium", size: 14))

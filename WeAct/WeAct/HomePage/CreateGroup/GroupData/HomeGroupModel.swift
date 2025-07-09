@@ -16,7 +16,6 @@ struct HomeGroupResponse: Decodable {
 struct HomeGroupModel: Decodable {
     var roomId: Int
     let roomName: String
-    let habit: String
     let period: String
     let dayCountByWeek: Int
     let percent: Int

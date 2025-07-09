@@ -17,9 +17,9 @@ class UserViewModel: ObservableObject {
         gender: nil,
         profileImageURL: nil
     )
-
-    @Published var isShowingImagePicker = false
     
+    @Published var token: String? = nil
+    @Published var isShowingImagePicker = false
     @Published var selectedImage: UIImage? {
         didSet {
             if let image = selectedImage {
@@ -27,6 +27,9 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+    
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    @Published var errorMessage: String? = nil
 
     private let service = UserService()
     
@@ -40,33 +43,31 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    
-    // MARK: - 회원가입 (POST)
-    func createUser(user: UserModel) async throws -> PartialUserResponse {
-        let response = try await service.createUser(user: user)
-            return response
-    }
-    
-    // MARK: - 로그인
-    func login() async -> Bool {
-        guard let userId = user.userId, let pw = user.pw else { return false }
+    // MARK: - 회원가입 + 로그인 처리
+    func createUserAndLogin() async {
+        guard let userId = user.userId,
+              let pw = user.pw else {
+            errorMessage = "아이디와 비밀번호를 입력해주세요."
+            return
+        }
 
         do {
-            let token = try await service.login(userId: userId, password: pw)
-            print("✅ 로그인 성공 - 토큰: \(token)")
+            // 1. 회원가입 요청 → 토큰 받기
+            let token = try await service.createUser(user: user)
 
-            // TODO: Token 저장 (UserDefaults, Keychain 등)
-            // 예시:
-            UserDefaults.standard.set(token, forKey: "accessToken")
+            // 2. 토큰 저장
+            TokenManager.shared.saveToken(token)
 
-            return true
+            // 3. 로그인 상태 전환
+            isLoggedIn = true
+
+            print("✅ 회원가입 및 자동 로그인 완료")
         } catch {
-            print("❌ 로그인 실패: \(error.localizedDescription)")
-            return false
+            print("❌ 회원가입 실패: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
-    
-    
+
     // MARK: - 프로필 이미지 관련
     func updateProfileImage(image: UIImage) {
         selectedImage = image
@@ -76,15 +77,20 @@ class UserViewModel: ObservableObject {
     func changeProfileImage() {
         isShowingImagePicker = true
     }
-    
+
     func goToNameEdit() {
         // 화면 전환 트리거용 함수 (View에서 사용)
     }
-    
+
     // MARK: - TODO
     // 내 습관 기록
-    
+
     // 로그아웃
-    
+    func logout() {
+        TokenManager.shared.deleteToken()
+        isLoggedIn = false
+        print("✅ 로그아웃 완료")
+    }
+
     // 회원탈퇴
 }

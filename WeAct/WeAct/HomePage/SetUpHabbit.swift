@@ -92,7 +92,12 @@ struct SetUpHabbit: View {
                 Spacer()
                 Button(action: {
                     CreateGroupData.shared.habitText = myHabbit
-                    navigationPath.removeLast(navigationPath.count) // 스택을 모두 비워서 메인으로 이동
+                       
+                       // 여기서 데이터 초기화
+                       CreateGroupData.shared.reset()
+                       
+                       // 스택을 모두 비워서 메인으로 이동
+                       navigationPath.removeLast(navigationPath.count)
                 }) {
                         Text("확인")
                             .font(.custom("Pretendard-Medium", size: 16))

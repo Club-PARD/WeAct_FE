@@ -22,6 +22,10 @@ struct Sign_in_Page: View {
     @State private var isUserIdCheckingEnabled = false
     // @State private var navigateToWelcome = false  // ✅ fullScreenCover 트리거
     
+    @State private var isSigningUp = false
+    @State private var signupError: String?
+    @State private var showErrorAlert = false
+    
     var isFormValid: Bool {
         !userViewModel.user.userName.isEmpty &&
         userIdError == nil &&
@@ -81,30 +85,62 @@ struct Sign_in_Page: View {
                     }
                     
                     // 회원가입 버튼
+                    //                    Button(action: {
+                    //                        //서버통신
+                    //                        Task {
+                    //                            do {
+                    //                                let response = try await userViewModel.createUser(user: userViewModel.user)
+                    //                                userViewModel.user.id = response.id  // 🔑 서버에서 받은 id만 업데이트
+                    //                                print("✅ 회원가입 성공")
+                    //                                print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+                    //                                print("🧠 ViewModel (회원가입 페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
+                    //                                showWelcome = true
+                    //                            } catch {
+                    //                                print("❌ 회원가입 실패: \(error.localizedDescription)")
+                    //                            }
+                    //                        }
+                    //                        //showWelcome = true
+                    //                    }) {
+                    //                        Text("회원가입")
+                    //                            .foregroundColor(.white)
+                    //                            .frame(maxWidth: .infinity)
+                    //                            .padding()
+                    //                            .background(isFormValid ? Color.init(hex: "#FF4B2F") : Color.gray.opacity(0.2))
+                    //                            .cornerRadius(8)
+                    //                    }
+                    //                    .disabled(!isFormValid)
+                    //                    .padding(.top, 30)
+                    
+                    // 회원가입 버튼 액션 부분만 수정
+                    
                     Button(action: {
-                        //서버통신
+                        isSigningUp = true
+                        signupError = nil
+                        
                         Task {
-                            do {
-                                let response = try await userViewModel.createUser(user: userViewModel.user)
-                                userViewModel.user.id = response.id  // 🔑 서버에서 받은 id만 업데이트
-                                print("✅ 회원가입 성공")
-                                print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
-                                print("🧠 ViewModel (회원가입 페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
-                                showWelcome = true
-                            } catch {
-                                print("❌ 회원가입 실패: \(error.localizedDescription)")
+                                await userViewModel.createUserAndLogin()
                             }
-                        }
-                        showWelcome = true
                     }) {
-                        Text("회원가입")
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(isFormValid ? Color.init(hex: "#FF4B2F") : Color.gray.opacity(0.2))
-                            .cornerRadius(8)
+                        HStack {
+                            if isSigningUp {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .foregroundColor(.white)
+                            }
+                            Text(isSigningUp ? "가입중..." : "회원가입")
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isFormValid && !isSigningUp ? Color.init(hex: "#FF4B2F") : Color.gray.opacity(0.2))
+                        .cornerRadius(8)
                     }
-                    .disabled(!isFormValid)
+                    .disabled(!isFormValid || isSigningUp)
+                    .alert("회원가입 실패", isPresented: $showErrorAlert) {
+                        Button("확인", role: .cancel) { }
+                    } message: {
+                        Text(signupError ?? "알 수 없는 오류가 발생했습니다.")
+                    }
                     .padding(.top, 30)
                 }
                 .fullScreenCover(isPresented: $showWelcome) {
@@ -142,7 +178,7 @@ struct Sign_in_Page: View {
                     isUserIdChecked = true
                 }
             } else {
-        
+                
                 userIdStatus = nil
                 isUserIdChecked = false
             }
@@ -242,7 +278,7 @@ struct Sign_in_Page: View {
     func validatePassword() {
         passwordLengthError = false
         passwordMismatchError = false
-
+        
         guard let password = userViewModel.user.pw else { return }
         
         if password.count < 4 || password.count > 12 {

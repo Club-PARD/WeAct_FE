@@ -75,6 +75,7 @@ struct MainView: View {
                                 .scaledToFit()
                                 .frame(height: 92)
                         } // HStack
+                        
                     } // HStack
                     .padding(.top, 25)
                     
@@ -208,18 +209,14 @@ struct MainView: View {
             do {
                 // 🔧 개선된 userId 검증 로직
                 guard let userId = userViewModel.user.userId else {
-                    
                     print("❌ 현재 사용자 상태 - userId: \(userViewModel.user.userId ?? "없음")")
-                    
                     return
                 }
-                
-                print("📡 [요청 시작] userId: \(userId)")
-                
+                guard let userId = userViewModel.user.userId else {
+                    print("❌ 현재 사용자 상태 - userId 없음")
+                    return
+                }
                 let response = try await HomeGroupService.shared.getHomeGroups(userId: userId)
-                
-                print("📡 [요청 URL] https://naruto.asia/user/home/\(userId)")
-                print("✅ [서버 응답 성공] 받은 그룹 수: \(response.roomInformationDtos.count)")
                 
                 // 메인 스레드에서 UI 업데이트
                 await MainActor.run {
@@ -234,13 +231,13 @@ struct MainView: View {
                     // 화면에서 실제 쓰는 groups 배열 업데이트
                     self.groupStore.groups = response.roomInformationDtos.map { homeGroup in
                         GroupModel(
-                            id: homeGroup.roomId ?? Int.random(in: 0...9999), // 서버에서 roomId 제공시 사용
+                            id: homeGroup.roomId ?? Int.random(in: 0...9999),
                             name: homeGroup.roomName,
                             startDate: parseDate(from: homeGroup.period) ?? Date(),
                             endDate: parseEndDate(from: homeGroup.period) ?? Date(),
-                            reward: "보상 미정", // 서버에서 제공하지 않으면 기본값
-                            partners: [], // 서버에 데이터 없으면 빈 배열
-                            selectedDaysString: "", // 서버에서 제공하지 않으면 빈 문자열
+                            reward: "보상 미정",
+                            partners: [],
+                            selectedDaysString: "",
                             selectedDaysCount: homeGroup.dayCountByWeek,
                             habitText: homeGroup.habit
                         )
@@ -251,14 +248,32 @@ struct MainView: View {
                 
             } catch {
                 print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
-                
-                // 오류 발생시 디버깅 정보 추가 출력
-                await MainActor.run {
-                    print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
-                }
+                //                print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+                //
+                //                // 🔍 더 자세한 에러 정보 출력
+                //                if let decodingError = error as? DecodingError {
+                //                    print("❌ 디코딩 에러 상세:")
+                //                    switch decodingError {
+                //                    case .dataCorrupted(let context):
+                //                        print("- 데이터 손상: \(context.debugDescription)")
+                //                    case .keyNotFound(let key, let context):
+                //                        print("- 키 없음: \(key), 컨텍스트: \(context.debugDescription)")
+                //                    case .typeMismatch(let type, let context):
+                //                        print("- 타입 불일치: \(type), 컨텍스트: \(context.debugDescription)")
+                //                    case .valueNotFound(let value, let context):
+                //                        print("- 값 없음: \(value), 컨텍스트: \(context.debugDescription)")
+                //                    @unknown default:
+                //                        print("- 알 수 없는 디코딩 에러")
+                //                    }
+                //                }
+                //
+                //                await MainActor.run {
+                //                    print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
+                //                }
             }
         }
     }
+}
     
     // MARK: - 날짜 파싱 헬퍼 함수들
     private func parseDate(from period: String) -> Date? {
@@ -278,7 +293,7 @@ struct MainView: View {
         formatter.dateFormat = "yyyy.MM.dd"
         return formatter.date(from: components[1])
     }
-}
+
 
 
 #Preview {

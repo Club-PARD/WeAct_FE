@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var userId: String = ""
     @State private var password: String = ""
     @FocusState private var focusedField: Field?
@@ -61,24 +61,13 @@ struct ContentView: View {
                 Button(action: {
                     if isFormValid {
                         isLoggedIn = true
+                        
+                        Task {
+                                            await login()
+                                        }
                     } else {
                         showAlert = true  // ✅ 입력 안했을 때 경고 표시
                     }
-                    Task {
-                       if isFormValid {
-                           userViewModel.user.userId = userId
-                           userViewModel.user.pw = password
-
-                           let success = await userViewModel.login()
-                           if success {
-                               isLoggedIn = true
-                           } else {
-                               showAlert = true
-                           }
-                       } else {
-                           showAlert = true
-                       }
-                   }
                 }) {
                     Text("로그인")
                         .foregroundColor(.white)
@@ -121,6 +110,38 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+    }
+
+//    func login() async {
+//        do {
+//            let token = try await UserService().login(userId: userId, password: password)
+//            TokenManager.shared.saveToken(token)
+//            userViewModel.user.userId = userId   // ✅ 여기 중요!
+//            isLoggedIn = true
+//            print("✅ 로그인 성공, 토큰: \(token)")
+//        } catch {
+//            print("❌ 로그인 에러: \(error)")
+//        }
+//    }
+    
+    func login() async {
+        do {
+            let token = try await UserService().login(userId: userId, password: password)
+            TokenManager.shared.saveToken(token)
+            userViewModel.token = token
+            isLoggedIn = true
+            
+            // ✅ 여기서 사용자 정보 요청
+            let userInfo = try await UserService().getUserInfo(token: token)
+            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
+            
+            print("✅ 로그인 후 사용자 정보: \(userInfo)")
+            print("🧠 userId: \(userInfo.userId ?? "없음")")
+            print("🧠 id: \(userInfo.id ?? -1)")
+            
+        } catch {
+            print("❌ 로그인 에러: \(error)")
         }
     }
 }

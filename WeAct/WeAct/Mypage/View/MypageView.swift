@@ -11,7 +11,7 @@ import SwiftUI
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var userViewModel: UserViewModel
-    @AppStorage("isLoggedIn") private var isLoggedIn = true
+    @AppStorage("isLoggedIn") var isLoggedIn = true
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
     
@@ -159,6 +159,8 @@ struct MypageView: View {
                            isLoggedIn = false
                            navigationPath = NavigationPath()
                            print("로그아웃 버튼 클릭")
+                           TokenManager.shared.deleteToken()
+                                          isLoggedIn = false
                        }
                    )
                }//isShowingLogoutModal

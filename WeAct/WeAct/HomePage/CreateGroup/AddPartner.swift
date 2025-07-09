@@ -60,7 +60,7 @@ struct AddPartner: View {
             .sheet(isPresented: $showingBottomSheet) {
                 PartnerSearchSheet(selectedPartners: $selectedPartners)
                     .presentationDetents([.height(UIScreen.main.bounds.height * 0.576)])
-                    .environmentObject(userViewModel) 
+                    .environmentObject(userViewModel)
             }
             
         }
@@ -131,7 +131,7 @@ struct AddPartner: View {
                     .scaledToFit()
                     .frame(height: 70)
             }
-       
+            
             if let userId = userViewModel.user.userId {
                 Text(userId)
                     .font(.custom("Pretendard-Medium", size: 14))
@@ -201,61 +201,70 @@ struct AddPartner: View {
     
     // MARK: - Actions
     
+    // MARK: - Actions
+    
     private func createRoom() {
         print("선택된 파트너: \(selectedPartners)")
         
         //서버통신 request 관련 코드
         guard let creatorId = userViewModel.user.id else {
-           print("❌ 유저 ID 없음 - 방 생성 불가")
-           return
-       }
+            print("❌ 유저 ID 없음 - 방 생성 불가")
+            return
+        }
         let invitedIds = selectedPartners.map { $0.id }
         let formatter = ISO8601DateFormatter()
-           formatter.formatOptions = [.withInternetDateTime]
-
+        formatter.formatOptions = [.withInternetDateTime]
+        
         let startDateString = formatter.string(from: CreateGroupData.shared.startDate)
         let endDateString = formatter.string(from: CreateGroupData.shared.endDate)
-
+        
         let request = GroupRequest(
-           invitedIds: invitedIds,
-           roomName: CreateGroupData.shared.name,
-           startDate: startDateString,
-           endDate: endDateString,
-           reward: CreateGroupData.shared.reward,
-           days: CreateGroupData.shared.selectedDaysString,
-           dayCountByWeek: CreateGroupData.shared.selectedDaysCount,
-           creatorId: creatorId
+            invitedIds: invitedIds,
+            roomName: CreateGroupData.shared.name,
+            startDate: startDateString,
+            endDate: endDateString,
+            reward: CreateGroupData.shared.reward,
+            days: CreateGroupData.shared.selectedDaysString,
+            dayCountByWeek: CreateGroupData.shared.selectedDaysCount,
+            creatorId: creatorId
         )
-
+        
         Task {
             do {
                 let response = try await GroupService.shared.createGroup(request: request)
                 print("✅ 서버에 그룹 생성 성공")
-                // 새로운 그룹 생성
-                let newGroup = GroupModel(
-                    id: response.roomId,
-                    name: CreateGroupData.shared.name,
-                    startDate: CreateGroupData.shared.startDate,
-                                           endDate: CreateGroupData.shared.endDate,
-                    reward: CreateGroupData.shared.reward,
-                    partners: selectedPartners.map { $0.name },
-                    selectedDaysString: CreateGroupData.shared.selectedDaysString,
-                    selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
-                    habitText: CreateGroupData.shared.habitText
-                )
                 
-                // 그룹 스토어에 추가
-                groupStore.addGroup(newGroup)
+                // 메인 스레드에서 UI 업데이트 실행
+                await MainActor.run {
+                    // 새로운 그룹 생성
+                    let newGroup = GroupModel(
+                        id: response.roomId,
+                        name: CreateGroupData.shared.name,
+                        startDate: CreateGroupData.shared.startDate,
+                        endDate: CreateGroupData.shared.endDate,
+                        reward: CreateGroupData.shared.reward,
+                        partners: selectedPartners.map { $0.name },
+                        selectedDaysString: CreateGroupData.shared.selectedDaysString,
+                        selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
+                        habitText: CreateGroupData.shared.habitText
+                    )
+                    
+                    // 그룹 스토어에 추가
+                    groupStore.addGroup(newGroup)
+                    
+                    // 습관 설정 페이지로 이동
+                    navigationPath.append(NavigationDestination.setuphabit)
+                    
+                    print("✅ 습관 설정 페이지로 이동")
+                }
                 
-                // 임시 데이터 초기화
-                CreateGroupData.shared.reset()
-                
-                // 습관 설정 페이지
-                navigationPath.append(NavigationDestination.setuphabit)
             } catch {
                 print("❌ 그룹 생성 실패: \(error.localizedDescription)")
+                // 에러 처리도 메인 스레드에서
+                await MainActor.run {
+                    // 여기에 에러 알림 UI 추가 가능
+                }
             }
-            
         }//Task
     }
 }

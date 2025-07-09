@@ -276,9 +276,6 @@ struct CreateGroup: View {
                 }
                 .disabled(!isFormValid)
                 .padding(.bottom, 10)
-                
-                
-                
             } // VStack
             .padding(.vertical, 18)
             .padding(.horizontal, 18)

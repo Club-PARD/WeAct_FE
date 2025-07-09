@@ -147,5 +147,5 @@ struct RankingCard: View {
 //            CheckPointMember(userName: "김종언", profileImage: nil)
 //        ]
 //    ))
-    CheckPointRankingView(roomId: 1)
+    CheckPointRankingView(roomId: 11)
 }

@@ -16,6 +16,8 @@ class NetworkService {
     func get<T: Decodable>(url: URL, accessToken: String? = nil) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        
+        // 토큰이 있으면 Authorization header 추가
         if let token = accessToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
@@ -30,7 +32,10 @@ class NetworkService {
         print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
 
         guard httpResponse.statusCode == 200 else {
-            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: nil)
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ GET 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
         }
 
         return try JSONDecoder().decode(T.self, from: data)
@@ -41,6 +46,8 @@ class NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // 토큰이 있으면 Authorization header 추가
         if let token = accessToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
@@ -56,12 +63,125 @@ class NetworkService {
         print("📡 POST 응답 코드: \(httpResponse.statusCode)")
         print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
 
-        guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
-            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: nil)
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ POST 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
         }
 
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    // 필요 시 PATCH, DELETE 메서드도 동일 패턴으로 추가
+    // MARK: - 공통 PUT 요청
+    func put<T: Decodable, U: Encodable>(url: URL, body: U, accessToken: String? = nil) async throws -> T {
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // 토큰이 있으면 Authorization header 추가
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        request.httpBody = try JSONEncoder().encode(body)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 PUT 응답 코드: \(httpResponse.statusCode)")
+        print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ PUT 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
+        }
+
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    // MARK: - 공통 DELETE 요청
+    func delete(url: URL, accessToken: String? = nil) async throws -> Bool {
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        // 토큰이 있으면 Authorization header 추가
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 DELETE 응답 코드: \(httpResponse.statusCode)")
+        print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ DELETE 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
+        }
+
+        return true
+    }
+
+    // MARK: - Body 없는 POST 요청 (가입, 탈퇴 등)
+    func postWithoutBody<T: Decodable>(url: URL, accessToken: String? = nil) async throws -> T {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // 토큰이 있으면 Authorization header 추가
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 POST (no body) 응답 코드: \(httpResponse.statusCode)")
+        print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ POST 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
+        }
+
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    // MARK: - Body 없는 POST 요청 (Boolean 응답)
+    func postWithoutBodyBool(url: URL, accessToken: String? = nil) async throws -> Bool {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // 토큰이 있으면 Authorization header 추가
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 POST (no body, bool) 응답 코드: \(httpResponse.statusCode)")
+        print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        return (200...299).contains(httpResponse.statusCode)
+    }
 }

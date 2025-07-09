@@ -84,189 +84,137 @@ struct GroupDetailBoard: View {
         return calendar.compare(nextDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
     }
     
-    // checkDays API 호출 함수 (Path parameter 사용 - 서버 API 명세에 맞춤)
-    private func checkDays() {
-        print("🔍 [checkDays] =================")
-        print("🔍 [checkDays] 함수 호출됨")
-        print("🔍 [checkDays] 그룹 ID: \(group.id)")
-        print("🔍 [checkDays] 현재 날짜: \(displayDateFormatter.string(from: currentDate))")
-        print("🔍 [checkDays] 그룹 선택 요일: \(group.selectedDaysString)")
-        print("🔍 [checkDays] 현재 canCertifyToday 상태: \(canCertifyToday)")
-        print("🔍 [checkDays] =================")
-        
-        // API URL 구성 - Path parameter 사용 (서버 API 명세에 맞춤)
-        let baseURL = "https://naruto.asia"
-        let endpoint = "/room/checkDays/\(group.id)"
-        let urlString = "\(baseURL)\(endpoint)"
-        
-        print("📡 [checkDays] API URL: \(urlString)")
-        print("🏠 [checkDays] 그룹 ID: \(group.id)")
-        print("⚠️ [checkDays] 참고: 이 API는 서버에서 현재 날짜를 기준으로 판단합니다")
-        
-        guard let url = URL(string: urlString) else {
-            print("❌ [checkDays] URL 생성 실패")
-            return
+    // 토큰을 가져오는 헬퍼 함수
+        private func getAccessToken() -> String? {
+            return UserDefaults.standard.string(forKey: "accessToken")
         }
-        
-        print("🚀 [checkDays] API 요청 시작...")
-        
-        // URLSession을 사용한 API 호출
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                print("📥 [checkDays] API 응답 받음")
-                
-                // HTTP 응답 상태 코드 확인
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("📊 [checkDays] 응답 상태 코드: \(httpResponse.statusCode)")
-                    
-                    if httpResponse.statusCode == 500 {
-                        print("❌ [checkDays] 서버 오류 발생 (500)")
-                        print("❌ [checkDays] 그룹의 days 필드가 설정되지 않았을 수 있습니다")
-                        canCertifyToday = false
-                        print("🔄 [checkDays] canCertifyToday -> false (서버 오류)")
-                        return
-                    }
-                    
-                    if httpResponse.statusCode != 200 {
-                        print("❌ [checkDays] 예상치 못한 상태 코드: \(httpResponse.statusCode)")
-                        canCertifyToday = false
-                        print("🔄 [checkDays] canCertifyToday -> false (비정상 응답)")
-                        return
-                    }
-                }
-                
-                if let error = error {
-                    print("❌ [checkDays] 네트워크 오류: \(error.localizedDescription)")
-                    canCertifyToday = false
-                    print("🔄 [checkDays] canCertifyToday -> false (네트워크 오류)")
-                    return
-                }
-                
-                guard let data = data else {
-                    print("❌ [checkDays] 응답 데이터 없음")
-                    canCertifyToday = false
-                    print("🔄 [checkDays] canCertifyToday -> false (데이터 없음)")
-                    return
-                }
-                
-                print("📦 [checkDays] 응답 데이터 크기: \(data.count) bytes")
-                
-                // 원시 응답 데이터 출력
-                if let rawString = String(data: data, encoding: .utf8) {
-                    print("📝 [checkDays] 원시 응답: '\(rawString)'")
-                } else {
-                    print("❌ [checkDays] 응답을 문자열로 변환 실패")
-                }
-                
+    
+    // checkDays API 호출 함수 (NetworkService 사용)
+        private func checkDays() {
+            print("🔍 [checkDays] =================")
+            print("🔍 [checkDays] 함수 호출됨")
+            print("🔍 [checkDays] 그룹 ID: \(group.id)")
+            print("🔍 [checkDays] 현재 날짜: \(displayDateFormatter.string(from: currentDate))")
+            print("🔍 [checkDays] 그룹 선택 요일: \(group.selectedDaysString)")
+            print("🔍 [checkDays] 현재 canCertifyToday 상태: \(canCertifyToday)")
+            print("🔍 [checkDays] =================")
+            
+            // 토큰 확인
+            guard let accessToken = getAccessToken() else {
+                print("❌ [checkDays] 액세스 토큰이 없습니다")
+                canCertifyToday = false
+                return
+            }
+            
+            print("🔑 [checkDays] 토큰 확인 완료")
+            
+            // API URL 구성
+            let urlString = "\(APIConstants.baseURL)/room/checkDays/\(group.id)"
+            
+            print("📡 [checkDays] API URL: \(urlString)")
+            
+            guard let url = URL(string: urlString) else {
+                print("❌ [checkDays] URL 생성 실패")
+                canCertifyToday = false
+                return
+            }
+            
+            print("🚀 [checkDays] API 요청 시작...")
+            
+            // NetworkService를 사용한 비동기 API 호출
+            Task {
                 do {
-                    // JSON 파싱 시도
-                    let jsonObject = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])
-                    print("✅ [checkDays] JSON 파싱 성공")
-                    print("📋 [checkDays] 파싱된 객체: \(jsonObject)")
-                    print("📋 [checkDays] 객체 타입: \(type(of: jsonObject))")
+                    let result: Bool = try await NetworkService.shared.get(url: url, accessToken: accessToken)
                     
-                    if let result = jsonObject as? Bool {
-                        print("✅ [checkDays] Boolean 파싱 성공: \(result)")
+                    // 메인 스레드에서 UI 업데이트
+                    await MainActor.run {
+                        print("✅ [checkDays] API 호출 성공: \(result)")
                         print("🔄 [checkDays] canCertifyToday: \(canCertifyToday) -> \(result)")
                         canCertifyToday = result
                         print("🎯 [checkDays] 최종 인증 가능 여부: \(canCertifyToday)")
-                        
-                        // UI 업데이트 확인을 위한 추가 로그
-                        print("🖼️ [checkDays] UI 업데이트 예정 - 인증 버튼 표시 여부: \(isCurrentDateInRange && canCertifyToday)")
-                        
-                    } else {
-                        print("❌ [checkDays] Boolean 타입 변환 실패")
-                        print("❌ [checkDays] 실제 받은 타입: \(type(of: jsonObject))")
-                        print("❌ [checkDays] 실제 받은 값: \(jsonObject)")
-                        canCertifyToday = false
-                        print("🔄 [checkDays] canCertifyToday -> false (타입 변환 실패)")
+                        print("🖼️ [checkDays] UI 업데이트 완료 - 인증 버튼 표시 여부: \(isCurrentDateInRange && canCertifyToday)")
                     }
-                } catch {
-                    print("❌ [checkDays] JSON 파싱 오류: \(error.localizedDescription)")
-                    print("❌ [checkDays] 파싱 오류 상세: \(error)")
-                    canCertifyToday = false
-                    print("🔄 [checkDays] canCertifyToday -> false (파싱 오류)")
-                }
-                
-                print("🔍 [checkDays] 처리 완료 =================")
-            }
-        }.resume()
-    }
-
-    
-    // oneDayCount API 호출 함수 (서버 데이터 수집용)
-    private func checkOneDayCount() {
-        print("🔍 [DEBUG] checkOneDayCount 호출됨")
-        
-        guard isCurrentDateInRange else {
-            print("❌ [DEBUG] 현재 날짜가 그룹 기간 외입니다.")
-            return
-        }
-        
-        // API URL 구성
-        let baseURL = "https://naruto.asia"
-        let endpoint = "/room/oneDayCount"
-        let dateString = apiDateFormatter.string(from: currentDate)
-        let urlString = "\(baseURL)\(endpoint)?roomId=\(group.id)&date=\(dateString)"
-        
-        print("📡 [DEBUG] API URL: \(urlString)")
-        print("📅 [DEBUG] 요청 날짜: \(dateString)")
-        print("🏠 [DEBUG] 그룹 ID: \(group.id)")
-        
-        guard let url = URL(string: urlString) else {
-            print("❌ [DEBUG] URL 생성 실패")
-            return
-        }
-        
-        print("🚀 [DEBUG] API 요청 시작...")
-        
-        // URLSession을 사용한 API 호출
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                print("📥 [DEBUG] API 응답 받음")
-                
-                // HTTP 응답 상태 코드 확인
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("📊 [DEBUG] 응답 상태 코드: \(httpResponse.statusCode)")
-                    print("📋 [DEBUG] 응답 헤더: \(httpResponse.allHeaderFields)")
-                }
-                
-                if let error = error {
-                    print("❌ [DEBUG] API 호출 오류: \(error.localizedDescription)")
-                    print("❌ [DEBUG] 에러 상세: \(error)")
-                    return
-                }
-                
-                guard let data = data else {
-                    print("❌ [DEBUG] 응답 데이터가 없습니다")
-                    return
-                }
-                
-                // 원시 응답 데이터 출력
-                print("📦 [DEBUG] 원시 응답 데이터 크기: \(data.count) bytes")
-                if let rawString = String(data: data, encoding: .utf8) {
-                    print("📝 [DEBUG] 원시 응답 내용: '\(rawString)'")
-                }
-                
-                do {
-                    // JSON 파싱 시도
-                    let jsonObject = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])
-                    print("✅ [DEBUG] JSON 파싱 성공: \(jsonObject)")
                     
-                    if let result = jsonObject as? Bool {
-                        isAllCompleted = result
-                        print("✅ [DEBUG] Boolean 파싱 성공: \(result)")
-                        print("🎯 [DEBUG] 해당 날짜 모든 멤버 인증 완료: \(result)")
-                    } else {
-                        print("❌ [DEBUG] Boolean 타입이 아닙니다. 실제 타입: \(type(of: jsonObject))")
-                    }
                 } catch {
-                    print("❌ [DEBUG] JSON 파싱 오류: \(error.localizedDescription)")
-                    print("❌ [DEBUG] 파싱 에러 상세: \(error)")
+                    // 메인 스레드에서 에러 처리
+                    await MainActor.run {
+                        print("❌ [checkDays] API 호출 실패: \(error)")
+                        
+                        // HTTP 에러 코드 확인
+                        if let nsError = error as NSError?, nsError.code == 500 {
+                            print("❌ [checkDays] 서버 오류 발생 (500)")
+                            print("❌ [checkDays] 그룹의 days 필드가 설정되지 않았을 수 있습니다")
+                        }
+                        
+                        canCertifyToday = false
+                        print("🔄 [checkDays] canCertifyToday -> false (API 호출 실패)")
+                    }
                 }
             }
-        }.resume()
-    }
+            
+            print("🔍 [checkDays] 처리 완료 =================")
+        }
+        
+        // oneDayCount API 호출 함수 (NetworkService 사용)
+        private func checkOneDayCount() {
+            print("🔍 [DEBUG] checkOneDayCount 호출됨")
+            
+            guard isCurrentDateInRange else {
+                print("❌ [DEBUG] 현재 날짜가 그룹 기간 외입니다.")
+                return
+            }
+            
+            // 토큰 확인
+            guard let accessToken = getAccessToken() else {
+                print("❌ [DEBUG] 액세스 토큰이 없습니다")
+                return
+            }
+            
+            print("🔑 [DEBUG] 토큰 확인 완료")
+            
+            // API URL 구성
+            let dateString = apiDateFormatter.string(from: currentDate)
+            let urlString = "\(APIConstants.baseURL)/room/oneDayCount?roomId=\(group.id)&date=\(dateString)"
+            
+            print("📡 [DEBUG] API URL: \(urlString)")
+            print("📅 [DEBUG] 요청 날짜: \(dateString)")
+            print("🏠 [DEBUG] 그룹 ID: \(group.id)")
+            
+            guard let url = URL(string: urlString) else {
+                print("❌ [DEBUG] URL 생성 실패")
+                return
+            }
+            
+            print("🚀 [DEBUG] API 요청 시작...")
+            
+            // NetworkService를 사용한 비동기 API 호출
+            Task {
+                do {
+                    let result: Bool = try await NetworkService.shared.get(url: url, accessToken: accessToken)
+                    
+                    // 메인 스레드에서 UI 업데이트
+                    await MainActor.run {
+                        print("✅ [DEBUG] API 호출 성공: \(result)")
+                        isAllCompleted = result
+                        print("🎯 [DEBUG] 해당 날짜 모든 멤버 인증 완료: \(result)")
+                    }
+                    
+                } catch {
+                    // 메인 스레드에서 에러 처리
+                    await MainActor.run {
+                        print("❌ [DEBUG] API 호출 실패: \(error)")
+                        
+                        // HTTP 에러 코드 확인
+                        if let nsError = error as NSError? {
+                            print("❌ [DEBUG] 에러 코드: \(nsError.code)")
+                        }
+                        
+                        isAllCompleted = false
+                        print("🔄 [DEBUG] isAllCompleted -> false (API 호출 실패)")
+                    }
+                }
+            }
+        }
     
     var customBackButton: some View {
         Button(action: {
@@ -536,7 +484,7 @@ extension String {
     let startDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 8)) ?? Date()
     let endDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 9)) ?? Date()
     let testGroup = GroupModel(
-        id: 1,
+        id: 11,
         name: "아침 운동 챌린지",
         startDate: startDate,
         endDate: endDate,

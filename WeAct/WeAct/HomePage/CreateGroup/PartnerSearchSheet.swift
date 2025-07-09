@@ -4,31 +4,16 @@
 //
 //  Created by 최승아 on 6/30/25.
 //
+// MARK: searchUser를 통해 유저 정보 가져오도록 업데이트됨
 
 import SwiftUI
 
 struct PartnerSearchSheet: View {
     @Binding var selectedPartners: Set<PartnerModel>
+    @StateObject private var viewModel = UserSearchViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
-    
-    // 샘플 사용자들을 static으로 선언하여 같은 인스턴스 사용
-    static let sampleUsers = [
-        PartnerModel(name: "김철수", profileImageName: nil),
-        PartnerModel(name: "이영희", profileImageName: nil),
-        PartnerModel(name: "박민수", profileImageName: nil),
-        PartnerModel(name: "정수진", profileImageName: nil),
-        PartnerModel(name: "최지훈", profileImageName: nil)
-    ]
-    
-    var filteredUsers: [PartnerModel] {
-        if searchText.isEmpty {
-            return Self.sampleUsers
-        } else {
-            return Self.sampleUsers.filter { $0.name.contains(searchText) }
-        }
-    }
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -43,6 +28,11 @@ struct PartnerSearchSheet: View {
             .navigationBarItems(
                 trailing: doneButton
             )
+            .onChange(of: searchText) { newValue in
+               Task {
+                   await viewModel.searchUsers(containing: newValue) // ✅ 4. 검색어 변경 시 서버 호출
+               }
+           }
         }
     }
     
@@ -65,8 +55,15 @@ struct PartnerSearchSheet: View {
     
     private var userList: some View {
         List {
-            ForEach(filteredUsers, id: \.self) { user in
-                userRow(user)
+            if viewModel.isLoading {
+                ProgressView()
+            } else if let error = viewModel.errorMessage {
+                Text(error).foregroundColor(.red)
+            } else {
+                ForEach(viewModel.searchedUsers) { user in // ✅ 3. 서버 응답 사용
+                    let partner = PartnerModel(id: user.id, name: user.userId, profileImageName: nil)
+                    userRow(partner)
+                }
             }
         }
         .listStyle(PlainListStyle())
@@ -101,7 +98,7 @@ struct PartnerSearchSheet: View {
             Button(action: {
                 toggleSelection(for: user)
             }) {
-                let isSelected = selectedPartners.contains(where: { $0.name == user.name })
+                let isSelected = selectedPartners.contains(where: { $0.id == user.id })
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(isSelected ? Color(hex: "FF4B2F") : Color(hex: "F7F7F7"))
                     .font(.system(size: 20))
@@ -122,7 +119,7 @@ struct PartnerSearchSheet: View {
     // MARK: - Actions
     
     private func toggleSelection(for user: PartnerModel) {
-        if let existingUser = selectedPartners.first(where: { $0.name == user.name }) {
+        if let existingUser = selectedPartners.first(where: { $0.id == user.id }) {
             selectedPartners.remove(existingUser)
         } else {
             selectedPartners.insert(user)

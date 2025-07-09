@@ -16,6 +16,8 @@ struct CertificationView: View {
 
     var body: some View {
         ZStack {
+            Color(hex: "F7F7F7")
+                        .ignoresSafeArea()
             Text("습관인증하기")
                 .font(
                     Font.custom("Pretendard", size: 18)
@@ -33,25 +35,25 @@ struct CertificationView: View {
                 Spacer()
             }
         }
-        .padding(.horizontal)
-        .padding(.top, 20)
+        .padding(.horizontal, 18)
+        .padding(.top, 15)
 
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading) {
             Text("오늘은 어떻게 인증할까요?")
-                .font(
-                    Font.custom("Pretendard", size: 16)
-                        .weight(.medium)
-                )
-                .foregroundColor(.gray)
-
+                .font(.custom("Pretendard-Medium", size: 16))
+                .foregroundColor(Color(hex: "858588"))
+                .padding(.top, 43)
+            
             HStack(spacing: 10) {
                 Button(action: {
                     selectedOption = "인증할래요"
                 }) {
                     Text("인증할래요")
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(selectedOption == "인증할래요" ? .white : .gray)
-                        .padding()
-                        .background(selectedOption == "인증할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(selectedOption == "인증할래요" ? Color(hex: "464646") : Color(hex: "E7E7E7"))
                         .cornerRadius(8)
                         .font(
                             Font.custom("Pretendard", size: 16)
@@ -63,8 +65,10 @@ struct CertificationView: View {
                     selectedOption = "해명할래요"
                 }) {
                     Text("해명할래요")
+                        .font(.custom("Pretendard-Medium", size: 16))
                         .foregroundColor(selectedOption == "해명할래요" ? .white : .gray)
-                        .padding()
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
                         .background(selectedOption == "해명할래요" ? Color(hex: "#464646") : Color(hex: "#E7E7E7"))
                         .cornerRadius(8)
                         .font(
@@ -73,24 +77,24 @@ struct CertificationView: View {
                         )
                 }
             }
+            .padding(.vertical, 12)
 
             VStack(alignment: .leading) {
                 Text(selectedOption == "인증할래요" ? "한 마디를 작성해주세요" : "친구에게 해명 한마디를 전해주세요")
-                    .font(
-                        Font.custom("Pretendard", size: 16)
-                            .weight(.medium)
-                    )
-                    .foregroundColor(.gray)
+                    .font(.custom("Pretendard-Medium", size: 16))
+                    .foregroundColor(Color(hex: "858588"))
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.systemGray6))
+                        .fill(Color(.white))
                         .frame(height: 54)
 
                     HStack {
                         LimitedTextField(text: $message, placeholder: "오늘의인증합니다아아", characterLimit: 15)
                             .frame(height: 20)
                             .padding(.vertical, 22)
+                        
+                        
                         Spacer()
                         (
                             Text("\(message.count)")
@@ -111,11 +115,8 @@ struct CertificationView: View {
 
             VStack(alignment: .leading, spacing: 17) {
                 Text("인증 사진을 등록해주세요")
-                    .font(
-                        Font.custom("Pretendard", size: 16)
-                            .weight(.medium)
-                    )
-                    .foregroundColor(.gray)
+                    .font(.custom("Pretendard-Medium", size: 16))
+                    .foregroundColor(Color(hex: "FFFFFFF"))
 
                 HStack {
                     Spacer()
@@ -150,7 +151,7 @@ struct CertificationView: View {
             .opacity(selectedOption == "인증할래요" ? 1 : 0)
             .allowsHitTesting(selectedOption == "인증할래요")
 
-            Spacer().frame(height: 73)
+            Spacer()
 
             Button(action: {
                 // 전송 로직
@@ -167,6 +168,12 @@ struct CertificationView: View {
                     )
             }
         }
-        .padding()
+        .padding(.bottom, 18)
+        .padding(.horizontal, 18)
+        .navigationBarBackButtonHidden(true)
     }
 }
+
+//#Preview {
+//    CertificationView()
+//}

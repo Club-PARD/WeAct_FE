@@ -16,7 +16,7 @@ struct OnBoardingPage: View {
 
             TabView(selection: $currentIndex) {
                 ForEach(0..<onboardingData.count, id: \.self) { index in
-                    VStack(spacing: 24) {
+                    VStack(spacing: 14) {
                         Text(onboardingData[index].title)
                             .font(.title2)
                             .fontWeight(.bold)
@@ -33,7 +33,7 @@ struct OnBoardingPage: View {
                         Image(onboardingData[index].imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 240, height: 240)
+                            .frame(width: 375, height: 340)
                             .cornerRadius(16)
 
                         Spacer()
@@ -63,7 +63,7 @@ struct OnBoardingPage: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color(hex: "#FF632F"))
+                            .background(Color(hex: "#FF4B2F"))
                             .cornerRadius(12)
                             .padding(.horizontal, 24)
                     }
@@ -84,3 +84,10 @@ struct OnboardingContent {
     let sub: String
     let imageName: String  // ✅ imageText → imageName으로 변경
 }
+
+
+//#Preview {
+//    StatefulPreviewWrapper(true) { isFirstLaunch in
+//            OnBoardingPage(isFirstLaunch: isFirstLaunch)
+//        }
+//}

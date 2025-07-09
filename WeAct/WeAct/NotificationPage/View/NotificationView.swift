@@ -72,7 +72,7 @@ struct NotificationView: View {
                          ToastView(message: "그룹 초대를 거절했어요")
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
-//                             .frame(width: 22.15384, height: 22.15384)
+
                      }
                  }//isShowingRejectToast
             }//ZStack

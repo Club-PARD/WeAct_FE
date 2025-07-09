@@ -44,3 +44,8 @@ struct WelcomePage: View {
         }
     }
 }
+
+
+#Preview {
+    WelcomePage()
+}

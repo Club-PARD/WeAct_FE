@@ -91,8 +91,7 @@ struct CreateGroup: View {
                         }
                     }
                     .padding(.horizontal, 22)
-                    .padding(.vertical, 20)
-                    .frame(height: 44)
+                    .padding(.vertical, 14)
                     .background(Color.white)
                     .cornerRadius(8)
                     .overlay(
@@ -254,6 +253,10 @@ struct CreateGroup: View {
 //                    print("🔴 [디버그] 보상(reward):", reward)
                     
                     if isFormValid {
+                    
+                        CreateGroupData.shared.startDate = startDate
+                        CreateGroupData.shared.endDate = endDate
+                        
                         // 임시 데이터를 환경 객체에 저장
                         CreateGroupData.shared.name = name
                         CreateGroupData.shared.period = period
@@ -322,6 +325,9 @@ class CreateGroupData: ObservableObject {
     @Published var selectedDaysString: [String] = [] // 빈 배열로 수정
     @Published var selectedDaysCount: Int = 0
     @Published var habitText: String = ""
+    @Published var startDate: Date = Date()
+   @Published var endDate: Date = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+
     
     private init() {}
     
@@ -332,6 +338,8 @@ class CreateGroupData: ObservableObject {
         selectedDaysString = []
         selectedDaysCount = 0
         habitText = ""
+        startDate = Date()
+        endDate = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
     }
 }
 

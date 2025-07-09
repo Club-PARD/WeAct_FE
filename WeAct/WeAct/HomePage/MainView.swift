@@ -169,16 +169,46 @@ struct MainView: View {
                     }
                 }
             } // ZStack
+            
+            
+            
+            
+//            .onAppear {
+//                fetchHomeGroups()
+//            }
+//            .onChange(of: navigationPath) { oldValue, newValue in
+//                // 네비게이션 스택이 비어있을 때 (홈화면으로 돌아왔을 때) 그룹 목록 새로고침
+//                if newValue.isEmpty {
+//                    print("🔄 홈화면으로 돌아옴 - 그룹 목록 새로고침")
+//                    fetchHomeGroups()
+//                }
+//            }
             .onAppear {
-                fetchHomeGroups()
+                if let userId = userViewModel.user.userId {
+                    print("✅ [onAppear] 유저 ID 확인됨: \(userId)")
+                    fetchHomeGroups()
+                } else {
+                    print("❌ [onAppear] 유저 ID가 nil이라서 그룹 요청 안 함")
+                }
+            }
+            .onChange(of: userViewModel.user.userId) { newUserId in
+                if let id = newUserId {
+                    print("🔄 [onChange] 유저 ID 감지됨: \(id) → 그룹 새로 요청")
+                    fetchHomeGroups()
+                }
             }
             .onChange(of: navigationPath) { oldValue, newValue in
-                // 네비게이션 스택이 비어있을 때 (홈화면으로 돌아왔을 때) 그룹 목록 새로고침
                 if newValue.isEmpty {
                     print("🔄 홈화면으로 돌아옴 - 그룹 목록 새로고침")
                     fetchHomeGroups()
                 }
             }
+
+            
+            
+            
+            
+            
         } // NavigationStack
         .navigationBarBackButtonHidden(true)
     }

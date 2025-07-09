@@ -16,7 +16,6 @@ struct GroupModel: Hashable, Identifiable, Codable {
     let partners: [String]
     let selectedDaysString: String
     let selectedDaysCount: Int
-    var habitText: String
     
     // 서버 응답에서 받은 추가 정보
     let roomId: Int?
@@ -31,7 +30,6 @@ struct GroupModel: Hashable, Identifiable, Codable {
          partners: [String],
          selectedDaysString: String,
          selectedDaysCount: Int,
-         habitText: String,
          roomId: Int? = nil,
          creatorName: String? = nil) {
         self.id = id
@@ -42,7 +40,6 @@ struct GroupModel: Hashable, Identifiable, Codable {
         self.partners = partners
         self.selectedDaysString = selectedDaysString
         self.selectedDaysCount = selectedDaysCount
-        self.habitText = habitText
         self.roomId = roomId
         self.creatorName = creatorName
     }
@@ -57,7 +54,6 @@ struct GroupModel: Hashable, Identifiable, Codable {
         self.partners = [] // 서버에서 파트너 정보를 받아오는 로직 필요
         self.selectedDaysString = originalData.selectedDaysString
         self.selectedDaysCount = response.dayCountByWeek
-        self.habitText = originalData.habitText
         self.roomId = response.roomId
         self.creatorName = response.creatorName
     }

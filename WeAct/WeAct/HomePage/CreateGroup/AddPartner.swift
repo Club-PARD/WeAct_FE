@@ -520,7 +520,6 @@ struct AddPartner: View {
                         partners: selectedPartners.map { $0.name },
                         selectedDaysString: CreateGroupData.shared.selectedDaysString,
                         selectedDaysCount: CreateGroupData.shared.selectedDaysCount,
-                        habitText: CreateGroupData.shared.habitText
                     )
                     
                     // 그룹 스토어에 추가

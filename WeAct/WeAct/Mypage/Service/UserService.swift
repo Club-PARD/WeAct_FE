@@ -96,21 +96,23 @@ class UserService {
         return tokenResponse.token
     }
     
-    // MARK: - 사용자 정보 가져오기 (기존 메서드 - 호환성 유지)
+    // MARK: - 사용자 정보 가져오기, 배열로
     func getUserInfo(token: String) async throws -> UserModel {
         guard let url = URL(string: APIConstants.baseURL + APIConstants.User.userInfo) else {
             throw URLError(.badURL)
         }
-        
-        do {
-            let userInfo: UserModel = try await networkService.get(url: url, accessToken: token)
-            return userInfo
-        } catch {
-            if let nsError = error as NSError?, nsError.code == 401 {
-                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
-            }
-            throw error
+
+        // ✅ 응답을 배열로 받기
+        let users: [UserModel] = try await networkService.get(url: url, accessToken: token)
+
+        // ✅ 배열 중 첫 번째 유저 사용
+        guard let firstUser = users.first else {
+            throw NSError(domain: "", code: -1, userInfo: [
+                NSLocalizedDescriptionKey: "사용자 정보를 불러올 수 없습니다."
+            ])
         }
+
+        return firstUser
     }
     
     // MARK: - 사용자 프로필 조회 (GET /user/profile)

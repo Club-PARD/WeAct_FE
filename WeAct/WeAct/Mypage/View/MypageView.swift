@@ -14,6 +14,7 @@ struct MypageView: View {
     @AppStorage("isLoggedIn") var isLoggedIn = true
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
+    @State private var remoteImage: UIImage? = nil
     
     private var customBackButton: some View {
         Button(action: {
@@ -186,9 +187,24 @@ struct MypageView: View {
         }//NavigationView
         .onAppear {
             print("📍 MypageView 진입")
-            print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
-            print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+//            print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
+//            print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+            
+            if let imageURLString = userViewModel.user.profileImageURL,
+               let imageURL = URL(string: imageURLString) {
+                DispatchQueue.global().async {
+                    if let data = try? Data(contentsOf: imageURL),
+                       let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.remoteImage = image
+                        }
+                    } else {
+                        print("❌ 이미지 변환 실패")
+                    }
+                }
+            }
         }
+
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("마이페이지")

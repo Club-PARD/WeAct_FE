@@ -253,7 +253,8 @@ class UserService {
         
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"profilePhoto\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        //body.append("Content-Disposition: form-data; name=\"profilePhoto\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
         body.append(imageData)
         body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
@@ -309,7 +310,7 @@ class UserService {
     }
     
     struct TokenResponse: Codable {
-        let token: String
+        let token : String
     }
     
     struct UserHomeResponse: Codable {

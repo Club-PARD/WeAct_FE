@@ -7,6 +7,9 @@ struct MainView: View {
     @State private var navigationPath = NavigationPath()
     @State private var TodayDate = Date()
     
+    // 무한 호출 방지를 위한 플래그
+    @State private var isLoading = false
+    
     // 각 그룹별 오늘 인증 가능 여부를 저장하는 딕셔너리
     @State private var canCertifyToday: [Int: Bool] = [:]
     
@@ -169,46 +172,29 @@ struct MainView: View {
                     }
                 }
             } // ZStack
-            
-            
-            
-            
-//            .onAppear {
-//                fetchHomeGroups()
-//            }
-//            .onChange(of: navigationPath) { oldValue, newValue in
-//                // 네비게이션 스택이 비어있을 때 (홈화면으로 돌아왔을 때) 그룹 목록 새로고침
-//                if newValue.isEmpty {
-//                    print("🔄 홈화면으로 돌아옴 - 그룹 목록 새로고침")
-//                    fetchHomeGroups()
-//                }
-//            }
             .onAppear {
-                if let userId = userViewModel.user.userId {
+                // 처음 진입할 때만 호출
+                if let userId = userViewModel.user.userId, !isLoading {
                     print("✅ [onAppear] 유저 ID 확인됨: \(userId)")
                     fetchHomeGroups()
                 } else {
-                    print("❌ [onAppear] 유저 ID가 nil이라서 그룹 요청 안 함")
+                    print("❌ [onAppear] 유저 ID가 nil이거나 이미 로딩 중")
                 }
             }
             .onChange(of: userViewModel.user.userId) { newUserId in
-                if let id = newUserId {
+                // 유저 ID가 변경될 때만 호출
+                if let id = newUserId, !isLoading {
                     print("🔄 [onChange] 유저 ID 감지됨: \(id) → 그룹 새로 요청")
                     fetchHomeGroups()
                 }
             }
-            .onChange(of: navigationPath) { oldValue, newValue in
-                if newValue.isEmpty {
-                    print("🔄 홈화면으로 돌아옴 - 그룹 목록 새로고침")
+            // 기존 navigationPath onChange 제거하고 다른 방법으로 처리
+            .refreshable {
+                // Pull to refresh 기능 추가
+                if !isLoading {
                     fetchHomeGroups()
                 }
             }
-
-            
-            
-            
-            
-            
         } // NavigationStack
         .navigationBarBackButtonHidden(true)
     }
@@ -240,15 +226,15 @@ struct MainView: View {
                 
                 guard let token = TokenManager.shared.getToken() else { return }
                 let response = try await HomeGroupService.shared.getHomeGroups(token: token)
-
+                
                 // ✅ 3. UI 업데이트
                 await MainActor.run {
                     if let date = Calendar.current.date(from: DateComponents(month: response.month, day: response.day)) {
                         self.TodayDate = date
                     }
-
+                    
                     self.homeGroups = response.roomInformationDtos
-
+                    
                     self.groupStore.groups = response.roomInformationDtos.map { homeGroup in
                         GroupModel(
                             id: homeGroup.roomId ?? Int.random(in: 0...9999),
@@ -262,7 +248,7 @@ struct MainView: View {
                             habitText: homeGroup.habit
                         )
                     }
-
+                    
                     print("✅ [UI 업데이트 완료] 표시할 그룹 수: \(self.groupStore.groups.count)")
                 }
             } catch {
@@ -271,25 +257,25 @@ struct MainView: View {
         }
     }
 }
+
+// MARK: - 날짜 파싱 헬퍼 함수들
+private func parseDate(from period: String) -> Date? {
+    let components = period.components(separatedBy: " ~ ")
+    guard let startString = components.first else { return nil }
     
-    // MARK: - 날짜 파싱 헬퍼 함수들
-    private func parseDate(from period: String) -> Date? {
-        let components = period.components(separatedBy: " ~ ")
-        guard let startString = components.first else { return nil }
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        return formatter.date(from: startString)
-    }
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy.MM.dd"
+    return formatter.date(from: startString)
+}
+
+private func parseEndDate(from period: String) -> Date? {
+    let components = period.components(separatedBy: " ~ ")
+    guard components.count > 1 else { return nil }
     
-    private func parseEndDate(from period: String) -> Date? {
-        let components = period.components(separatedBy: " ~ ")
-        guard components.count > 1 else { return nil }
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        return formatter.date(from: components[1])
-    }
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy.MM.dd"
+    return formatter.date(from: components[1])
+}
 
 
 

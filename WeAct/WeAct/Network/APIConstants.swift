@@ -22,7 +22,7 @@ struct APIConstants {
         static let create = "/room"                           // 방 생성 (POST)
         static let oneDayCount = "/room/oneDayCount"          // 일일 카운트 조회
         static let finalRanking = "/room/finalRanking"        // + /{roomId}
-        static let checkThreeDay = "/room/checkThreeDay"      // + /{roomId}
+        static let checkThreeDay = "/room/checkThreeDay"      // + /{roomId},
         static let checkPoint = "/room/checkPoint"            // + /{roomId}
         static let checkDays = "/room/checkDays"              // + /{roomId}
     }

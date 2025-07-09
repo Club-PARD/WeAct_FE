@@ -44,44 +44,91 @@ class UserViewModel: ObservableObject {
     }
     
     // MARK: - 회원가입 + 로그인 처리
+//    func createUserAndLogin() async {
+//        guard let userId = user.userId,
+//              let pw = user.pw else {
+//            errorMessage = "아이디와 비밀번호를 입력해주세요."
+//            return
+//        }
+//
+//        do {
+//            // 1. 회원가입 요청 (토큰 반환하지 않음)
+//            try await service.createUser(user: user)
+//            
+//            // 2. 회원가입 후 로그인하여 토큰 받기
+//            let token = try await service.login(userId: userId, password: pw)
+//            
+//            // 3. 토큰 저장
+//            TokenManager.shared.saveToken(token)
+//
+//            // 4. 로그인 상태 전환
+//            isLoggedIn = true
+//
+//            print("✅ 회원가입 및 자동 로그인 완료")
+//        } catch {
+//            print("❌ 회원가입/로그인 실패: \(error.localizedDescription)")
+//            errorMessage = error.localizedDescription
+//        }
+//    }
+    
+    // MARK: - 회원가입 + 로그인 처리
     func createUserAndLogin() async {
         guard let userId = user.userId,
               let pw = user.pw else {
             errorMessage = "아이디와 비밀번호를 입력해주세요."
             return
         }
-        
+
         do {
-            //            // 1. 회원가입 요청 → 토큰 받기
-            //            let token = try await service.createUser(user: user)
-            //
-            //            // 2. 토큰 저장
-            //            TokenManager.shared.saveToken(token)
-            //            self.token = token
-            //
-            //            // ✅ 3. 서버에서 사용자 정보 요청 후 ViewModel에 저장
-            //            let userInfo = try await service.getUserInfo(token: token)
-            //            self.user = userInfo  // <- 이 줄이 중요합니다!
-            //
-            //            print("✅ 회원가입 및 자동 로그인 완료")
-            //            print("🧠 로그인된 사용자 ID: \(userInfo.id ?? -1), 유저아이디: \(userInfo.userId ?? "nil")")
-            //
-            //            // 4. 로그인 상태 전환
-            //            isLoggedIn = true
+            // 1. 회원가입 요청
+            print("📝 회원가입 시도 중...")
+            print("📝 회원가입 데이터: userId=\(userId), pw=\(pw), userName=\(user.userName)")
+            try await service.createUser(user: user)
+            print("✅ 회원가입 성공")
             
-            let token = try await service.createUser(user: user)
+            // 2. 로그인 시도
+            print("🔑 로그인 시도 중...")
+            print("🔑 로그인 데이터: userId=\(userId), password=\(pw)")
+            let token = try await service.login(userId: userId, password: pw)
+            print("✅ 로그인 성공, 토큰: \(token.prefix(20))...")
+            
+            // 3. 토큰 저장
             TokenManager.shared.saveToken(token)
+            print("💾 토큰 저장 완료")
+
+            // 4. 로그인 상태 전환
             isLoggedIn = true
-            
-            // 🔥 유저 정보 불러오기 & 반영
-            let userInfo = try await service.getUserInfo(token: token)
-            self.user = userInfo
-            
-            print("✅ 회원가입 및 유저 정보 수신 완료: \(userInfo.userId ?? "없음")")
+            print("✅ 회원가입 및 자동 로그인 완료")
             
         } catch {
-            print("❌ 회원가입 실패: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
+            print("❌ 에러 발생 위치 확인:")
+            print("❌ 에러 타입: \(type(of: error))")
+            print("❌ 에러 메시지: \(error.localizedDescription)")
+            print("❌ 상세 에러: \(error)")
+            
+            // NSError인 경우 상태 코드 확인
+            if let nsError = error as NSError? {
+                print("❌ 에러 도메인: \(nsError.domain)")
+                print("❌ 에러 코드: \(nsError.code)")
+                print("❌ 에러 정보: \(nsError.userInfo)")
+                
+                switch nsError.code {
+                case 400:
+                    errorMessage = "요청 데이터가 올바르지 않습니다."
+                case 401:
+                    errorMessage = "아이디 또는 비밀번호가 잘못되었습니다."
+                case 404:
+                    errorMessage = "사용자를 찾을 수 없습니다."
+                case 409:
+                    errorMessage = "이미 존재하는 사용자입니다."
+                case 500:
+                    errorMessage = "서버 오류가 발생했습니다."
+                default:
+                    errorMessage = "알 수 없는 오류: \(nsError.localizedDescription)"
+                }
+            } else {
+                errorMessage = error.localizedDescription
+            }
         }
     }
     

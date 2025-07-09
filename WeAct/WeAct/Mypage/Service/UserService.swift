@@ -93,7 +93,7 @@ class UserService {
         print("🌐 [로그인 요청] \(url.absoluteString)")
         
         let tokenResponse: TokenResponse = try await networkService.post(url: url, body: body)
-        return tokenResponse.accessToken
+        return tokenResponse.token
     }
     
     // MARK: - 사용자 정보 가져오기 (기존 메서드 - 호환성 유지)
@@ -309,7 +309,7 @@ class UserService {
     }
     
     struct TokenResponse: Codable {
-        let accessToken: String
+        let token: String
     }
     
     struct UserHomeResponse: Codable {

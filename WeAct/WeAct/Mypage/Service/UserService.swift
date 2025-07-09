@@ -38,40 +38,101 @@ struct UserDeleteResponse: Codable {
 class UserService {
     private let networkService = NetworkService.shared
     
-    // MARK: - 사용자 정보 생성 (회원가입) - 토큰 반환
-    func createUser(user: UserModel) async throws -> String {
+    // MARK: - 아이디 중복 확인 (Boolean 응답 버전)
+    func checkUserIdDuplicate(userId: String) async throws -> Bool {
+
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.checkDuplicate + "/\(userId)") else {
+            throw URLError(.badURL)
+        }
+
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        print("🌐 [중복확인 요청] \(url.absoluteString)")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("❌ HTTP 응답 아님")
+            throw URLError(.badServerResponse)
+        }
+
+        print("📡 응답 상태코드: \(httpResponse.statusCode)")
+        print("📄 응답 원시 데이터: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+        guard httpResponse.statusCode == 200 else {
+            throw NSError(domain: "", code: 1, userInfo: [NSLocalizedDescriptionKey: "❌ 아이디 중복 확인 실패 (코드 \(httpResponse.statusCode))"])
+        }
+
+        do {
+            let isDuplicated = try JSONDecoder().decode(Bool.self, from: data)
+            print("🔍 최종 파싱 결과: \(isDuplicated)")
+            return isDuplicated  // true면 중복, false면 사용 가능
+        } catch {
+            print("❌ Boolean 디코딩 실패: \(error)")
+            throw error
+        }
+    }
+
+    // 사용자 정보 생성
+    func createUser(user: UserModel) async throws -> PartialUserResponse {
         guard let url = URL(string: APIConstants.baseURL + APIConstants.User.create) else {
             throw URLError(.badURL)
         }
 
-        print("🌐 [회원가입 요청] \(url.absoluteString)")
-        print("📤 [회원가입 요청 데이터] \(user)")
-        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // 요청 바디(JSON) 인코딩 및 출력
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted // 보기 좋게 출력
+        let encodedBody = try encoder.encode(user)
+        request.httpBody = encodedBody
+
+        if let jsonString = String(data: encodedBody, encoding: .utf8) {
+            print("📤 [요청 바디 JSON]")
+            print(jsonString)
+        }
+
         do {
-            let cleanedUser = cleanUserModel(user)
-            let signUpResponse: SignUpResponse = try await networkService.post(url: url, body: cleanedUser)
-            
-            print("✅ 회원가입 성공, 토큰 수신: \(signUpResponse.token)")
-            return signUpResponse.token
-            
-        } catch {
-            print("❌ 회원가입 실패: \(error)")
-            
-            if let nsError = error as NSError? {
-                switch nsError.code {
-                case 400:
-                    throw NSError(domain: "", code: 400, userInfo: [NSLocalizedDescriptionKey: "입력 데이터가 올바르지 않습니다."])
-                case 409:
-                    throw NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "이미 존재하는 사용자입니다."])
-                case 500:
-                    throw NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "서버 오류가 발생했습니다."])
-                default:
-                    throw error
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            // 응답 상태 코드 확인
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 [응답 상태코드]: \(httpResponse.statusCode)")
+
+                // 응답 바디 출력
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("📄 [응답 바디]: \(responseBody)")
                 }
+
+                // 성공 처리
+                if httpResponse.statusCode == 201 {
+                    let partialUser = try JSONDecoder().decode(PartialUserResponse.self, from: data)
+                    print("✅ 서버 응답 디코딩 성공: \(partialUser)")
+                    return partialUser
+                } else {
+                    // 실패 시 throw → 상세 에러 전달
+                    throw NSError(
+                        domain: "",
+                        code: httpResponse.statusCode,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: "❌ 사용자 생성 실패 (code: \(httpResponse.statusCode))"
+                        ]
+                    )
+                }
+            } else {
+                throw URLError(.badServerResponse)
             }
+
+        } catch {
+            print("❌ [에러 발생]: \(error.localizedDescription)")
             throw error
         }
     }
+
     
     // MARK: - 사용자 ID 중복 확인
     func checkUserIdDuplicate(userId: String) async throws -> Bool {

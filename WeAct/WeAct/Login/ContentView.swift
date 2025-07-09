@@ -117,33 +117,37 @@ struct ContentView: View {
 //        do {
 //            let token = try await UserService().login(userId: userId, password: password)
 //            TokenManager.shared.saveToken(token)
-//            userViewModel.user.userId = userId   // ✅ 여기 중요!
+//            userViewModel.token = token
 //            isLoggedIn = true
-//            print("✅ 로그인 성공, 토큰: \(token)")
+//            
+//            // ✅ 여기서 사용자 정보 요청
+//            let userInfo = try await UserService().getUserInfo(token: token)
+//            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
+//            
+//            print("✅ 로그인 후 사용자 정보: \(userInfo)")
+//            print("🧠 userId: \(userInfo.userId ?? "없음")")
+//            print("🧠 id: \(userInfo.id ?? -1)")
+//            
 //        } catch {
 //            print("❌ 로그인 에러: \(error)")
 //        }
 //    }
-    
     func login() async {
         do {
             let token = try await UserService().login(userId: userId, password: password)
             TokenManager.shared.saveToken(token)
-            userViewModel.token = token
-            isLoggedIn = true
-            
-            // ✅ 여기서 사용자 정보 요청
+
+            // ✅ 유저 정보 받아오기
             let userInfo = try await UserService().getUserInfo(token: token)
-            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
-            
-            print("✅ 로그인 후 사용자 정보: \(userInfo)")
-            print("🧠 userId: \(userInfo.userId ?? "없음")")
-            print("🧠 id: \(userInfo.id ?? -1)")
-            
+            userViewModel.user = userInfo
+
+            isLoggedIn = true
+            print("✅ 로그인 성공, 유저 ID: \(userInfo.id ?? -1)")
         } catch {
             print("❌ 로그인 에러: \(error)")
         }
     }
+
 }
 
 #Preview {

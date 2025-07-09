@@ -207,28 +207,18 @@ struct MainView: View {
     private func fetchHomeGroups() {
         Task {
             do {
-                // 🔧 개선된 userId 검증 로직
-                guard let userId = userViewModel.user.userId else {
-                    print("❌ 현재 사용자 상태 - userId: \(userViewModel.user.userId ?? "없음")")
-                    return
-                }
-                guard let userId = userViewModel.user.userId else {
-                    print("❌ 현재 사용자 상태 - userId 없음")
-                    return
-                }
-                let response = try await HomeGroupService.shared.getHomeGroups(userId: userId)
                 
-                // 메인 스레드에서 UI 업데이트
+                guard let token = TokenManager.shared.getToken() else { return }
+                let response = try await HomeGroupService.shared.getHomeGroups(token: token)
+
+                // ✅ 3. UI 업데이트
                 await MainActor.run {
-                    // 서버 응답에서 날짜 정보 업데이트
                     if let date = Calendar.current.date(from: DateComponents(month: response.month, day: response.day)) {
                         self.TodayDate = date
                     }
-                    
-                    // 서버에서 받은 데이터 배열 업데이트
+
                     self.homeGroups = response.roomInformationDtos
-                    
-                    // 화면에서 실제 쓰는 groups 배열 업데이트
+
                     self.groupStore.groups = response.roomInformationDtos.map { homeGroup in
                         GroupModel(
                             id: homeGroup.roomId ?? Int.random(in: 0...9999),
@@ -242,34 +232,11 @@ struct MainView: View {
                             habitText: homeGroup.habit
                         )
                     }
-                    
+
                     print("✅ [UI 업데이트 완료] 표시할 그룹 수: \(self.groupStore.groups.count)")
                 }
-                
             } catch {
                 print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
-                //                print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
-                //
-                //                // 🔍 더 자세한 에러 정보 출력
-                //                if let decodingError = error as? DecodingError {
-                //                    print("❌ 디코딩 에러 상세:")
-                //                    switch decodingError {
-                //                    case .dataCorrupted(let context):
-                //                        print("- 데이터 손상: \(context.debugDescription)")
-                //                    case .keyNotFound(let key, let context):
-                //                        print("- 키 없음: \(key), 컨텍스트: \(context.debugDescription)")
-                //                    case .typeMismatch(let type, let context):
-                //                        print("- 타입 불일치: \(type), 컨텍스트: \(context.debugDescription)")
-                //                    case .valueNotFound(let value, let context):
-                //                        print("- 값 없음: \(value), 컨텍스트: \(context.debugDescription)")
-                //                    @unknown default:
-                //                        print("- 알 수 없는 디코딩 에러")
-                //                    }
-                //                }
-                //
-                //                await MainActor.run {
-                //                    print("❌ 홈 그룹 조회 실패:", error.localizedDescription)
-                //                }
             }
         }
     }

@@ -28,6 +28,4 @@ struct UserModel: Codable {
         case profileImageURL
         // localProfileImage는 제외함
     }
-
-    
 }

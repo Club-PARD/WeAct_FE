@@ -2,9 +2,7 @@ import SwiftUI
 import Foundation
 
 // 회원가입 응답 구조체 (서버가 토큰 반환)
-struct SignUpResponse: Codable {
-    let token: String
-}
+struct SignUpResponse: Codable {}
 
 struct PartialUserResponse: Codable {
     let id: Int?
@@ -39,20 +37,20 @@ class UserService {
     private let networkService = NetworkService.shared
     
     // MARK: - 사용자 정보 생성 (회원가입) - 토큰 반환
-    func createUser(user: UserModel) async throws -> String {
+    func createUser(user: UserModel) async throws {
         guard let url = URL(string: APIConstants.baseURL + APIConstants.User.create) else {
             throw URLError(.badURL)
         }
-
+        
         print("🌐 [회원가입 요청] \(url.absoluteString)")
         print("📤 [회원가입 요청 데이터] \(user)")
         
         do {
             let cleanedUser = cleanUserModel(user)
-            let signUpResponse: SignUpResponse = try await networkService.post(url: url, body: cleanedUser)
+            let _: SignUpResponse = try await networkService.post(url: url, body: cleanedUser)
             
-            print("✅ 회원가입 성공, 토큰 수신: \(signUpResponse.token)")
-            return signUpResponse.token
+            print("✅ 회원가입 성공")
+            // 토큰이 없으므로 저장 생략
             
         } catch {
             print("❌ 회원가입 실패: \(error)")
@@ -223,25 +221,19 @@ class UserService {
         }
     }
     
-    // MARK: - 사용자 홈 정보 조회 (GET /user/home)
-    func getUserHome(token: String) async throws -> UserHomeResponse {
+    // MARK: - 홈 그룹 정보 조회 (GET /user/home)
+    func getHomeGroups(token: String) async throws -> HomeGroupResponse {
         guard let url = URL(string: APIConstants.baseURL + "/user/home") else {
             throw URLError(.badURL)
         }
+
+        print("🌐 [홈 그룹 조회 요청] \(url.absoluteString)")
         
-        print("🌐 [홈 정보 조회 요청] \(url.absoluteString)")
+        // 토큰을 accessToken 파라미터로 넘겨서 GET 요청
+        let response: HomeGroupResponse = try await networkService.get(url: url, accessToken: token)
         
-        do {
-            let homeInfo: UserHomeResponse = try await networkService.get(url: url, accessToken: token)
-            print("✅ 홈 정보 조회 성공")
-            return homeInfo
-        } catch {
-            print("❌ 홈 정보 조회 실패: \(error)")
-            if let nsError = error as NSError?, nsError.code == 401 {
-                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
-            }
-            throw error
-        }
+        print("✅ 홈 그룹 조회 성공")
+        return response
     }
     
     // MARK: - 프로필 사진 업로드 (POST /user/profile-photo)

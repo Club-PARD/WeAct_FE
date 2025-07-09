@@ -46,43 +46,11 @@ class HomeGroupService {
     static let shared = HomeGroupService()
     private init() {}
     
-    func getHomeGroups(userId: String) async throws -> HomeGroupResponse {
-        // 1) 토큰 가져오기
-        guard let token = TokenManager.shared.getToken() else {
-            throw URLError(.userAuthenticationRequired)
-        }
-        
-        // 2) userId 인코딩
-        guard let encodedUserId = userId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+    func getHomeGroups(token: String) async throws -> HomeGroupResponse {
+        guard let url = URL(string: APIConstants.baseURL + "/user/home") else {
             throw URLError(.badURL)
         }
-        
-        // 3) URL 생성
-        let urlString = "https://naruto.asia/user/home/\(encodedUserId)"
-        guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
-        }
-        
-        // 4) URLRequest 준비
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        // 5) 헤더에 토큰과 Accept 설정
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
-        // 6) 비동기 데이터 요청
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        // (선택) 상태 코드와 응답 로그 출력
-        if let httpResponse = response as? HTTPURLResponse {
-            print("📡 [HTTP 상태] \(httpResponse.statusCode)")
-        }
-        if let json = String(data: data, encoding: .utf8) {
-            print("✅ [서버 응답 원본 JSON] \(json)")
-        }
-        
-        // 7) JSON 파싱 후 반환
-        return try JSONDecoder().decode(HomeGroupResponse.self, from: data)
+
+        return try await NetworkService.shared.get(url: url, accessToken: token)
     }
 }

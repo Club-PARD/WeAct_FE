@@ -55,7 +55,7 @@ struct MypageView: View {
                                .frame(width: 94, height: 94)
                                .clipped()
                                .cornerRadius(20)
-                        }else {
+                       }else {
                             Text("프로필\n사진")
                                .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)

@@ -2,8 +2,8 @@ import SwiftUI
 
 struct GroupList: View {
     @Binding var navigationPath: NavigationPath
-    var homeGroup: HomeGroupModel
-    var group: GroupModel
+    var homeGroup: HomeGroupModel // 유저, 홈의 GET
+    var group: GroupModel // 룸의 POST
     let canCertifyToday: Bool // 오늘 인증 가능 여부
     var onTap: () -> Void
     
@@ -15,16 +15,27 @@ struct GroupList: View {
                         Text(homeGroup.roomName)
                             .font(.custom("Pretendard-SemiBold", size: 22))
                             .foregroundColor(Color(hex: "171717"))
-                        //                        Text("\(group.partners.count)")
-                        //                            .font(.custom("Pretendard-Medium", size: 18))
-                        //                            .foregroundColor(Color(hex: "929292"))
+                        Text("\(homeGroup.memberCount)")
+                            .font(.custom("Pretendard-Medium", size: 18))
+                            .foregroundColor(Color(hex: "929292"))
                     } // HStack
                     
                     
 //                    Text(homeGroup.habit)
 //                        .font(.custom("Pretendard-Medium", size: 16))
 //                        .foregroundColor(Color(hex: "171717"))
-//                    
+                    // 옵셔널 바인딩으로 habit 처리
+                                        if let habit = homeGroup.habit, !habit.isEmpty {
+                                            Text(habit)
+                                                .font(.custom("Pretendard-Medium", size: 16))
+                                                .foregroundColor(Color(hex: "171717"))
+                                        } else {
+                                            Text("습관이 설정되지 않았습니다")
+                                                .font(.custom("Pretendard-Medium", size: 16))
+                                                .foregroundColor(Color(hex: "929292"))
+                                                .italic()
+                                        }
+                    
                     HStack {
                         Text(homeGroup.period)
                             .font(.custom("Pretendard-Medium", size: 14))
@@ -66,8 +77,8 @@ struct GroupList: View {
                             .background(Color(hex: "FF4B2F"))
                             .cornerRadius(18)
                         } // Button
-                    }
-                }
+                    } // HStack
+                } // if
             } // HStack
             
             Divider()
@@ -94,23 +105,6 @@ struct GroupList: View {
         .contentShape(Rectangle()) // 빈 영역 터치 가능하게
         .onTapGesture {
             onTap()
-        }
+        } // onTapGesture
     }
 }
-//
-//#Preview {
-//    StatefulPreviewWrapper(NavigationPath()) { path in
-//        GroupList(
-//            navigationPath: path,
-//            homeGroup: HomeGroupModel(
-//                roomName: "아침 운동 챌린지",
-//                habit: "스트레칭하기",
-//                period: "2025.07.01 - 2025.07.31",
-//                dayCountByWeek: 3,
-//                percent: 58
-//            ),
-//            group: GroupModel,
-//            onTap: { }
-//        )
-//    }
-//}

@@ -1,9 +1,8 @@
-////
-////  AddPartner.swift
-////  WeAct
-////
-////  Created by 최승아 on 6/30/25.
-////
+//
+//  AddPartner.swift
+//  WeAct
+//
+//  Created by 최승아 on 6/30/25.
 //
 
 import SwiftUI
@@ -252,7 +251,7 @@ struct AddPartner: View {
                     groupStore.addGroup(newGroup)
                     
                     // 습관 설정 페이지로 이동
-                    navigationPath.append(NavigationDestination.setuphabit)
+                    navigationPath.append(NavigationDestination.setuphabit(roomId: response.roomId))
                     
                     print("✅ 습관 설정 페이지로 이동")
                 }

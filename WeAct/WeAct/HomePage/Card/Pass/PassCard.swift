@@ -7,8 +7,10 @@
 import SwiftUI
 
 struct PassCard: View {
-    let userName: String = "이단진"
-    
+    let userName: String
+        init(userName: String = "이단진") {
+            self.userName = userName
+        }
     var body: some View {
         ZStack {
             

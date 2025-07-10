@@ -15,12 +15,8 @@ struct TestingPage: View {
         ZStack {
             Color(hex: "F7F7F7").ignoresSafeArea()
             
-            VStack{
-                
-                
-                
-                
-                HStack(spacing: 16) {
+            VStack {
+                HStack(spacing: 25) {
                     CertificationCard(userName: "이주원")
                         .rotationEffect(.degrees(-4))
                         .onTapGesture {
@@ -37,20 +33,19 @@ struct TestingPage: View {
                             }
                         }
                 }
-                
-                // ✅ 인증 카드 최대 확대 뷰
-                if showMaxView {
-                    CerificationMax(isPresented: $showMaxView)
-                        .transition(.opacity)
-                        .zIndex(1)
-                }
-                
-                // ✅ 패스 카드 최대 확대 뷰
-                if showPassCard {
-                    PassCardMax(isPresented: $showPassCard)
-                        .transition(.opacity)
-                        .zIndex(1)
-                }
+            }
+            
+            // ✅ 확대 화면들은 ZStack의 위쪽에 둬야 함!
+            if showMaxView {
+                CerificationMax(isPresented: $showMaxView)
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
+            
+            if showPassCard {
+                PassCardMax(isPresented: $showPassCard)
+                    .transition(.opacity)
+                    .zIndex(1)
             }
         }
     }

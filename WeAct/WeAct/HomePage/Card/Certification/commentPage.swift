@@ -4,7 +4,6 @@
 //
 //  Created by 현승훈 on 7/8/25.
 //
-
 import SwiftUI
 
 struct Comment: Identifiable, Hashable, Codable {
@@ -24,6 +23,7 @@ struct CommentPage: View {
     @State private var commentText = ""
     @State private var comments: [Comment] = []
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isTextFieldFocused: Bool  // ✅ 키보드 감지
     
     var body: some View {
         VStack(spacing: 0) {
@@ -41,7 +41,7 @@ struct CommentPage: View {
                             Spacer()
                             Button(action: {
                                 withAnimation {
-                                    isFlipped = false  // 뒤집기 (카드로 돌아가기)
+                                    isFlipped = false
                                 }
                             }) {
                                 Image(systemName: "xmark")
@@ -87,6 +87,7 @@ struct CommentPage: View {
                                 .background(Color(hex: "F7F7F7"))
                                 .cornerRadius(8)
                                 .frame(width: 252, height: 44)
+                                .focused($isTextFieldFocused)
                             
                             HStack {
                                 Spacer()
@@ -104,21 +105,23 @@ struct CommentPage: View {
                                         .foregroundStyle(Color(hex: "FF4B2F"))
                                 }
                                 .padding(.trailing, 26)
+                                .disabled(commentText.trimmingCharacters(in: .whitespaces).isEmpty)  // ✅ 비활성화
+                                .opacity(commentText.trimmingCharacters(in: .whitespaces).isEmpty ? 0.3 : 1)  // ✅ 흐리게
                             }
                         }
                         .padding(.bottom, 14)
                     }
                 )
             
-            // ✅ 카드 밖 버튼 (사진 보기)
+            // ✅ 카드 밖 버튼 (사진 보기) - 키보드 올라오면 비활성화
             Spacer().frame(height: 53)
             Button(action: {
                 withAnimation {
-                    isFlipped = false  // 1️⃣ 카드 뒤집기 (사진으로)
+                    isFlipped = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {  // 2️⃣ 뒤집기 끝나고
-                    withAnimation(.easeInOut(duration: 0.3)) {  // 3️⃣ Fade Out 애니메이션
-                        dismiss()  // 4️⃣ TestingPage 사라짐
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        dismiss()
                     }
                 }
             }) {
@@ -131,13 +134,14 @@ struct CommentPage: View {
             .frame(width: 118, height: 48)
             .background(Color(hex: "464646"))
             .cornerRadius(24)
+            .disabled(isTextFieldFocused)  // ✅ 비활성화
+            .opacity(isTextFieldFocused ? 0.3 : 1)  // ✅ 흐리게
         }
         .onAppear {
             loadComments()
         }
     }
     
-    // ✅ 시간 표시
     func relativeTimeString(from date: Date) -> String {
         let seconds = Int(Date().timeIntervalSince(date))
         if seconds < 60 {
@@ -151,14 +155,12 @@ struct CommentPage: View {
         }
     }
     
-    // ✅ 댓글 저장
     func saveComments() {
         if let data = try? JSONEncoder().encode(comments) {
             UserDefaults.standard.set(data, forKey: "savedComments")
         }
     }
     
-    // ✅ 댓글 불러오기
     func loadComments() {
         if let data = UserDefaults.standard.data(forKey: "savedComments"),
            let decoded = try? JSONDecoder().decode([Comment].self, from: data) {
@@ -166,7 +168,3 @@ struct CommentPage: View {
         }
     }
 }
-
-//#Preview {
-//    CommentPage(isFlipped: .constant(true))
-//}

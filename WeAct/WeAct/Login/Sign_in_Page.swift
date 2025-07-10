@@ -7,7 +7,6 @@ import SwiftUI
 
 struct Sign_in_Page: View {
     @ObservedObject var userViewModel: UserViewModel
-    @Environment(\.modelContext) private var modelContext
     @Binding var path: NavigationPath
     @Environment(\.dismiss) var dismiss
     @AppStorage("isLoggedIn") private var isLoggedIn = false
@@ -181,6 +180,7 @@ struct Sign_in_Page: View {
                             //showWelcome = true
                         } catch {
                             print("❌ 회원가입 실패: \(error.localizedDescription)")
+                            showWelcome = true
                         }
                     }
                     

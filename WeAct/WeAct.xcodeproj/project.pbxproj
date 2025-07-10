@@ -46,22 +46,11 @@
 		510606722E164D19000C37B9 /* Exceptions for "WeAct" folder in "WeAct" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Data/SwiftDataUserModel.swift,
 				Info.plist,
 			);
 			target = 4D153EE42E126A5700AFA2BF /* WeAct */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		4D79E9B72E1E4A2500D5506A /* Exceptions for "WeAct" folder in "Copy Bundle Resources" phase from "WeAct" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 4D153EE32E126A5700AFA2BF /* Resources */;
-			membershipExceptions = (
-				Data/SwiftDataUserModel.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D153EF52E126A5D00AFA2BF /* WeActTests */ = {
@@ -78,7 +67,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				510606722E164D19000C37B9 /* Exceptions for "WeAct" folder in "WeAct" target */,
-				4D79E9B72E1E4A2500D5506A /* Exceptions for "WeAct" folder in "Copy Bundle Resources" phase from "WeAct" target */,
 			);
 			path = WeAct;
 			sourceTree = "<group>";

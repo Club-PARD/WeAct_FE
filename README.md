@@ -61,3 +61,17 @@
     </td>
   </tr>
 </table>
+
+---
+
+## 📖 WeAct 주요 기능 플로우
+
+
+### 1. ✨ 스플래쉬
+
+
+  <img src="https://github.com/user-attachments/assets/0acb8c92-3b18-4a95-8a3f-499a8ff27664" width="300" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+
+
+
+

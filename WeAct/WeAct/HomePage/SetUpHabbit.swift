@@ -9,10 +9,15 @@ import SwiftUI
 
 struct SetUpHabbit: View {
     @Binding var navigationPath: NavigationPath
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var myHabbit = ""
     @State private var selectedTime = Date()
     @State private var showTimePicker = false
     @State private var isTimeSelected = false
+    @State private var isLoading = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
+    var roomId: Int
     
     var customBackButton: some View {
         Button(action: {
@@ -91,24 +96,20 @@ struct SetUpHabbit: View {
                 } // VStack
                 Spacer()
                 Button(action: {
-                    CreateGroupData.shared.habitText = myHabbit
-                       
-                       // 여기서 데이터 초기화
-                       CreateGroupData.shared.reset()
-                       
-                       // 스택을 모두 비워서 메인으로 이동
-                       navigationPath.removeLast(navigationPath.count)
+                    Task {
+                        await submitHabit()
+                    }
                 }) {
-                        Text("확인")
-                            .font(.custom("Pretendard-Medium", size: 16))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background((myHabbit.isEmpty && !isTimeSelected ? Color(hex: "E7E7E7") : Color(hex: "FF4B2F")))
-                            .cornerRadius(8)
-                        
-                    } //Button
-                .disabled(myHabbit.isEmpty && !isTimeSelected)
+                    Text("확인")
+                        .font(.custom("Pretendard-Medium", size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background((myHabbit.isEmpty || !isTimeSelected) ? Color(hex: "E7E7E7") : Color(hex: "FF4B2F"))
+                        .cornerRadius(8)
+                    
+                } //Button
+                .disabled(myHabbit.isEmpty || !isTimeSelected)
                 .padding(.bottom, 18)
             } // VStack
             .sheet(isPresented: $showTimePicker) {
@@ -137,11 +138,28 @@ struct SetUpHabbit: View {
                     DatePicker("시간 선택", selection: $selectedTime, displayedComponents: .hourAndMinute)
                         .datePickerStyle(.wheel)
                         .labelsHidden()
+                        .onChange(of: selectedTime) { _ in
+                            isTimeSelected = true
+                        }
                     
-       
+                    Button(action: {
+                        isTimeSelected = true
+                        showTimePicker = false
+                    }) {
+                        Text("확인")
+                            .font(.custom("Pretendard-Medium", size: 16))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color(hex: "FF4B2F"))
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 20)
+                    
                 } // VStack
                 .cornerRadius(16)
-                .presentationDetents([.height(UIScreen.main.bounds.height * 0.403)])
+                .presentationDetents([.height(UIScreen.main.bounds.height * 0.5)])
             } // sheet
             
             .padding(.horizontal, 16)
@@ -149,12 +167,72 @@ struct SetUpHabbit: View {
             .navigationBarItems(leading: customBackButton)
             .navigationTitle("내 습관 설정")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("오류", isPresented: $showErrorAlert) {
+                Button("확인") { }
+            } message: {
+                Text(errorMessage)
+            }
         } // ZStack
     }
     
+    private func submitHabit() async {
+        guard !myHabbit.isEmpty else {
+            errorMessage = "습관을 입력해 주세요."
+            showErrorAlert = true
+            return
+        }
+        
+        guard isTimeSelected else {
+            errorMessage = "알림 시간을 선택해 주세요."
+            showErrorAlert = true
+            return
+        }
+        
+        isLoading = true
+        
+        // 1. 토큰 새로고침 (TokenManager와 동기화)
+        userViewModel.refreshTokenFromStorage()
+        
+        // 2. 시간 포맷팅 - 띄어쓰기 있는 형태로 서버에 전송
+        let remindTime = "\(getAMPM(selectedTime)) \(formatTime(selectedTime))"
+        
+        // 3. 기존 검증 로직 그대로 유지
+        guard let token = userViewModel.token else {
+            errorMessage = "로그인이 필요합니다."
+            showErrorAlert = true
+            isLoading = false
+            return
+        }
+        
+        print("🔍 [SetUpHabbit] habit 업데이트 시작")
+        print("🔍 [SetUpHabbit] roomId: \(roomId)")
+        print("🔍 [SetUpHabbit] habit: \(myHabbit)")
+        print("🔍 [SetUpHabbit] remindTime: \(remindTime)")
+        print("🔍 [SetUpHabbit] token exists: \(token.count > 0)")
+        
+        do {
+            try await HabitService.shared.updateHabit(token: token, roomId: roomId, habit: myHabbit, remindTime: remindTime)
+            
+            CreateGroupData.shared.habitText = myHabbit
+            CreateGroupData.shared.reset()
+            
+            await MainActor.run {
+                navigationPath.removeLast(navigationPath.count) // 메인으로 돌아가기
+            }
+        } catch let error as HabitServiceError {
+            errorMessage = error.localizedDescription
+            showErrorAlert = true
+        } catch {
+            errorMessage = "습관 설정 저장에 실패했습니다.\n\(error.localizedDescription)"
+            showErrorAlert = true
+        }
+        
+        isLoading = false
+    }
+
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        formatter.dateFormat = "hh:mm"  // 12시간 형식으로 변경
         return formatter.string(from: date)
     }
     
@@ -162,9 +240,4 @@ struct SetUpHabbit: View {
         let hour = Calendar.current.component(.hour, from: date)
         return hour < 12 ? "오전" : "오후"
     }
-}
-
-#Preview {
-    @State var path = NavigationPath()
-    SetUpHabbit(navigationPath: .constant(path))
 }

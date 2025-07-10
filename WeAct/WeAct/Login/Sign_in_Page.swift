@@ -118,8 +118,8 @@ struct Sign_in_Page: View {
                         signupError = nil
                         
                         Task {
-                                await userViewModel.createUserAndLogin()
-                            }
+                            await userViewModel.createUserAndLogin()
+                        }
                     }) {
                         HStack {
                             if isSigningUp {

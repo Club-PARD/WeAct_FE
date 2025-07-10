@@ -13,12 +13,14 @@ struct HomeGroupResponse: Decodable {
     let roomInformationDtos: [HomeGroupModel]
 }
 
-struct HomeGroupModel: Decodable {
-    var roomId: Int
+struct HomeGroupModel: Decodable { // roomInformationDtos의 [HomeGroupModel]
     let roomName: String
+    let habit: String?  // null 값 허용
     let period: String
     let dayCountByWeek: Int
     let percent: Int
+    let memberCount: Int
+    let roomId: Int
 }
 
 extension HomeGroupModel {

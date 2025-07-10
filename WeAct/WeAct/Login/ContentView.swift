@@ -62,7 +62,7 @@ struct ContentView: View {
                 Button(action: {
                     if isFormValid {
                         Task {
-                            await login()
+                            await userViewModel.login(userId: userId, password: password)
                         }
                     } else {
                         alertMessage = "아이디와 비밀번호를 모두 입력해주세요."
@@ -110,27 +110,13 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                await userViewModel.checkLoginStatus()
+            }
+        }
     }
-    
-    //    func login() async {
-    //        do {
-    //            let token = try await UserService().login(userId: userId, password: password)
-    //            TokenManager.shared.saveToken(token)
-    //            userViewModel.token = token
-    //            isLoggedIn = true
-    //
-    //            // ✅ 여기서 사용자 정보 요청
-    //            let userInfo = try await UserService().getUserInfo(token: token)
-    //            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
-    //
-    //            print("✅ 로그인 후 사용자 정보: \(userInfo)")
-    //            print("🧠 userId: \(userInfo.userId ?? "없음")")
-    //            print("🧠 id: \(userInfo.id ?? -1)")
-    //
-    //        } catch {
-    //            print("❌ 로그인 에러: \(error)")
-    //        }
-    //    }
+  
     func login() async {
         do {
             let token = try await UserService().login(userId: userId, password: password)
@@ -161,8 +147,6 @@ struct ContentView: View {
             showAlert = true
         }
     }
-
-    
 }
 
 #Preview {

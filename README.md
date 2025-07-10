@@ -1,4 +1,4 @@
-<div align="center">
+![onboarding1](https://github.com/user-attachments/assets/bd3bcac1-58f7-465d-b8e9-c7966af83c93)<div align="center">
   <img src="https://github.com/user-attachments/assets/4c7d6080-9d05-4d64-a882-3e84258ad27e" width="200" style="border-radius: 15px; margin-bottom: 20px;">
   <h1 style="font-size: 2.5rem;">WeAct</h1>
   <p style="font-size: 1.3rem; color: #555;">WeAct 친구와 함께하는 습관 달성 플랫폼</p>
@@ -70,7 +70,21 @@
 ### 1. ✨ 스플래쉬
 
 
-  <img src="https://github.com/user-attachments/assets/0acb8c92-3b18-4a95-8a3f-499a8ff27664" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/0acb8c92-3b18-4a95-8a3f-499a8ff27664" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+> WeAct에 오신 것을 환영합니다! 앱으로 진입하여 습관을 형성 및 유지하기를 시작하세요.
+
+
+---
+
+## 2. 🏄🏻 온보딩
+
+
+<img src="https://github.com/user-attachments/assets/bc35bde7-370d-4fe2-8749-22935d512a54" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/71e6f296-f0d0-49b2-a38c-3d3866925e7a" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/c75c65bc-18d4-4a3a-a76a-401e4d29230b" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+
+> WeAct에 오신 것을 환영합니다! 앱으로 진입하여 습관을 형성 및 유지하기를 시작하세요.
+
 
 
 

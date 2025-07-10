@@ -35,6 +35,13 @@ struct UserDeleteResponse: Codable {
     let message: String?
 }
 
+// JWT 토큰 디코딩을 위한 구조체
+struct JWTPayload: Codable {
+    let sub: String  // subject - 사용자 ID
+    let iat: Int     // issued at
+    let exp: Int     // expiration
+}
+
 class UserService {
     private let networkService = NetworkService.shared
     
@@ -98,24 +105,78 @@ class UserService {
         return tokenResponse.token
     }
     
+    // MARK: - JWT 토큰에서 사용자 ID 추출
+        private func extractUserIdFromToken(_ token: String) -> String? {
+            let components = token.split(separator: ".")
+            guard components.count == 3 else {
+                print("❌ JWT 토큰 형식이 올바르지 않습니다")
+                return nil
+            }
+            
+            // Base64 디코딩을 위한 패딩 추가
+            var payload = String(components[1])
+            while payload.count % 4 != 0 {
+                payload += "="
+            }
+            
+            // Base64 디코딩
+            guard let data = Data(base64Encoded: payload) else {
+                print("❌ JWT 페이로드 디코딩 실패")
+                return nil
+            }
+            
+            do {
+                let jwtPayload = try JSONDecoder().decode(JWTPayload.self, from: data)
+                print("✅ JWT에서 사용자 ID 추출 성공: \(jwtPayload.sub)")
+                return jwtPayload.sub
+            } catch {
+                print("❌ JWT 페이로드 파싱 실패: \(error)")
+                return nil
+            }
+        }
+    
     // MARK: - 사용자 정보 가져오기, 배열로
     func getUserInfo(token: String) async throws -> UserModel {
-        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.userInfo) else {
-            throw URLError(.badURL)
-        }
+            guard let url = URL(string: APIConstants.baseURL + APIConstants.User.userInfo) else {
+                throw URLError(.badURL)
+            }
 
-        // ✅ 응답을 배열로 받기
-        let users: [UserModel] = try await networkService.get(url: url, accessToken: token)
-
-        // ✅ 배열 중 첫 번째 유저 사용
-        guard let firstUser = users.first else {
-            throw NSError(domain: "", code: -1, userInfo: [
-                NSLocalizedDescriptionKey: "사용자 정보를 불러올 수 없습니다."
-            ])
+            print("🌐 [사용자 정보 조회] \(url.absoluteString)")
+            
+            // 🔥 1. 토큰에서 사용자 ID 추출
+            guard let currentUserId = extractUserIdFromToken(token) else {
+                throw NSError(domain: "", code: -1, userInfo: [
+                    NSLocalizedDescriptionKey: "토큰에서 사용자 정보를 추출할 수 없습니다."
+                ])
+            }
+            
+            print("🔍 현재 로그인한 사용자 ID: \(currentUserId)")
+            
+            // 🔥 2. 서버에서 모든 사용자 정보 가져오기
+            let users: [UserModel] = try await networkService.get(url: url, accessToken: token)
+            
+            print("📦 서버에서 받은 사용자 수: \(users.count)")
+            
+            // 🔥 3. 토큰의 사용자 ID와 일치하는 사용자 찾기
+            guard let matchedUser = users.first(where: { $0.userId == currentUserId }) else {
+                print("❌ 토큰의 사용자 ID(\(currentUserId))와 일치하는 사용자를 찾을 수 없습니다")
+                print("📋 서버의 사용자 목록:")
+                for user in users {
+                    print("   - ID: \(user.id ?? -1), 사용자ID: \(user.userId ?? "nil"), 이름: \(user.userName)")
+                }
+                
+                throw NSError(domain: "", code: 404, userInfo: [
+                    NSLocalizedDescriptionKey: "해당 사용자를 찾을 수 없습니다."
+                ])
+            }
+            
+            print("✅ 일치하는 사용자 발견:")
+            print("   - ID: \(matchedUser.id ?? -1)")
+            print("   - 사용자ID: \(matchedUser.userId ?? "")")
+            print("   - 이름: \(matchedUser.userName)")
+            
+            return matchedUser
         }
-      
-        return firstUser
-    }
     
     // MARK: - 사용자 프로필 조회 (GET /user/profile)
     func getUserProfile(token: String) async throws -> UserProfileResponse {

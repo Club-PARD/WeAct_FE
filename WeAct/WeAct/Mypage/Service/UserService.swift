@@ -1,90 +1,339 @@
-//
-//  UserService.swift
-//  WeAct
-//
-//  Created by 주현아 on 7/2/25.
-//
-
 import SwiftUI
 import Foundation
 
+// 회원가입 응답 구조체 (서버가 토큰 반환)
+struct SignUpResponse: Codable {}
+
+struct PartialUserResponse: Codable {
+    let id: Int?
+    let userId: String?
+    let token: String? // 서버가 토큰을 반환할 수 있음
+}
+
+// 사용자 프로필 응답 구조체
+struct UserProfileResponse: Codable {
+    let id: Int?
+    let userId: String?
+    let userName: String?
+    let gender: String?
+    let profileImageUrl: String?
+    let createdAt: String?
+    let updatedAt: String?
+}
+
+// 사용자 프로필 업데이트 요청 구조체
+struct UserProfileUpdateRequest: Codable {
+    let userName: String?
+    let gender: String?
+}
+
+// 사용자 삭제 응답 구조체
+struct UserDeleteResponse: Codable {
+    let success: Bool
+    let message: String?
+}
+
 class UserService {
+    private let networkService = NetworkService.shared
     
-    // POST: 사용자 정보 생성
-       func createUser(user: UserModel) async throws {
-           guard let url = URL(string: "https://naruto.asia/user/") else {
-               throw URLError(.badURL)
-           }
-           
-           var request = URLRequest(url: url)
-           request.httpMethod = "POST"  // ✅ POST 방식
-           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-           
-           // JSON 데이터로 변환
-           let encoder = JSONEncoder()
-           request.httpBody = try encoder.encode(user)
-           
-           let (_, response) = try await URLSession.shared.data(for: request)
-           
-           guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
-               throw NSError(domain: "", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create user"])
-           }
-           
-           print("✅ 사용자 정보가 성공적으로 전송되었습니다.")
-       }
-    
-    
-    // GET: 사용자 데이터 가져오기
-    func fetchUsers() async throws -> [UserModel] {
-          let url = URL(string: "http://192.168.0.7:8080/user/")! // 스웨거 주소 기반
-          
-          let (data, response) = try await URLSession.shared.data(from: url)
-          
-          if let httpResponse = response as? HTTPURLResponse {
-              print("📡 응답코드: \(httpResponse.statusCode)")
-              print("📦 응답내용: \(String(data: data, encoding: .utf8) ?? "없음")")
-          }
-          
-          let users = try JSONDecoder().decode([UserModel].self, from: data)
-          return users
-      }
-    
-    // PATCH: 사용자 이름 수정
-    func updateUsername(_ name: String) async throws {
-        // 예시 URL (실제 URL로 교체해야 함)
-        let url = URL(string: "https://example.com/api/updateUsernameUsername")!
+    // MARK: - 사용자 정보 생성 (회원가입) - 토큰 반환
+    func createUser(user: UserModel) async throws {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.create) else {
+            throw URLError(.badURL)
+        }
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        print("🌐 [회원가입 요청] \(url.absoluteString)")
+        print("📤 [회원가입 요청 데이터] \(user)")
         
-        // 사용자 이름을 JSON 형식으로 요청 본문에 포함
-        let body = ["userName": name]
-        request.httpBody = try JSONEncoder().encode(body)
-        
-        // 요청 보내기
-        let (_, response) = try await URLSession.shared.data(for: request)
-        
-        // 성공적으로 응답이 오면 처리 (상태 코드 확인 등)
-        if (response as! HTTPURLResponse).statusCode != 200 {
-            throw NSError(domain: "com.example", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to update username"])
+        do {
+            let cleanedUser = cleanUserModel(user)
+            let _: SignUpResponse = try await networkService.post(url: url, body: cleanedUser)
+            
+            print("✅ 회원가입 성공")
+            // 토큰이 없으므로 저장 생략
+            
+        } catch {
+            print("❌ 회원가입 실패: \(error)")
+            
+            if let nsError = error as NSError? {
+                switch nsError.code {
+                case 400:
+                    throw NSError(domain: "", code: 400, userInfo: [NSLocalizedDescriptionKey: "입력 데이터가 올바르지 않습니다."])
+                case 409:
+                    throw NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "이미 존재하는 사용자입니다."])
+                case 500:
+                    throw NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "서버 오류가 발생했습니다."])
+                default:
+                    throw error
+                }
+            }
+            throw error
         }
     }
     
-    // DELETE: 계정 삭제
-    func deleteAccount() async throws {
-        // 예시 URL (실제 URL로 교체해야 함)
-        let url = URL(string: "https://example.com/api/deleteAccount")!
+    // MARK: - 사용자 ID 중복 확인
+    func checkUserIdDuplicate(userId: String) async throws -> Bool {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.checkDuplicate + "/\(userId)") else {
+            throw URLError(.badURL)
+        }
+
+        print("🌐 [중복확인 요청] \(url.absoluteString)")
+        
+        return try await networkService.get(url: url)
+    }
+    
+    // MARK: - 로그인
+    func login(userId: String, password: String) async throws -> String {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.login) else {
+            throw URLError(.badURL)
+        }
+
+        let body = LoginRequest(userId: userId, password: password)
+        
+        print("🌐 [로그인 요청] \(url.absoluteString)")
+        
+        let tokenResponse: TokenResponse = try await networkService.post(url: url, body: body)
+        return tokenResponse.token
+    }
+    
+    // MARK: - 사용자 정보 가져오기, 배열로
+    func getUserInfo(token: String) async throws -> UserModel {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.userInfo) else {
+            throw URLError(.badURL)
+        }
+
+        // ✅ 응답을 배열로 받기
+        let users: [UserModel] = try await networkService.get(url: url, accessToken: token)
+
+        // ✅ 배열 중 첫 번째 유저 사용
+        guard let firstUser = users.first else {
+            throw NSError(domain: "", code: -1, userInfo: [
+                NSLocalizedDescriptionKey: "사용자 정보를 불러올 수 없습니다."
+            ])
+        }
+
+        return firstUser
+    }
+    
+    // MARK: - 사용자 프로필 조회 (GET /user/profile)
+    func getUserProfile(token: String) async throws -> UserProfileResponse {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.profile) else {
+            throw URLError(.badURL)
+        }
+        
+        print("🌐 [프로필 조회 요청] \(url.absoluteString)")
+        
+        do {
+            let profile: UserProfileResponse = try await networkService.get(url: url, accessToken: token)
+            print("✅ 프로필 조회 성공")
+            return profile
+        } catch {
+            print("❌ 프로필 조회 실패: \(error)")
+            if let nsError = error as NSError?, nsError.code == 401 {
+                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
+            }
+            throw error
+        }
+    }
+    
+    // MARK: - 사용자 프로필 업데이트 (PATCH /user)
+    func updateUserProfile(token: String, userName: String?, gender: String?) async throws -> UserProfileResponse {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.update) else {
+            throw URLError(.badURL)
+        }
+        
+        let updateRequest = UserProfileUpdateRequest(userName: userName, gender: gender)
+        
+        print("🌐 [프로필 업데이트 요청] \(url.absoluteString)")
+        print("📤 [업데이트 데이터] \(updateRequest)")
+        
+        do {
+            let updatedProfile: UserProfileResponse = try await networkService.put(url: url, body: updateRequest, accessToken: token)
+            print("✅ 프로필 업데이트 성공")
+            return updatedProfile
+        } catch {
+            print("❌ 프로필 업데이트 실패: \(error)")
+            if let nsError = error as NSError?, nsError.code == 401 {
+                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
+            }
+            throw error
+        }
+    }
+    
+    // MARK: - 사용자 탈퇴 (DELETE /user)
+    func deleteUser(token: String) async throws -> Bool {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.delete) else {
+            throw URLError(.badURL)
+        }
+        
+        print("🌐 [사용자 탈퇴 요청] \(url.absoluteString)")
+        
+        do {
+            let success = try await networkService.delete(url: url, accessToken: token)
+            print("✅ 사용자 탈퇴 성공")
+            return success
+        } catch {
+            print("❌ 사용자 탈퇴 실패: \(error)")
+            if let nsError = error as NSError?, nsError.code == 401 {
+                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
+            }
+            throw error
+        }
+    }
+    
+    // MARK: - 사용자 검색 (GET /user/search/{userId})
+    func searchUser(userId: String, token: String) async throws -> UserProfileResponse {
+        guard let url = URL(string: APIConstants.baseURL + "/user/search/\(userId)") else {
+            throw URLError(.badURL)
+        }
+        
+        print("🌐 [사용자 검색 요청] \(url.absoluteString)")
+        
+        do {
+            let userProfile: UserProfileResponse = try await networkService.get(url: url, accessToken: token)
+            print("✅ 사용자 검색 성공")
+            return userProfile
+        } catch {
+            print("❌ 사용자 검색 실패: \(error)")
+            if let nsError = error as NSError?, nsError.code == 404 {
+                throw NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "사용자를 찾을 수 없습니다"])
+            }
+            throw error
+        }
+    }
+    
+    // MARK: - 사용자 친구 추가 (GET /user/search/add/{userId})
+    func addFriend(userId: String, token: String) async throws -> Bool {
+        guard let url = URL(string: APIConstants.baseURL + "/user/search/add/\(userId)") else {
+            throw URLError(.badURL)
+        }
+        
+        print("🌐 [친구 추가 요청] \(url.absoluteString)")
+        
+        do {
+            let success: Bool = try await networkService.get(url: url, accessToken: token)
+            print("✅ 친구 추가 성공")
+            return success
+        } catch {
+            print("❌ 친구 추가 실패: \(error)")
+            if let nsError = error as NSError?, nsError.code == 409 {
+                throw NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "이미 친구입니다"])
+            }
+            throw error
+        }
+    }
+    
+    // MARK: - 홈 그룹 정보 조회 (GET /user/home)
+    func getHomeGroups(token: String) async throws -> HomeGroupResponse {
+        guard let url = URL(string: APIConstants.baseURL + "/user/home") else {
+            throw URLError(.badURL)
+        }
+
+        print("🌐 [홈 그룹 조회 요청] \(url.absoluteString)")
+        
+        // 토큰을 accessToken 파라미터로 넘겨서 GET 요청
+        let response: HomeGroupResponse = try await networkService.get(url: url, accessToken: token)
+        
+        print("✅ 홈 그룹 조회 성공")
+        return response
+    }
+    
+    // MARK: - 프로필 사진 업로드 (POST /user/profile-photo)
+    func uploadProfilePhoto(token: String, imageData: Data) async throws -> ProfilePhotoResponse {
+        guard let url = URL(string: APIConstants.baseURL + "/user/profile-photo") else {
+            throw URLError(.badURL)
+        }
+        
+        print("🌐 [프로필 사진 업로드 요청] \(url.absoluteString)")
         
         var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        // 요청 보내기
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        // 성공적으로 응답이 오면 처리 (상태 코드 확인 등)
-        if (response as! HTTPURLResponse).statusCode != 200 {
-            throw NSError(domain: "com.example", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to delete account"])
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"profilePhoto\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        request.httpBody = body
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw URLError(.badServerResponse)
+            }
+            
+            guard (200...299).contains(httpResponse.statusCode) else {
+                let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+                throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                    NSLocalizedDescriptionKey: "프로필 사진 업로드 실패: \(errorMessage)"
+                ])
+            }
+            
+            let photoResponse = try JSONDecoder().decode(ProfilePhotoResponse.self, from: data)
+            print("✅ 프로필 사진 업로드 성공")
+            return photoResponse
+            
+        } catch {
+            print("❌ 프로필 사진 업로드 실패: \(error)")
+            throw error
         }
+    }
+    
+    // MARK: - UserModel 정리 함수 (Codable 구조체로 변경)
+    private func cleanUserModel(_ user: UserModel) -> CleanedUserData {
+        return CleanedUserData(
+            userName: user.userName,
+            userId: user.userId,
+            pw: user.pw,
+            gender: user.gender
+        )
+    }
+    
+    // MARK: - 정리된 사용자 데이터 구조체
+    private struct CleanedUserData: Codable {
+        let userName: String?
+        let userId: String?
+        let pw: String?
+        let gender: String?
+    }
+    
+    // MARK: - 요청/응답 구조체들
+    private struct LoginRequest: Codable {
+        let userId: String
+        let password: String
+    }
+    
+    struct TokenResponse: Codable {
+        let token: String
+    }
+    
+    struct UserHomeResponse: Codable {
+        let userName: String?
+        let userId: String?
+        let profileImageUrl: String?
+        let recentActivities: [Activity]?
+        let friendsCount: Int?
+        let groupsCount: Int?
+    }
+    
+    struct Activity: Codable {
+        let id: Int?
+        let type: String?
+        let title: String?
+        let description: String?
+        let createdAt: String?
+    }
+    
+    struct ProfilePhotoResponse: Codable {
+        let success: Bool
+        let imageUrl: String?
+        let message: String?
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GroupDetailBoard: View {
     @Binding var navigationPath: NavigationPath
+    let groupResponse: GroupResponse?
     let group: GroupModel
     @ObservedObject var groupStore: GroupStore
     @State var presentSideMenu = false
@@ -23,6 +24,9 @@ struct GroupDetailBoard: View {
     
     @State private var showImagePicker = false
     
+    @State private var isAllCompleted = false // 모든 멤버가 인증했는지
+    @State private var canCertifyToday = false // 오늘 인증 가능한지 (선택한 요일인지)
+    
     // 날짜 포맷터
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -33,6 +37,12 @@ struct GroupDetailBoard: View {
     private let displayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "M월 d일"
+        return formatter
+    }()
+    
+    private let apiDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
     
@@ -57,7 +67,7 @@ struct GroupDetailBoard: View {
     private var isCurrentDateInRange: Bool {
         let calendar = Calendar.current
         return calendar.compare(currentDate, to: groupStartDate, toGranularity: .day) != .orderedAscending &&
-               calendar.compare(currentDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
+        calendar.compare(currentDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
     }
     
     // 이전 날짜로 갈 수 있는지 확인
@@ -73,6 +83,138 @@ struct GroupDetailBoard: View {
         guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else { return false }
         return calendar.compare(nextDate, to: groupEndDate, toGranularity: .day) != .orderedDescending
     }
+    
+    // 토큰을 가져오는 헬퍼 함수
+        private func getAccessToken() -> String? {
+            return UserDefaults.standard.string(forKey: "accessToken")
+        }
+    
+    // checkDays API 호출 함수 (NetworkService 사용)
+        private func checkDays() {
+            print("🔍 [checkDays] =================")
+            print("🔍 [checkDays] 함수 호출됨")
+            print("🔍 [checkDays] 그룹 ID: \(group.id)")
+            print("🔍 [checkDays] 현재 날짜: \(displayDateFormatter.string(from: currentDate))")
+            print("🔍 [checkDays] 그룹 선택 요일: \(group.selectedDaysString)")
+            print("🔍 [checkDays] 현재 canCertifyToday 상태: \(canCertifyToday)")
+            print("🔍 [checkDays] =================")
+            
+            // 토큰 확인
+            guard let accessToken = getAccessToken() else {
+                print("❌ [checkDays] 액세스 토큰이 없습니다")
+                canCertifyToday = false
+                return
+            }
+            
+            print("🔑 [checkDays] 토큰 확인 완료")
+            
+            // API URL 구성
+            let urlString = "\(APIConstants.baseURL)/room/checkDays/\(group.id)"
+            
+            print("📡 [checkDays] API URL: \(urlString)")
+            
+            guard let url = URL(string: urlString) else {
+                print("❌ [checkDays] URL 생성 실패")
+                canCertifyToday = false
+                return
+            }
+            
+            print("🚀 [checkDays] API 요청 시작...")
+            
+            // NetworkService를 사용한 비동기 API 호출
+            Task {
+                do {
+                    let result: Bool = try await NetworkService.shared.get(url: url, accessToken: accessToken)
+                    
+                    // 메인 스레드에서 UI 업데이트
+                    await MainActor.run {
+                        print("✅ [checkDays] API 호출 성공: \(result)")
+                        print("🔄 [checkDays] canCertifyToday: \(canCertifyToday) -> \(result)")
+                        canCertifyToday = result
+                        print("🎯 [checkDays] 최종 인증 가능 여부: \(canCertifyToday)")
+                        print("🖼️ [checkDays] UI 업데이트 완료 - 인증 버튼 표시 여부: \(isCurrentDateInRange && canCertifyToday)")
+                    }
+                    
+                } catch {
+                    // 메인 스레드에서 에러 처리
+                    await MainActor.run {
+                        print("❌ [checkDays] API 호출 실패: \(error)")
+                        
+                        // HTTP 에러 코드 확인
+                        if let nsError = error as NSError?, nsError.code == 500 {
+                            print("❌ [checkDays] 서버 오류 발생 (500)")
+                            print("❌ [checkDays] 그룹의 days 필드가 설정되지 않았을 수 있습니다")
+                        }
+                        
+                        canCertifyToday = false
+                        print("🔄 [checkDays] canCertifyToday -> false (API 호출 실패)")
+                    }
+                }
+            }
+            
+            print("🔍 [checkDays] 처리 완료 =================")
+        }
+        
+        // oneDayCount API 호출 함수 (NetworkService 사용)
+        private func checkOneDayCount() {
+            print("🔍 [DEBUG] checkOneDayCount 호출됨")
+            
+            guard isCurrentDateInRange else {
+                print("❌ [DEBUG] 현재 날짜가 그룹 기간 외입니다.")
+                return
+            }
+            
+            // 토큰 확인
+            guard let accessToken = getAccessToken() else {
+                print("❌ [DEBUG] 액세스 토큰이 없습니다")
+                return
+            }
+            
+            print("🔑 [DEBUG] 토큰 확인 완료")
+            
+            // API URL 구성
+            let dateString = apiDateFormatter.string(from: currentDate)
+            let urlString = "\(APIConstants.baseURL)/room/oneDayCount?roomId=\(group.id)&date=\(dateString)"
+            
+            print("📡 [DEBUG] API URL: \(urlString)")
+            print("📅 [DEBUG] 요청 날짜: \(dateString)")
+            print("🏠 [DEBUG] 그룹 ID: \(group.id)")
+            
+            guard let url = URL(string: urlString) else {
+                print("❌ [DEBUG] URL 생성 실패")
+                return
+            }
+            
+            print("🚀 [DEBUG] API 요청 시작...")
+            
+            // NetworkService를 사용한 비동기 API 호출
+            Task {
+                do {
+                    let result: Bool = try await NetworkService.shared.get(url: url, accessToken: accessToken)
+                    
+                    // 메인 스레드에서 UI 업데이트
+                    await MainActor.run {
+                        print("✅ [DEBUG] API 호출 성공: \(result)")
+                        isAllCompleted = result
+                        print("🎯 [DEBUG] 해당 날짜 모든 멤버 인증 완료: \(result)")
+                    }
+                    
+                } catch {
+                    // 메인 스레드에서 에러 처리
+                    await MainActor.run {
+                        print("❌ [DEBUG] API 호출 실패: \(error)")
+                        
+                        // HTTP 에러 코드 확인
+                        if let nsError = error as NSError? {
+                            print("❌ [DEBUG] 에러 코드: \(nsError.code)")
+                        }
+                        
+                        isAllCompleted = false
+                        print("🔄 [DEBUG] isAllCompleted -> false (API 호출 실패)")
+                    }
+                }
+            }
+        }
     
     var customBackButton: some View {
         Button(action: {
@@ -134,6 +276,10 @@ struct GroupDetailBoard: View {
                             )
                             .datePickerStyle(.graphical)
                             .accentColor(Color(hex: "FF4B2F"))
+                            .onChange(of: currentDate) { _ in
+                                // 날짜가 변경될 때 API 호출
+                                checkOneDayCount()
+                            }
                             
                             Button(action: {
                                 showDatePicker = false
@@ -181,7 +327,7 @@ struct GroupDetailBoard: View {
                             .background(Color(hex: "F7F7F7"))
                             .cornerRadius(6)
                         
-                        Text(group.selectedDaysString.joined(separator: ", "))
+                        Text(group.selectedDaysString.toDisplayDays())
                             .font(.system(size: 14))
                             .foregroundColor(Color(hex: "464646"))
                     }
@@ -207,6 +353,14 @@ struct GroupDetailBoard: View {
                 .padding(.top, 20)
                 
                 
+                // 중간 랭킹 추가
+                VStack(alignment: .leading) {
+                    CheckPointRankingView(roomId: group.id)
+                }
+                //.padding(.horizontal, 22)
+                .padding(.vertical, 20)
+                
+                
                 ZStack {
                     // 날짜 네비게이션 (그룹 정보 아래로 이동)
                     HStack {
@@ -214,6 +368,7 @@ struct GroupDetailBoard: View {
                         Button(action: {
                             if canGoPrevious {
                                 currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+                                checkOneDayCount()
                             }
                         }) {
                             Image(systemName: "chevron.left")
@@ -232,6 +387,7 @@ struct GroupDetailBoard: View {
                         Button(action: {
                             if canGoNext {
                                 currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+                                checkOneDayCount()
                             }
                         }) {
                             Image(systemName: "chevron.right")
@@ -266,8 +422,8 @@ struct GroupDetailBoard: View {
                 
                 Spacer()
                 
-                // 인증하기 버튼 (기간 내 날짜일 때만 표시)
-                if isCurrentDateInRange {
+                // 인증하기 버튼 (기간 내 날짜이면서 선택한 요일일 때만 표시)
+                                if isCurrentDateInRange && canCertifyToday {
                     // 그룹 만들기 버튼
                     HStack {
                         Spacer()
@@ -293,12 +449,18 @@ struct GroupDetailBoard: View {
                     
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 // 초기 날짜를 그룹 시작 날짜로 설정
                 currentDate = groupStartDate
+                checkDays() // 선택한 요일 확인
+                checkOneDayCount()
+            }
+            .onChange(of: currentDate) { _ in
+                // 날짜가 변경될 때마다 API 호출
+                checkOneDayCount()
             }
             
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
@@ -309,19 +471,41 @@ struct GroupDetailBoard: View {
     }
 }
 
+extension String {
+    // "월화수" -> "월, 화, 수"
+    func toDisplayDays() -> String {
+        return self.map { String($0) }.joined(separator: ", ")
+    }
+}
+
 #Preview {
-    @State var path = NavigationPath()
-    let groupStore = GroupStore()
-    
-    let group = GroupModel(
+    // 테스트용
+    let calendar = Calendar.current
+    let startDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 8)) ?? Date()
+    let endDate = calendar.date(from: DateComponents(year: 2025, month: 7, day: 9)) ?? Date()
+    let testGroup = GroupModel(
+        id: 11,
         name: "아침 운동 챌린지",
-        period: "2024.07.01 - 2024.07.31",
-        reward: "스타벅스 기프티콘",
-        partners: ["김철수", "이영희", "박민수", "최수진", "정다은", "홍길동"],
-        selectedDaysString: ["월", "수", "금"],
-        selectedDaysCount: 3,
-        habitText: "매일 아침 스트레칭"
+        startDate: startDate,
+        endDate: endDate,
+        reward: "맛있는 브런치 먹기",
+        partners: [],
+        selectedDaysString: "월화수목금",
+        selectedDaysCount: 5,
     )
     
-    GroupDetailBoard(navigationPath: .constant(path), group: group, groupStore: groupStore)
+    // 테스트용 GroupStore 생성
+    let testGroupStore = GroupStore()
+    
+    // StatefulPreviewWrapper를 사용하여 NavigationPath 상태 관리
+    StatefulPreviewWrapper(NavigationPath()) { path in
+        NavigationStack(path: path) {
+            GroupDetailBoard(
+                navigationPath: path,
+                groupResponse: nil,
+                group: testGroup,
+                groupStore: testGroupStore
+            )
+        }
+    }
 }

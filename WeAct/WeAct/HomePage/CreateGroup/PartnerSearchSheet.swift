@@ -12,6 +12,7 @@ struct PartnerSearchSheet: View {
     @Binding var selectedPartners: Set<PartnerModel>
     @StateObject private var viewModel = UserSearchViewModel()
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var userViewModel: UserViewModel
     @State private var searchText = ""
 
     var body: some View {
@@ -60,7 +61,7 @@ struct PartnerSearchSheet: View {
             } else if let error = viewModel.errorMessage {
                 Text(error).foregroundColor(.red)
             } else {
-                ForEach(viewModel.searchedUsers) { user in // ✅ 3. 서버 응답 사용
+                ForEach(viewModel.searchedUsers.filter { $0.userId != userViewModel.user.userId}) { user in
                     let partner = PartnerModel(id: user.id, name: user.userId, profileImageName: nil)
                     userRow(partner)
                 }
@@ -71,25 +72,11 @@ struct PartnerSearchSheet: View {
     
     private func userRow(_ user: PartnerModel) -> some View {
         HStack {
-            // 프로필 이미지
-            Circle()
-                .fill(Color(hex: "40444B"))
-                .frame(width: 40, height: 40)
-                .overlay(
-                    Image(systemName: "person")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white)
-                )
-            
             // 사용자 정보
             VStack(alignment: .leading, spacing: 2) {
                 Text(user.name)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.custom("Pretendard-Medium", size: 16))
                     .foregroundColor(Color(hex: "40444B"))
-                
-                Text("@\(user.name.lowercased())")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "8691A2"))
             }
             
             Spacer()

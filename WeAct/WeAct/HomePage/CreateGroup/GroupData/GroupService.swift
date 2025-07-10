@@ -3,8 +3,7 @@
 //  WeAct
 //
 //  Created by 주현아 on 7/7/25.
-//
-// GroupService.swift
+
 // MARK: 새로 생성된 그룹 정보를 서버에 post하기 위한 코드들
 
 import Foundation

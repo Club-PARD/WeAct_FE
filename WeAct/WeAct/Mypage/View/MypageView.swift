@@ -7,13 +7,13 @@
 
 import SwiftUI
 
+
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var userViewModel: UserViewModel
     @AppStorage("isLoggedIn") var isLoggedIn = true
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
-    @State private var selectedImage: UIImage? = nil
     
     private var customBackButton: some View {
         Button(action: {
@@ -26,6 +26,7 @@ struct MypageView: View {
                 .foregroundColor(.black)
         }
     }
+  
 
     var body: some View {
         NavigationView {
@@ -37,7 +38,7 @@ struct MypageView: View {
                             .frame(width: 100, height: 100)
                             .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                             .cornerRadius(20)
-                    
+                        
                         if let localImage = userViewModel.user.localProfileImage {
                             Image(uiImage: localImage)
                                 .resizable()
@@ -46,21 +47,36 @@ struct MypageView: View {
                                 .clipped()
                                 .cornerRadius(20)
                         } else if let imageURLString = userViewModel.user.profileImageURL,
-                              let imageURL = URL(string: imageURLString),
-                              let data = try? Data(contentsOf: imageURL),
-                              let image = UIImage(data: data) {
-                           Image(uiImage: image)
-                               .resizable()
-                               .scaledToFill()
-                               .frame(width: 94, height: 94)
-                               .clipped()
-                               .cornerRadius(20)
-                       }else {
+                                   let imageURL = URL(string: imageURLString) {
+                               AsyncImage(url: imageURL) { phase in
+                                   switch phase {
+                                   case .empty:
+                                       ProgressView()
+                                           .frame(width: 94, height: 94)
+                                   case .success(let image):
+                                       image
+                                           .resizable()
+                                           .scaledToFill()
+                                           .frame(width: 94, height: 94)
+                                           .clipped()
+                                           .cornerRadius(20)
+                                   case .failure(_):
+                                       Text("이미지 오류")
+                                           .frame(width: 94, height: 94)
+                                           .background(Color.gray)
+                                           .cornerRadius(20)
+                                   @unknown default:
+                                       EmptyView()
+                                   }
+                               }
+                           }
+                        else {
                             Text("프로필\n사진")
                                .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                         }
+                        
                     } //ZStack
                     .padding(.top, 39)
                     .padding(.bottom, 13)
@@ -69,9 +85,10 @@ struct MypageView: View {
                         .font(.custom("Pretendard-Medium", size: 22))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     
+                    
                     HStack(alignment: .center, spacing: 10){
                         Button(action: {
-              
+                            userViewModel.changeProfileImage()
                         }) {
                             Text("프로필 사진 변경")
                                 .font(.custom("Pretendard-Medium", size: 16))
@@ -87,6 +104,7 @@ struct MypageView: View {
                                 .inset(by: 0.5)
                                 .stroke(Color(red: 0.91, green: 0.91, blue: 0.91), lineWidth: 1)
                         )
+                        
                         
                         Button(action: {
                             userViewModel.goToNameEdit()
@@ -135,8 +153,9 @@ struct MypageView: View {
                     
                 }//VStack
                 .background(Color(red: 0.97, green: 0.97, blue: 0.97))
-               
-                
+                .sheet(isPresented: $userViewModel.isShowingImagePicker) {
+                    ImagePicker(image: $userViewModel.selectedImage)
+                }
                 if isShowingLogoutModal {
                    Color.black.opacity(0.6).edgesIgnoringSafeArea(.all)
                    CustomModalView(
@@ -154,11 +173,10 @@ struct MypageView: View {
                            navigationPath = NavigationPath()
                            print("로그아웃 버튼 클릭")
                            TokenManager.shared.deleteToken()
-                           isLoggedIn = false
+                                          isLoggedIn = false
                        }
                    )
                }//isShowingLogoutModal
-                
                 if isShowingDeleteAccountModal {
                    Color.black.opacity(0.6).edgesIgnoringSafeArea(.all)
                    CustomModalView(
@@ -179,6 +197,17 @@ struct MypageView: View {
                 
             }//ZStack
         }//NavigationView
+        .onAppear {
+            print("📍 MypageView 진입")
+            print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
+            print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+
+            Task {
+                userViewModel.refreshTokenFromStorage() // 🔁 토큰 불러오기
+                await userViewModel.fetchSimpleProfile()    // 🔁 사용자 정보 불러오기 (프로필 포함)
+            }
+        }
+
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("마이페이지")

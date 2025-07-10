@@ -20,14 +20,7 @@ class UserViewModel: ObservableObject {
     
     @Published var token: String? = nil
     @Published var isShowingImagePicker = false
-    @Published var selectedImage: UIImage? {
-        didSet {
-            if let image = selectedImage {
-                user.localProfileImage = image
-                updateProfileImage(image: image)
-            }
-        }
-    }
+    @Published var localSelectedImage: UIImage?  // 로컬에서만 사용하는 이미지
     
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @Published var errorMessage: String? = nil
@@ -73,37 +66,10 @@ class UserViewModel: ObservableObject {
         }
     }
     
+    // MARK: - 프로필 이미지 관련 (로컬 전용)
     
-    // MARK: - 프로필 이미지 관련
-    func updateProfileImage(image: UIImage) {
-        selectedImage = image
-
-        // ✅ 수정된 코드
-        guard let token = TokenManager.shared.getToken() else {
-            print("❌ 토큰 없음 - 업로드 중단")
-            return
-        }
-
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            print("❌ 이미지 변환 실패")
-            return
-        }
-
-        Task {
-            do {
-                let response = try await service.uploadProfilePhoto(token: token, imageData: imageData)
-                print("✅ 프로필 사진 업로드 성공: \(response.imageUrl ?? "URL 없음")")
-                
-                // 업로드 후 받은 URL을 저장
-                user.profileImageURL = response.imageUrl
-                
-            } catch {
-                print("❌ 프로필 사진 업로드 실패: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    func changeProfileImage() {
+    // 이미지 피커 열기
+    func openImagePicker() {
         isShowingImagePicker = true
     }
     

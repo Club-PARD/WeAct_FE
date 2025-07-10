@@ -16,16 +16,16 @@ struct UserModel: Codable {
     var profileImageURL: String?
     
     // ❌ Codable 제외 (직렬화 X)
-    var localProfileImage: UIImage? = UIImage(named: "profile")
-    
-    // 필요한 경우에만 CodingKeys 선언
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case userId
-        case pw
-        case userName
-        case gender
-        case profileImageURL
+//    var localProfileImage: UIImage? = UIImage(named: "profile")
+//    
+//    // 필요한 경우에만 CodingKeys 선언
+//    private enum CodingKeys: String, CodingKey {
+//        case id
+//        case userId
+//        case pw
+//        case userName
+//        case gender
+//        case profileImageURL
         // localProfileImage는 제외함
-    }
+//    }
 }

@@ -7,14 +7,13 @@
 
 import SwiftUI
 
-
 struct MypageView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var userViewModel: UserViewModel
     @AppStorage("isLoggedIn") var isLoggedIn = true
     @State private var isShowingLogoutModal = false
     @State private var isShowingDeleteAccountModal = false
-    @State private var remoteImage: UIImage? = nil
+    @State private var selectedImage: UIImage? = nil
     
     private var customBackButton: some View {
         Button(action: {
@@ -27,7 +26,6 @@ struct MypageView: View {
                 .foregroundColor(.black)
         }
     }
-  
 
     var body: some View {
         NavigationView {
@@ -40,28 +38,40 @@ struct MypageView: View {
                             .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                             .cornerRadius(20)
                         
-//                        if let localImage = userViewModel.user.localProfileImage {
-//                            Image(uiImage: localImage)
-//                                .resizable()
-//                                .scaledToFill()
-//                                .frame(width: 94, height: 94)
-//                                .clipped()
-//                                .cornerRadius(20)
-//                        } else if let image = remoteImage {
-//                            Image(uiImage: image)
-//                                .resizable()
-//                                .scaledToFill()
-//                                .frame(width: 94, height: 94)
-//                                .clipped()
-//                                .cornerRadius(20)
-//                        } else {
-////
-//                            Text("프로필\n사진")
-//                               .font(.custom("Pretendard-Medium", size: 16))
-//                                .multilineTextAlignment(.center)
-//                                .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
+                        // 로컬 이미지 우선 표시, 없으면 서버 이미지 표시
+                        if let localImage = userViewModel.localSelectedImage {
+                            Image(uiImage: localImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 94, height: 94)
+                                .clipped()
+                                .cornerRadius(20)
+                       }
+//                            else if let urlString = userViewModel.user.profileImageURL,
+//                                  let url = URL(string: urlString) {
+//                            AsyncImage(url: url) { phase in
+//                                if let image = phase.image {
+//                                    image
+//                                        .resizable()
+//                                        .scaledToFill()
+//                                        .frame(width: 94, height: 94)
+//                                        .clipped()
+//                                        .cornerRadius(20)
+//                                } else {
+//                                    // 이미지 로딩 실패하거나 없음
+//                                    Text("프로필\n사진")
+//                                        .font(.custom("Pretendard-Medium", size: 16))
+//                                        .multilineTextAlignment(.center)
+//                                        .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
+//                                }
+//                            }
 //                        }
-                        
+                        else {
+                            Text("프로필\n사진")
+                                .font(.custom("Pretendard-Medium", size: 16))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
+                        }
                     } //ZStack
                     .padding(.top, 39)
                     .padding(.bottom, 13)
@@ -70,10 +80,9 @@ struct MypageView: View {
                         .font(.custom("Pretendard-Medium", size: 22))
                         .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     
-                    
                     HStack(alignment: .center, spacing: 10){
                         Button(action: {
-                            userViewModel.changeProfileImage()
+                            userViewModel.openImagePicker()
                         }) {
                             Text("프로필 사진 변경")
                                 .font(.custom("Pretendard-Medium", size: 16))
@@ -89,7 +98,6 @@ struct MypageView: View {
                                 .inset(by: 0.5)
                                 .stroke(Color(red: 0.91, green: 0.91, blue: 0.91), lineWidth: 1)
                         )
-                        
                         
                         Button(action: {
                             userViewModel.goToNameEdit()
@@ -139,8 +147,9 @@ struct MypageView: View {
                 }//VStack
                 .background(Color(red: 0.97, green: 0.97, blue: 0.97))
                 .sheet(isPresented: $userViewModel.isShowingImagePicker) {
-                    ImagePicker(image: $userViewModel.selectedImage)
+                    ImagePicker(image: $userViewModel.localSelectedImage)
                 }
+                
                 if isShowingLogoutModal {
                    Color.black.opacity(0.6).edgesIgnoringSafeArea(.all)
                    CustomModalView(
@@ -158,10 +167,11 @@ struct MypageView: View {
                            navigationPath = NavigationPath()
                            print("로그아웃 버튼 클릭")
                            TokenManager.shared.deleteToken()
-                                          isLoggedIn = false
+                           isLoggedIn = false
                        }
                    )
                }//isShowingLogoutModal
+                
                 if isShowingDeleteAccountModal {
                    Color.black.opacity(0.6).edgesIgnoringSafeArea(.all)
                    CustomModalView(
@@ -182,62 +192,9 @@ struct MypageView: View {
                 
             }//ZStack
         }//NavigationView
-//        .onAppear {
-//            print("📍 MypageView 진입")
-////            print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
-////            print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
-//            
-//            if let imageURLString = userViewModel.user.profileImageURL,
-//               let imageURL = URL(string: imageURLString) {
-//                DispatchQueue.global().async {
-//                    if let data = try? Data(contentsOf: imageURL),
-//                       let image = UIImage(data: data) {
-//                        DispatchQueue.main.async {
-//                            self.remoteImage = image
-//                        }
-//                    } else {
-//                        print("❌ 이미지 변환 실패")
-//                    }
-//                }
-//            }
-//        }
-        .onAppear {
-            print("📍 MypageView 진입")
-
-            guard let imageURLString = userViewModel.user.profileImageURL,
-                  let imageURL = URL(string: imageURLString) else {
-                print("❌ 유효하지 않은 이미지 URL")
-                return
-            }
-
-            // 비동기 URL 로드
-            URLSession.shared.dataTask(with: imageURL) { data, response, error in
-                if let error = error {
-                    print("❌ 이미지 다운로드 에러: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let data = data, let image = UIImage(data: data) else {
-                    print("❌ 이미지 변환 실패")
-                    return
-                }
-
-                DispatchQueue.main.async {
-                    self.remoteImage = image
-                    print("✅ 프로필 이미지 로드 완료")
-                }
-            }.resume()
-        }
-
-        
-        
-        
-        
-
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("마이페이지")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-

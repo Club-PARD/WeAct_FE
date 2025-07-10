@@ -111,26 +111,7 @@ struct ContentView: View {
             }
         }
     }
-    
-    //    func login() async {
-    //        do {
-    //            let token = try await UserService().login(userId: userId, password: password)
-    //            TokenManager.shared.saveToken(token)
-    //            userViewModel.token = token
-    //            isLoggedIn = true
-    //
-    //            // ✅ 여기서 사용자 정보 요청
-    //            let userInfo = try await UserService().getUserInfo(token: token)
-    //            userViewModel.user = userInfo  // ⭐️ userId, id, userName 등 할당됨
-    //
-    //            print("✅ 로그인 후 사용자 정보: \(userInfo)")
-    //            print("🧠 userId: \(userInfo.userId ?? "없음")")
-    //            print("🧠 id: \(userInfo.id ?? -1)")
-    //
-    //        } catch {
-    //            print("❌ 로그인 에러: \(error)")
-    //        }
-    //    }
+ 
     func login() async {
         do {
             let token = try await UserService().login(userId: userId, password: password)

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GroupModel: Hashable, Identifiable, Codable {
+struct GroupModel: Hashable, Identifiable, Codable { // POST의 room
     let id: Int
     let name: String
     let startDate: Date

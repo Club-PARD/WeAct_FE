@@ -22,7 +22,7 @@
   <tr>
     <td align="center" style="padding: 20px;">
       <img src="https://github.com/user-attachments/assets/82a75fb8-2c31-4a09-820f-f82f55bac10d" width="120" style="border-radius: 15px; margin-bottom: 10px;">
-      <h3 style="font-size: 1.3rem;">� 이단진</h3>
+      <h3 style="font-size: 1.3rem;">이단진</h3>
       <p style="color: #555;">PM</p>
     </td>
     <td align="center" style="padding: 20px;">

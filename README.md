@@ -71,6 +71,7 @@
 
 
 <img src="https://github.com/user-attachments/assets/0acb8c92-3b18-4a95-8a3f-499a8ff27664" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+
 > WeAct에 오신 것을 환영합니다! 앱으로 진입하여 습관을 형성 및 유지하기를 시작하세요.
 
 
@@ -85,7 +86,18 @@
 
 > WeAct에 오신 것을 환영합니다! 앱으로 진입하여 습관을 형성 및 유지하기를 시작하세요.
 
+---
 
+## 3. 🔐 로그인 및 회원가입
+
+
+<img src="https://github.com/user-attachments/assets/1769ee6a-0496-4503-affd-1ed22233b9fe" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/c5c665e1-eb54-4927-8d74-010fd79e5250" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/70a96201-5389-4562-b04f-7ce16a0a5091" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/b9ea5223-111f-48b1-b47c-f2554532e68d" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+<img src="https://github.com/user-attachments/assets/daf28d64-4a23-4adc-b511-d9c16c5e848a" width="250" height="500" style="border-radius: 15px; margin-bottom: 10px;">
+
+> WeAct에 로그인 및 회원가입을 해서 습관형성 및 유지를 시작하세요.
 
 
 

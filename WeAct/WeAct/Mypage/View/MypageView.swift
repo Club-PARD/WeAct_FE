@@ -37,38 +37,27 @@ struct MypageView: View {
                             .frame(width: 100, height: 100)
                             .background(Color(red: 0.93, green: 0.95, blue: 0.96))
                             .cornerRadius(20)
-                        
-                        // 로컬 이미지 우선 표시, 없으면 서버 이미지 표시
-                        if let localImage = userViewModel.localSelectedImage {
+                    
+                        if let localImage = userViewModel.user.localProfileImage {
                             Image(uiImage: localImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 94, height: 94)
                                 .clipped()
                                 .cornerRadius(20)
-                       }
-//                            else if let urlString = userViewModel.user.profileImageURL,
-//                                  let url = URL(string: urlString) {
-//                            AsyncImage(url: url) { phase in
-//                                if let image = phase.image {
-//                                    image
-//                                        .resizable()
-//                                        .scaledToFill()
-//                                        .frame(width: 94, height: 94)
-//                                        .clipped()
-//                                        .cornerRadius(20)
-//                                } else {
-//                                    // 이미지 로딩 실패하거나 없음
-//                                    Text("프로필\n사진")
-//                                        .font(.custom("Pretendard-Medium", size: 16))
-//                                        .multilineTextAlignment(.center)
-//                                        .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
-//                                }
-//                            }
-//                        }
-                        else {
+                        } else if let imageURLString = userViewModel.user.profileImageURL,
+                              let imageURL = URL(string: imageURLString),
+                              let data = try? Data(contentsOf: imageURL),
+                              let image = UIImage(data: data) {
+                           Image(uiImage: image)
+                               .resizable()
+                               .scaledToFill()
+                               .frame(width: 94, height: 94)
+                               .clipped()
+                               .cornerRadius(20)
+                        }else {
                             Text("프로필\n사진")
-                                .font(.custom("Pretendard-Medium", size: 16))
+                               .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(Color(red: 0.53, green: 0.57, blue: 0.64))
                         }
@@ -82,7 +71,7 @@ struct MypageView: View {
                     
                     HStack(alignment: .center, spacing: 10){
                         Button(action: {
-                            userViewModel.openImagePicker()
+              
                         }) {
                             Text("프로필 사진 변경")
                                 .font(.custom("Pretendard-Medium", size: 16))
@@ -146,9 +135,7 @@ struct MypageView: View {
                     
                 }//VStack
                 .background(Color(red: 0.97, green: 0.97, blue: 0.97))
-                .sheet(isPresented: $userViewModel.isShowingImagePicker) {
-                    ImagePicker(image: $userViewModel.localSelectedImage)
-                }
+               
                 
                 if isShowingLogoutModal {
                    Color.black.opacity(0.6).edgesIgnoringSafeArea(.all)

@@ -19,8 +19,7 @@ class UserViewModel: ObservableObject {
     )
     
     @Published var token: String? = nil
-    @Published var isShowingImagePicker = false
-    @Published var localSelectedImage: UIImage?  // 로컬에서만 사용하는 이미지
+
     
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @Published var errorMessage: String? = nil
@@ -66,13 +65,7 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 프로필 이미지 관련 (로컬 전용)
-    
-    // 이미지 피커 열기
-    func openImagePicker() {
-        isShowingImagePicker = true
-    }
-    
+  
     func goToNameEdit() {
         // 화면 전환 트리거용 함수 (View에서 사용)
     }

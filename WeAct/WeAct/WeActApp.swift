@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 @main
 struct WeActApp: App {
     @StateObject private var userViewModel = UserViewModel()
@@ -18,5 +19,6 @@ struct WeActApp: App {
                     .environmentObject(userViewModel)
             }
         }
+        
     }
 }

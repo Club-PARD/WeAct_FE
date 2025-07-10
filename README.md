@@ -1,4 +1,4 @@
-![onboarding1](https://github.com/user-attachments/assets/bd3bcac1-58f7-465d-b8e9-c7966af83c93)<div align="center">
+<div align="center">
   <img src="https://github.com/user-attachments/assets/4c7d6080-9d05-4d64-a882-3e84258ad27e" width="200" style="border-radius: 15px; margin-bottom: 20px;">
   <h1 style="font-size: 2.5rem;">WeAct</h1>
   <p style="font-size: 1.3rem; color: #555;">WeAct 친구와 함께하는 습관 달성 플랫폼</p>

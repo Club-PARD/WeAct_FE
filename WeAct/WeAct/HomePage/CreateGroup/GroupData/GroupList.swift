@@ -2,8 +2,7 @@ import SwiftUI
 
 struct GroupList: View {
     @Binding var navigationPath: NavigationPath
-    var homeGroup: HomeGroupModel // 유저, 홈의 GET
-    var group: GroupModel // 룸의 POST
+    let homeGroup: HomeGroupModel
     let canCertifyToday: Bool // 오늘 인증 가능 여부
     var onTap: () -> Void
     
@@ -20,21 +19,17 @@ struct GroupList: View {
                             .foregroundColor(Color(hex: "929292"))
                     } // HStack
                     
-                    
-//                    Text(homeGroup.habit)
-//                        .font(.custom("Pretendard-Medium", size: 16))
-//                        .foregroundColor(Color(hex: "171717"))
                     // 옵셔널 바인딩으로 habit 처리
-                                        if let habit = homeGroup.habit, !habit.isEmpty {
-                                            Text(habit)
-                                                .font(.custom("Pretendard-Medium", size: 16))
-                                                .foregroundColor(Color(hex: "171717"))
-                                        } else {
-                                            Text("습관이 설정되지 않았습니다")
-                                                .font(.custom("Pretendard-Medium", size: 16))
-                                                .foregroundColor(Color(hex: "929292"))
-                                                .italic()
-                                        }
+                    if let habit = homeGroup.habit, !habit.isEmpty {
+                        Text(habit)
+                            .font(.custom("Pretendard-Medium", size: 16))
+                            .foregroundColor(Color(hex: "171717"))
+                    } else {
+                        Text("습관이 설정되지 않았습니다")
+                            .font(.custom("Pretendard-Medium", size: 16))
+                            .foregroundColor(Color(hex: "929292"))
+                            .italic()
+                    }
                     
                     HStack {
                         Text(homeGroup.period)
@@ -56,7 +51,7 @@ struct GroupList: View {
                 } // VStack
                 
                 // 인증하기 버튼 (오늘 인증 가능한 경우에만 표시)
-                if canCertifyToday {
+                //if canCertifyToday {
                     HStack {
                         Spacer()
                         
@@ -78,7 +73,7 @@ struct GroupList: View {
                             .cornerRadius(18)
                         } // Button
                     } // HStack
-                } // if
+               // } // if
             } // HStack
             
             Divider()
@@ -96,6 +91,25 @@ struct GroupList: View {
                 Text("\(homeGroup.percent)%")
                     .font(.custom("Pretendard-Medium", size: 14))
                     .foregroundColor(Color(hex: "FF4B2F"))
+                
+                // 중간점검 상태 표시 (선택적)
+                if homeGroup.isCheckPointTime {
+                    Text("중간점검 시점")
+                        .font(.custom("Pretendard-Medium", size: 12))
+                        .foregroundColor(.orange)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.1))
+                        .cornerRadius(4)
+                } else if homeGroup.isCheckPointPassed {
+                    Text("중간점검 완료")
+                        .font(.custom("Pretendard-Medium", size: 12))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(4)
+                }
             } // HStack
         } // VStack
         .padding(.vertical, 16)

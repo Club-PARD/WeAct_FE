@@ -46,7 +46,7 @@ struct Sign_in_Page: View {
                         Task {
                             await userViewModel.createUserAndLogin()
                         }
-                        //dismiss()
+                        dismiss()
                     }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)

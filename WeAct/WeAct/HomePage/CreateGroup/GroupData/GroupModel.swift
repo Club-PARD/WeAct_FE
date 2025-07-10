@@ -45,18 +45,18 @@ struct GroupModel: Hashable, Identifiable, Codable { // POST의 room
     }
     
     // 서버 응답으로부터 생성하는 생성자
-    init(from response: GroupResponse, originalData: CreateGroupData) {
-        self.id = response.roomId
-        self.name = response.roomName
-        self.startDate = originalData.startDate
-        self.endDate = originalData.endDate
-        self.reward = originalData.reward
-        self.partners = [] // 서버에서 파트너 정보를 받아오는 로직 필요
-        self.selectedDaysString = originalData.selectedDaysString
-        self.selectedDaysCount = response.dayCountByWeek
-        self.roomId = response.roomId
-        self.creatorName = response.creatorName
-    }
+//    init(from response: GroupResponse, originalData: CreateGroupData) {
+//        self.id = response.roomId
+//        self.name = response.roomName
+//        self.startDate = originalData.startDate
+//        self.endDate = originalData.endDate
+//        self.reward = originalData.reward
+//        self.partners = [] // 서버에서 파트너 정보를 받아오는 로직 필요
+//        self.selectedDaysString = originalData.selectedDaysString
+//        self.selectedDaysCount = response.dayCountByWeek
+//        self.roomId = response.roomId
+//        self.creatorName = response.creatorName
+//    }
 }
 
 extension GroupModel {

@@ -266,9 +266,3 @@ struct AddPartner: View {
         }//Task
     }
 }
-
-//#Preview {
-//    @State var path = NavigationPath()
-//    let groupStore = GroupStore()
-//    AddPartner(groupStore: groupStore, navigationPath: .constant(path))
-//}

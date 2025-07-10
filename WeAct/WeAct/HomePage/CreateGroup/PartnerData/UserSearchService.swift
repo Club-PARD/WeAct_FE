@@ -40,7 +40,4 @@ class UserSearchService {
         let decoded = try JSONDecoder().decode([UserSearchResponse].self, from: data)
         return decoded
     }
-
-    // TODO: 사용자 프로필 이미지 등 상세 정보 조회 함수도 여기에 추가 가능
-    
 }

@@ -1,12 +1,4 @@
-//
-//  GroupService.swift
-//  WeAct
-//
-//  Created by 주현아 on 7/7/25.
-//
-// GroupService.swift
-// MARK: 새로 생성된 그룹 정보를 서버에 post하기 위한 코드들
-
+// POST한 후 받은 reponse로 내부 보드 들어가기
 import Foundation
 
 // MARK: - GroupRequest (서버로 보낼 모델)
@@ -20,14 +12,10 @@ struct GroupRequest: Codable {
     let dayCountByWeek: Int // 주 n회
 }
 
-
 // MARK: - GroupResponse (서버에서 받을 모델)
 struct GroupResponse: Codable {
     let creatorName: String // 방 주최자 이름
     let roomId: Int // 방 식별자 아이디, 몇 번째 방
-    let roomName: String
-    let dayCountByWeek: Int
-    let checkPoints: [String]
 }
 
 extension CreateGroupData {
@@ -61,7 +49,7 @@ class GroupService {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") // ✅ 수정된 부분
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         let jsonData = try JSONEncoder().encode(request)
         urlRequest.httpBody = jsonData
@@ -96,11 +84,7 @@ class GroupService {
             print("✅ [GroupService] Response:")
             print("""
             ▸ roomId         : \(decoded.roomId)
-            ▸ roomName       : \(decoded.roomName)
             ▸ creatorName    : \(decoded.creatorName)
-            ▸ dayCountByWeek : \(decoded.dayCountByWeek)
-            ▸ checkPoints    :
-              \(decoded.checkPoints.joined(separator: "\n  "))
             """)
             
             return decoded

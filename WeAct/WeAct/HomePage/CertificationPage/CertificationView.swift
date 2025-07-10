@@ -18,13 +18,6 @@ struct CertificationView: View {
         ZStack {
             Color(hex: "F7F7F7")
                         .ignoresSafeArea()
-            Text("습관인증하기")
-                .font(
-                    Font.custom("Pretendard", size: 18)
-                        .weight(.medium)
-                )
-                .foregroundColor(.black)
-
             HStack {
                 Button(action: {
                     dismiss()
@@ -33,7 +26,14 @@ struct CertificationView: View {
                         .foregroundColor(.black)
                 }
                 Spacer()
-            }
+                Text("습관인증하기")
+                    .font(
+                        Font.custom("Pretendard", size: 18)
+                            .weight(.medium)
+                    )
+                    .foregroundColor(.black)
+                Spacer()
+            } // HStack
         }
         .padding(.horizontal, 18)
         .padding(.top, 15)

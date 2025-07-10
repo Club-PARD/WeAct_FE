@@ -202,7 +202,7 @@ struct MypageView: View {
             print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
             print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
 
-            Task {
+            Task { 
                 userViewModel.refreshTokenFromStorage() // 🔁 토큰 불러오기
                 await userViewModel.fetchSimpleProfile()    // 🔁 사용자 정보 불러오기 (프로필 포함)
             }

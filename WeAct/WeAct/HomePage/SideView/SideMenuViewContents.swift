@@ -1,25 +1,15 @@
-//
-//  SideMenuViewContents.swift
-//  WeAct
-//
-//  Created by 최승아 on 7/1/25.
-//
-
 import SwiftUI
 
 struct SideMenuViewContents: View {
     @Binding var presentSideMenu: Bool
     @State var isDisplayTooltip: Bool = false
+    let roomId: Int
+    let token: String
     
-    // 샘플 데이터 - 실제로는 GroupModel에서 받아올 것
-    let members = [
-        ("김종언", "1시간에 한 걸기", 0.0),
-        ("이단지", "자기 전 일기 쓰기", 0.0),
-        ("주현아", "기상 후 물 마시기", 0.0),
-        ("최송아", "10분 독서", 0.0),
-        ("빈지성", "자기 전 일기 쓰기", 0.0),
-        ("현승훈", "기상 후 오늘의 할 일 정리", 0.0)
-    ]
+    // 햄버거 메뉴 정보 상태
+    @State private var hamburgerInfo: HamburgerModel?
+    @State private var isLoadingHamburger = false
+    @State private var errorMessage: String?
     
     var body: some View {
         ZStack {
@@ -31,7 +21,7 @@ struct SideMenuViewContents: View {
                             presentSideMenu.toggle()
                         }) {
                             Image(systemName: "xmark")
-                                .font(.system(size: 24, weight: .medium))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(Color(hex: "858588"))
                         }
                         
@@ -41,73 +31,151 @@ struct SideMenuViewContents: View {
                             isDisplayTooltip = true
                         }) {
                             Image(systemName: "info.circle")
-                                .font(.system(size: 24, weight: .medium))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(Color(hex: "858588"))
                         }
-                        
                         
                         Button(action: {
                             // 공유 버튼 액션
                         }) {
                             Image("share")
                                 .resizable()
-                                .frame(width: 24, height: 24)
+                                .frame(width: 20, height: 20)
                                 .foregroundColor(Color(hex: "858588"))
                         }
-                        
-                    } // HStack
+                    }
+                    .padding(.top, 15)
                     .padding(.horizontal, 18)
                     
-                    // 그룹 정보
-                    HStack(spacing: 12) {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(hex: "8FB4D3"))
-                            .frame(width: 60, height: 60)
-                            .overlay(
-                                Image(systemName: "figure.walk")
-                                    .font(.system(size: 24, weight: .medium))
-                                    .foregroundColor(.white)
-                            )
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("이주원")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.black)
+                    // 로딩 상태 또는 그룹 정보
+                    if isLoadingHamburger {
+                        // 로딩 중일 때
+                        HStack(spacing: 12) {
+                            Circle()
+                                .fill(Color(hex: "F0F0F0"))
+                                .frame(width: 50, height: 50)
+                                .overlay(
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                )
                             
-                            HStack(spacing: 4) {
-                                Image(systemName: "pencil")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "FF6B47"))
-                                Text("10분 독서")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(hex: "666666"))
-                            } // HStack
-                            
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "FF6B47"))
-                                Text("내 습관 달성률")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(hex: "666666"))
+                            VStack(alignment: .leading, spacing: 4) {
+                                Rectangle()
+                                    .fill(Color(hex: "F0F0F0"))
+                                    .frame(width: 100, height: 20)
+                                    .cornerRadius(4)
                                 
-                                Spacer()
-                                
-                                Text("58%")
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(Color(hex: "FF6B47"))
-                            } // HStack
+                                Rectangle()
+                                    .fill(Color(hex: "F0F0F0"))
+                                    .frame(width: 150, height: 16)
+                                    .cornerRadius(4)
+                            }
                             
-                            // 진행률 바
-                            ProgressView(value: 0.58)
-                                .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "FF6B47")))
-                                .scaleEffect(x: 1, y: 1.5, anchor: .center)
-                        } // VStack
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
                         
-                        Spacer()
-                    } // HStack
-                    .padding(.horizontal, 20)
-                } // VStack
+                    } else if let hamburgerInfo = hamburgerInfo {
+                        // 데이터 로드 완료
+                        VStack(alignment: .leading) {
+                            HStack {
+                                // 프로필 이미지
+                                AsyncImage(url: URL(string: hamburgerInfo.imageUrl ?? "")) { phase in
+                                    switch phase {
+                                    case .success(let image):
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                    case .failure(_):
+                                        Rectangle()
+                                            .fill(Color(hex: "F0F0F0"))
+                                            .overlay(
+                                                Image(systemName: "person.circle")
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(Color(hex: "C6C6C6"))
+                                            )
+                                    case .empty:
+                                        Rectangle()
+                                            .fill(Color(hex: "F0F0F0"))
+                                            .overlay(
+                                                ProgressView()
+                                                    .scaleEffect(0.8)
+                                            )
+                                    @unknown default:
+                                        Rectangle()
+                                            .fill(Color(hex: "F0F0F0"))
+                                    }
+                                }
+                                .frame(width: 48, height: 48)
+                                .cornerRadius(14)
+                                
+                                Text(hamburgerInfo.myName)
+                                    .font(.custom("Pretendard-Bold", size: 22))
+                                    .foregroundColor(Color(hex: "171717"))
+                                
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                
+                                HStack(spacing: 4) {
+                                    Image("pen")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 24, height: 24)
+                                    
+                                    Text(hamburgerInfo.myHabit ?? "습관을 설정해주세요")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(Color(hex: "464646"))
+                                }
+                                
+                                HStack(spacing: 4) {
+                                    Image("icon_goal")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 24, height: 24)
+                                    
+                                    Text("내 습관 달성률")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(Color(hex: "464646"))
+                                    
+                                    Spacer()
+                                    
+                                    let safePercent = max(0, min(100, hamburgerInfo.myPercent))
+                                    Text("\(safePercent)%")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(Color(hex: "FF4B2F"))
+                                }
+                                
+                                // 진행률 바
+                                let progressValue = Double(hamburgerInfo.myPercent) / 100.0
+                                ProgressView(value: progressValue)
+                                    .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "FF4B2F")))
+                                    .scaleEffect(x: 1, y: 1.5, anchor: .center)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        
+                    } else if let errorMessage = errorMessage {
+                        // 오류 상태
+                        VStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 24))
+                                .foregroundColor(Color(hex: "FF6B47"))
+                            
+                            Text(errorMessage)
+                                .font(.system(size: 14))
+                                .foregroundColor(Color(hex: "666666"))
+                                .multilineTextAlignment(.center)
+                            
+                            Button("다시 시도") {
+                                fetchHamburgerInfo()
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(Color(hex: "FF6B47"))
+                        }
+                        .padding(.horizontal, 20)
+                    }
+                }
                 .padding(.bottom, 24)
                 
                 // 구분선
@@ -116,45 +184,77 @@ struct SideMenuViewContents: View {
                     .frame(height: 8)
                 
                 // 멤버 목록
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("친구 목록")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color(hex: "333333"))
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
-                        .padding(.bottom, 12)
-                    
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(Array(members.enumerated()), id: \.offset) { index, member in
-                                HStack(spacing: 12) {
-                                    // 프로필 이미지
-                                    Circle()
-                                        .fill(Color(hex: "E8E8E8"))
-                                        .frame(width: 40, height: 40)
-                                        .overlay(
-                                            Image(systemName: "person.fill")
-                                                .font(.system(size: 16))
-                                                .foregroundColor(Color(hex: "999999"))
-                                        )
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(member.0)
-                                            .font(.system(size: 16, weight: .medium))
-                                            .foregroundColor(.black)
-                                        
-                                        Text(member.1)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(Color(hex: "666666"))
-                                    } // VStack
-                                    
-                                    Spacer()
-                                } // HStack
+                if let hamburgerInfo = hamburgerInfo {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text("친구 목록")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(Color(hex: "333333"))
                                 .padding(.horizontal, 20)
-                                .padding(.vertical, 12)
-                            } // ForEach
-                        } // LazyVStack
-                    } // ScrollView
+                                .padding(.top, 20)
+                                .padding(.bottom, 12)
+                            
+                            Spacer()
+                            
+                            Text("\(hamburgerInfo.memberNameAndHabitDtos.count)명")
+                                .font(.custom("Pretendard-Medium", size: 14))
+                                .foregroundColor(Color(hex: "8691A2"))
+                                .padding(.trailing, 20)
+                        }
+                        
+                        ScrollView {
+                            LazyVStack(spacing: 0) {
+                                ForEach(hamburgerInfo.memberNameAndHabitDtos.indices, id: \.self) { index in
+                                    let member = hamburgerInfo.memberNameAndHabitDtos[index]
+                                    HStack(spacing: 12) {
+                                        // 멤버 프로필 이미지
+                                        AsyncImage(url: URL(string: member.imageUrl ?? "")) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                            case .failure(_):
+                                                Rectangle()
+                                                    .fill(Color(hex: "F0F0F0"))
+                                                    .overlay(
+                                                        Image(systemName: "person.circle")
+                                                            .font(.system(size: 16))
+                                                            .foregroundColor(Color(hex: "C6C6C6"))
+                                                    )
+                                            case .empty:
+                                                Rectangle()
+                                                    .fill(Color(hex: "F0F0F0"))
+                                                    .overlay(
+                                                        ProgressView()
+                                                            .scaleEffect(0.6)
+                                                    )
+                                            @unknown default:
+                                                Rectangle()
+                                                    .fill(Color(hex: "F0F0F0"))
+                                            }
+                                        }
+                                        .frame(width: 48, height: 48)
+                                        .cornerRadius(14)
+                                        
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(member.memberName)
+                                                .font(.custom("Pretendard-Medium", size: 16))
+                                                .foregroundColor(Color(hex: "464646"))
+                                            
+                                            Text(member.memberHabit ?? "습관 없음")
+                                                .font(.custom("Pretendard-Regular", size: 14))
+                                                .foregroundColor(Color(hex: "858588"))
+                                        }
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 Spacer()
@@ -168,27 +268,95 @@ struct SideMenuViewContents: View {
                         .foregroundColor(Color(hex: "FF6B47"))
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 16)
-                } // Button
-                .padding(.horizontal, 20)
-            } // VStack
+                }
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
-        
-            if isDisplayTooltip {
-                    TooltipView(isDisplayTooltip: $isDisplayTooltip)
-                    .offset(x: -30, y: -268)
-                }
             
-        } // ZStack
+            if isDisplayTooltip {
+                TooltipView(isDisplayTooltip: $isDisplayTooltip)
+                    .offset(x: -30, y: -268)
+            }
+        }
         .onTapGesture {
             isDisplayTooltip = false
+        }
+        .onAppear {
+            // 뷰가 나타날 때 햄버거 정보 가져오기
+            fetchHamburgerInfo()
+        }
+    }
+    
+    // MARK: - 햄버거 정보 가져오기
+    private func fetchHamburgerInfo() {
+        print("🔍 [fetchHamburgerInfo] 시작 - roomId: \(roomId)")
+        
+        guard !token.isEmpty else {
+            print("❌ [fetchHamburgerInfo] 액세스 토큰이 없습니다")
+            errorMessage = "인증 토큰이 없습니다. 다시 로그인해 주세요."
+            return
+        }
+        
+        isLoadingHamburger = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                let hamburgerInfo = try await HamburgerService.shared.getHamburger(
+                    roomId: String(roomId),
+                    token: token
+                )
+                
+                await MainActor.run {
+                    print("✅ [fetchHamburgerInfo] 성공")
+                    print("📦 내 이름: \(hamburgerInfo.myName)")
+                    print("📦 내 습관: \(hamburgerInfo.myHabit ?? "없음")")
+                    print("📦 진행률: \(hamburgerInfo.myPercent)%")
+                    print("📦 멤버 수: \(hamburgerInfo.memberNameAndHabitDtos.count)")
+                    
+                    self.hamburgerInfo = hamburgerInfo
+                    self.isLoadingHamburger = false
+                }
+            } catch {
+                await MainActor.run {
+                    print("❌ [fetchHamburgerInfo] 실패: \(error)")
+                    self.isLoadingHamburger = false
+                    
+                    // HTTP 상태 코드 확인을 위한 처리
+                    if let nsError = error as NSError? {
+                        switch nsError.code {
+                        case 401:
+                            self.errorMessage = "인증이 필요합니다. 다시 로그인해 주세요."
+                        case 403:
+                            self.errorMessage = "접근 권한이 없습니다."
+                        case 404:
+                            self.errorMessage = "존재하지 않는 그룹입니다."
+                        case 500:
+                            self.errorMessage = "서버 오류가 발생했습니다."
+                        default:
+                            self.errorMessage = "정보를 불러오는데 실패했습니다. (코드: \(nsError.code))"
+                        }
+                    } else if let urlError = error as? URLError {
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            self.errorMessage = "인터넷 연결을 확인해 주세요."
+                        case .timedOut:
+                            self.errorMessage = "요청 시간이 초과되었습니다."
+                        default:
+                            self.errorMessage = "네트워크 오류가 발생했습니다."
+                        }
+                    } else {
+                        self.errorMessage = "알 수 없는 오류가 발생했습니다."
+                    }
+                }
+            }
         }
     }
 }
 
 private struct TooltipView: View {
     @Binding var isDisplayTooltip: Bool
-
+    
     var body: some View {
         HStack {
             Spacer()
@@ -237,7 +405,6 @@ struct SideView<RenderView: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
-
-#Preview {
-    SideMenuViewContents(presentSideMenu: .constant(true))
-}
+    #Preview {
+        SideMenuViewContents(presentSideMenu: .constant(true), roomId: 1, token: "test")
+    }

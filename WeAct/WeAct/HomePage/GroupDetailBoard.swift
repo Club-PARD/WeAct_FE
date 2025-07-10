@@ -570,7 +570,7 @@ struct GroupDetailBoard: View {
             }
             
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
-                SideMenuViewContents(presentSideMenu: $presentSideMenu)
+                SideMenuViewContents(presentSideMenu: $presentSideMenu, roomId: roomId, token: getAccessToken() ?? "")
             }
         }
         .navigationBarBackButtonHidden(true)

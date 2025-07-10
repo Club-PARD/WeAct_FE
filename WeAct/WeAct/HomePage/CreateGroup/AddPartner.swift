@@ -205,7 +205,7 @@ struct AddPartner: View {
         print("선택된 파트너: \(selectedPartners)")
         
         // 토큰 확인
-        guard let token = TokenManager.shared.getToken() else {
+        guard let token = TokenManager.shared.getToken() else { 
             print("❌ 토큰 없음 - 방 생성 불가")
             return
         }

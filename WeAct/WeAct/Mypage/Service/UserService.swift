@@ -23,8 +23,15 @@ struct UserProfileResponse: Codable {
 
 // 사용자 프로필 업데이트 요청 구조체
 struct UserProfileUpdateRequest: Codable {
-    let userName: String?
+    let userName: String
     let gender: String?
+    let userId: String?
+    let pw: String?
+}
+
+struct SimpleUserProfileResponse: Codable {
+    let userName: String
+    let profilePhoto: String
 }
 
 // 사용자 삭제 응답 구조체
@@ -102,6 +109,29 @@ class UserService {
         let tokenResponse: TokenResponse = try await networkService.post(url: url, body: body)
         return tokenResponse.token
     }
+    
+    // MARK: - 현재 로그인한 유저의 프로필 정보 가져오기
+    func getCurrentUserProfile(token: String) async throws -> (userName: String, profilePhoto: String)? {
+        guard let url = URL(string: APIConstants.baseURL + "/user/profile") else {
+            throw URLError(.badURL)
+        }
+
+        print("🌐 [프로필 정보 조회 요청] \(url.absoluteString)")
+
+        do {
+            let profile: SimpleUserProfileResponse = try await networkService.get(url: url, accessToken: token)
+            
+            print("✅ 현재 유저 프로필 조회 성공:")
+            print("   - 이름: \(profile.userName)")
+            print("   - 이미지 URL: \(profile.profilePhoto)")
+            
+            return (profile.userName, profile.profilePhoto)
+        } catch {
+            print("❌ 현재 유저 프로필 조회 실패: \(error)")
+            throw error
+        }
+    }
+
     
     // MARK: - JWT 토큰에서 사용자 ID 추출
         private func extractUserIdFromToken(_ token: String) -> String? {
@@ -196,51 +226,93 @@ class UserService {
             throw error
         }
     }
-    
-    // MARK: - 사용자 프로필 업데이트 (PATCH /user)
-    func updateUserProfile(token: String, userName: String?, gender: String?) async throws -> UserProfileResponse {
-        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.update) else {
+   
+
+    func uploadProfileImage(image: UIImage, token: String) async throws {
+        // 🔥 API 경로 수정: profile-image → profile-photo
+        guard let url = URL(string: APIConstants.baseURL + "/user/profile-photo") else {
             throw URLError(.badURL)
         }
-        
-        let updateRequest = UserProfileUpdateRequest(userName: userName, gender: gender)
-        
-        print("🌐 [프로필 업데이트 요청] \(url.absoluteString)")
-        print("📤 [업데이트 데이터] \(updateRequest)")
-        
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = createMultipartBody(image: image, boundary: boundary)
+
         do {
-            let updatedProfile: UserProfileResponse = try await networkService.put(url: url, body: updateRequest, accessToken: token)
-            print("✅ 프로필 업데이트 성공")
-            return updatedProfile
-        } catch {
-            print("❌ 프로필 업데이트 실패: \(error)")
-            if let nsError = error as NSError?, nsError.code == 401 {
-                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NSError(domain: "ResponseError", code: -1, userInfo: [
+                    NSLocalizedDescriptionKey: "잘못된 응답 형식"
+                ])
             }
+            
+            print("📡 서버 응답 코드: \(httpResponse.statusCode)")
+            print("📡 서버 응답 헤더: \(httpResponse.allHeaderFields)")
+            
+            // 응답 본문도 로그로 출력 (디버깅용)
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📡 서버 응답 본문: \(responseString)")
+            }
+            
+            // 성공 상태 코드 확인
+            if (200...299).contains(httpResponse.statusCode) {
+                print("✅ 프로필 이미지 업로드 성공")
+                return
+            } else {
+                // 실제 HTTP 상태 코드로 에러 던지기
+                var errorMessage = "프로필 이미지 업로드 실패"
+                
+                // 서버에서 온 에러 메시지가 있다면 파싱해서 사용
+                if let responseString = String(data: data, encoding: .utf8), !responseString.isEmpty {
+                    // JSON 응답인 경우 파싱 시도
+                    if let jsonData = responseString.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                       let message = json["message"] as? String {
+                        errorMessage = message
+                    } else {
+                        errorMessage = responseString
+                    }
+                }
+                
+                throw NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: [
+                    NSLocalizedDescriptionKey: errorMessage
+                ])
+            }
+            
+        } catch {
+            // URLSession 에러를 그대로 던지기
+            print("❌ 네트워크 요청 실패: \(error)")
             throw error
         }
     }
     
-    // MARK: - 사용자 탈퇴 (DELETE /user)
-    func deleteUser(token: String) async throws -> Bool {
-        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.delete) else {
-            throw URLError(.badURL)
+    private func createMultipartBody(image: UIImage, boundary: String) -> Data {
+        var body = Data()
+        
+        // 1. boundary 시작
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        
+        // 2. Content-Disposition
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        
+        // 3. 이미지 데이터 추가
+        if let imageData = image.jpegData(compressionQuality: 0.8) {
+            body.append(imageData)
         }
         
-        print("🌐 [사용자 탈퇴 요청] \(url.absoluteString)")
+        // 4. boundary 종료
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
         
-        do {
-            let success = try await networkService.delete(url: url, accessToken: token)
-            print("✅ 사용자 탈퇴 성공")
-            return success
-        } catch {
-            print("❌ 사용자 탈퇴 실패: \(error)")
-            if let nsError = error as NSError?, nsError.code == 401 {
-                throw NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 만료되었습니다"])
-            }
-            throw error
-        }
+        return body
     }
+
+    
     
     // MARK: - 사용자 검색 (GET /user/search/{userId})
     func searchUser(userId: String, token: String) async throws -> UserProfileResponse {
@@ -298,54 +370,7 @@ class UserService {
         print("✅ 홈 그룹 조회 성공")
         return response
     }
-    
-    // MARK: - 프로필 사진 업로드 (POST /user/profile-photo)
-    func uploadProfilePhoto(token: String, imageData: Data) async throws -> ProfilePhotoResponse {
-        guard let url = URL(string: APIConstants.baseURL + "/user/profile-photo") else {
-            throw URLError(.badURL)
-        }
-        
-        print("🌐 [프로필 사진 업로드 요청] \(url.absoluteString)")
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        let boundary = "Boundary-\(UUID().uuidString)"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        var body = Data()
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"profilePhoto\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-        body.append(imageData)
-        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        request.httpBody = body
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw URLError(.badServerResponse)
-            }
-            
-            guard (200...299).contains(httpResponse.statusCode) else {
-                let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
-                throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
-                    NSLocalizedDescriptionKey: "프로필 사진 업로드 실패: \(errorMessage)"
-                ])
-            }
-            
-            let photoResponse = try JSONDecoder().decode(ProfilePhotoResponse.self, from: data)
-            print("✅ 프로필 사진 업로드 성공")
-            return photoResponse
-            
-        } catch {
-            print("❌ 프로필 사진 업로드 실패: \(error)")
-            throw error
-        }
-    }
+   
     
     // MARK: - UserModel 정리 함수 (Codable 구조체로 변경)
     private func cleanUserModel(_ user: UserModel) -> CleanedUserData {
@@ -372,7 +397,7 @@ class UserService {
     }
     
     struct TokenResponse: Codable {
-        let token: String
+        let token : String
     }
     
     struct UserHomeResponse: Codable {
@@ -390,11 +415,5 @@ class UserService {
         let title: String?
         let description: String?
         let createdAt: String?
-    }
-    
-    struct ProfilePhotoResponse: Codable {
-        let success: Bool
-        let imageUrl: String?
-        let message: String?
     }
 }

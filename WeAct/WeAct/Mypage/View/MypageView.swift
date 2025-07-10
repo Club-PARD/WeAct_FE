@@ -47,16 +47,30 @@ struct MypageView: View {
                                 .clipped()
                                 .cornerRadius(20)
                         } else if let imageURLString = userViewModel.user.profileImageURL,
-                                 let imageURL = URL(string: imageURLString),
-                                 let data = try? Data(contentsOf: imageURL),
-                                 let image = UIImage(data: data) {
-                           Image(uiImage: image)
-                               .resizable()
-                               .scaledToFill()
-                               .frame(width: 94, height: 94)
-                               .clipped()
-                               .cornerRadius(20)
-                       }else {
+                                   let imageURL = URL(string: imageURLString) {
+                               AsyncImage(url: imageURL) { phase in
+                                   switch phase {
+                                   case .empty:
+                                       ProgressView()
+                                           .frame(width: 94, height: 94)
+                                   case .success(let image):
+                                       image
+                                           .resizable()
+                                           .scaledToFill()
+                                           .frame(width: 94, height: 94)
+                                           .clipped()
+                                           .cornerRadius(20)
+                                   case .failure(_):
+                                       Text("이미지 오류")
+                                           .frame(width: 94, height: 94)
+                                           .background(Color.gray)
+                                           .cornerRadius(20)
+                                   @unknown default:
+                                       EmptyView()
+                                   }
+                               }
+                           }
+                        else {
                             Text("프로필\n사진")
                                .font(.custom("Pretendard-Medium", size: 16))
                                 .multilineTextAlignment(.center)
@@ -187,11 +201,16 @@ struct MypageView: View {
             print("📍 MypageView 진입")
             print("🧠 ViewModel (마이페이지): \(Unmanaged.passUnretained(userViewModel).toOpaque())")
             print("🧑‍💻 유저 ID: \(userViewModel.user.id ?? -1)")
+
+            Task {
+                userViewModel.refreshTokenFromStorage() // 🔁 토큰 불러오기
+                await userViewModel.fetchSimpleProfile()    // 🔁 사용자 정보 불러오기 (프로필 포함)
+            }
         }
+
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("마이페이지")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-

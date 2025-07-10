@@ -22,9 +22,13 @@ struct CerificationMax: View {
                 }
                 
                 if isFlipped {
-                    CommentPage(isFlipped: $isFlipped)
-                        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))  // ✅ 정방향 보정
-                        .transition(.identity)
+                    CommentPage(isPresented: $isPresented, onPhotoView: {
+                        withAnimation {
+                            isFlipped = false  // 뒤집기만 함, 모달 안 닫음
+                        }
+                    })
+                    .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))  // ✅ 정방향 보정
+                    .transition(.identity)
                 }
             }
             .frame(width: 280, height: 500)

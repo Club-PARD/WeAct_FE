@@ -17,6 +17,7 @@ struct WeActApp: App {
             NavigationStack {
                 RootView()
                     .environmentObject(userViewModel)
+
             }
         }
         

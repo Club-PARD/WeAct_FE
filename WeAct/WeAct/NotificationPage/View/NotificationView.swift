@@ -9,8 +9,8 @@ import SwiftUI
 
 struct NotificationView: View {
     @Binding var navigationPath: NavigationPath
-    @State private var selectedImage: UIImage? = nil
     @State private var isShowingRejectToast = false
+    @StateObject private var viewModel = NotificationViewModel()
     
     private var customBackButton: some View {
         Button(action: {
@@ -24,12 +24,6 @@ struct NotificationView: View {
         }
     }
     
-    @State private var notificationItems: [NotificationType] = [
-        .groupInvite(sender: "이주원", groupName: "롱커톤 모여라"),
-        .groupInvite(sender: "주현아", groupName: "숏커톤 모여라"),
-        .memberNoVerification(sender: "이주원", groupName: "롱커톤 모여라")
-    ]
-    
     var body: some View {
         NavigationView{
             ZStack{
@@ -42,26 +36,16 @@ struct NotificationView: View {
 
                     ScrollView{
                         VStack(spacing: 40) {
-                            ForEach(notificationItems, id: \.id) { item in
+                            ForEach(viewModel.notifications, id: \.roomId) { item in
                                 NotificationRow(
-                                    item: item,
-                                    selectedImage: $selectedImage,
-                                    onAccept: {
-                                        removeItem(item)
-                                    },
-                                    onReject: {
-                                        showRejectToast()
-                                        removeItem(item)
-                                    }
-                                    
+                                    model: item,
+                                    onAccept: { handleAccept(item) },
+                                    onReject: { handleReject(item) }
                                 )
                             }
                         }
                         .padding(.top, 10)
-                 
-                        
                         Spacer()
-                        
                     }//ScrollView
                 }//VStack
                 .background(Color.white)
@@ -72,7 +56,6 @@ struct NotificationView: View {
                          ToastView(message: "그룹 초대를 거절했어요")
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
-
                      }
                  }//isShowingRejectToast
             }//ZStack
@@ -81,7 +64,37 @@ struct NotificationView: View {
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("알림")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.fetchNotifications()
+        }
     }
+    
+    // 수락 처리
+       private func handleAccept(_ item: NotificationModel) {
+           Task {
+               let success = await viewModel.acceptInvite(roomId: item.roomId)
+               if success {
+                   viewModel.removeNotification(roomId: item.roomId)
+               } else {
+                   // 실패 시 처리 (필요하면 에러 토스트 추가)
+                   print("❌ 초대 수락 실패")
+               }
+           }
+       }
+    
+    // 거절 처리
+       private func handleReject(_ item: NotificationModel) {
+           Task {
+               let success = await viewModel.rejectInvite(roomId: item.roomId)
+               if success {
+                   viewModel.removeNotification(roomId: item.roomId)
+                   showRejectToast()
+               } else {
+                   // 실패 시 처리 (필요하면 에러 토스트 추가)
+                   print("❌ 초대 거절 실패")
+               }
+           }
+       }
     
     private func showRejectToast() {
            isShowingRejectToast = true
@@ -89,13 +102,6 @@ struct NotificationView: View {
                isShowingRejectToast = false
        }
    }//showRejectToast
-    
-    
-    private func removeItem(_ item: NotificationType) {
-       if let index = notificationItems.firstIndex(where: { $0.id == item.id }) {
-           notificationItems.remove(at: index)
-       }
-   }//removeItem
 }
 
 #Preview {

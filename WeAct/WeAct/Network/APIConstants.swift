@@ -47,7 +47,7 @@ struct APIConstants {
     }
     
     struct UserInvite {
-        static let update = "/invite"                         // PATCH
+        static let respond = "/invite"                         // PATCH
     }
     
     struct InAppNotification {

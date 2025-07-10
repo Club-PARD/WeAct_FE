@@ -2,97 +2,48 @@
 
 import SwiftUI
 
-struct NotificationRow: View {
+enum NotificationType {
+    case groupInvite(sender: String, groupName: String)
+    case memberNoVerification(sender: String, groupName: String)
+    case forcedOut(sender: String, groupName: String)
+    case postConfirm(sender: String, groupName: String)
+}
 
-    var item: NotificationType
-    @Binding var selectedImage: UIImage?
+struct NotificationRow: View {
+    let model: NotificationModel
     var onAccept: () -> Void = {}
     var onReject: () -> Void
     
-    
     var body: some View {
-            HStack {
-                VStack(alignment: .leading, spacing: 5){
-                    Text(mainText)
-                        .font(.custom("Pretendard-Medium", size: 16))
-                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    
-                    if let subtitle = subtitleText {
-                        Text(subtitle)
-                            .font(.custom("Pretendard-Medium", size: 14))
-                            .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
-                    }
-                }//VStack
-
-                Spacer()
+        HStack {
+            VStack(alignment: .leading, spacing: 5){
+                Text(model.message)
+                    .font(.custom("Pretendard-Medium", size: 16))
+                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                Text(model.roomName)
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .foregroundColor(Color(red: 0.52, green: 0.52, blue: 0.53))
+            }
+            Spacer()
+            
+            if model.type == "INVITE" {
+                Button("수락", action: onAccept)
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .foregroundColor(Color(red: 0.2, green: 0.44, blue: 0.87)) // 진한 파랑
+                    .background(Color(red: 0.9, green: 0.95, blue: 1.0)) // 연파랑 배경
+                    .cornerRadius(8)
                 
-                if case .groupInvite = item {
-                    Button(action: {
-                        print("그룹에 초대되셨습니다")
-                        onAccept()
-                    }) {
-                        Text("수락")
-                            .font(.custom("Pretendard-Medium", size: 14))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .foregroundColor(Color(red: 0.2, green: 0.44, blue: 0.87)) // 진한 파랑
-                            .background(Color(red: 0.9, green: 0.95, blue: 1.0)) // 연파랑 배경
-                            .cornerRadius(8)
-                    }
-                    
-                    
-                    Button(action: {
-                        onReject()
-                        print("그룹 초대를 거절하셨습니다")
-                    }) {
-                        Text("거절")
-                            .font(.custom("Pretendard-Medium", size: 14))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .foregroundColor(Color(red: 1, green: 0.36, blue: 0.35))
-                            .background(Color(red: 1, green: 0.92, blue: 0.92))
-
-                            .cornerRadius(8)
-                    }
-                    
-                }//groupInvite
-         
-            } //HStack
-            .padding(.horizontal)
-        }
-        
-        var mainText: String {
-            switch item {
-            case .groupInvite(let sender, _):
-                return "\(sender)님이 보낸 그룹 초대"
-            case .memberNoVerification(let sender, _):
-                return "\(sender)님이 오늘 인증하지 않았어요"
+                Button("거절", action: onReject)
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .foregroundColor(.red)
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(8)
             }
         }
-
-        var subtitleText: String? {
-           switch item {
-           case .groupInvite(_, let groupName),
-                .memberNoVerification(_, let groupName):
-               return groupName
-           }
-       }
+        .padding(.horizontal)
     }
-
-
-#Preview {
-    @State var selectedImage: UIImage? = nil
-
-    let mockItem: NotificationType = .groupInvite(
-        sender: "이주원",
-        groupName: "롱커톤 모여라"
-    )
-
-    return NotificationRow(
-        item: mockItem,
-        selectedImage: $selectedImage,
-        onReject: {
-            print("프리뷰에서 거절 버튼 눌림")
-        }
-    )
 }

@@ -164,7 +164,7 @@ class NetworkService {
     }
 
     // MARK: - Body 없는 POST 요청 (Boolean 응답)
-    func postWithoutBodyBool(url: URL, accessToken: String? = nil) async throws -> Bool {
+    func postWithoutBody(url: URL, accessToken: String? = nil) async throws -> Bool {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
@@ -184,4 +184,43 @@ class NetworkService {
 
         return (200...299).contains(httpResponse.statusCode)
     }
+    
+    
+    // MARK: - Body가 있는 POST 요청 (응답 없음)
+       func postWithBodyNoResponse<U: Encodable>(url: URL, body: U, accessToken: String? = nil) async throws -> Bool {
+           var request = URLRequest(url: url)
+           request.httpMethod = "POST"
+           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+           
+           // 토큰이 있으면 Authorization header 추가
+           if let token = accessToken {
+               request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+           }
+
+           request.httpBody = try JSONEncoder().encode(body)
+           
+           // 요청 본문 로깅
+           if let bodyData = request.httpBody,
+              let bodyString = String(data: bodyData, encoding: .utf8) {
+               print("📤 요청 본문: \(bodyString)")
+           }
+
+           let (data, response) = try await URLSession.shared.data(for: request)
+
+           guard let httpResponse = response as? HTTPURLResponse else {
+               throw URLError(.badServerResponse)
+           }
+
+           print("📡 POST (with body, no response) 응답 코드: \(httpResponse.statusCode)")
+           print("📦 응답 본문: \(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
+
+           guard (200...299).contains(httpResponse.statusCode) else {
+               let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+               throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                   NSLocalizedDescriptionKey: "❌ POST 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+               ])
+           }
+
+           return true
+       }
 }

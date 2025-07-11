@@ -1,10 +1,3 @@
-//
-//  CommentPage_pass.swift
-//  WeAct
-//
-//  Created by 현승훈 on 7/9/25.
-//
-
 import SwiftUI
 
 struct PassComment: Identifiable, Hashable, Codable {
@@ -20,20 +13,20 @@ struct PassComment: Identifiable, Hashable, Codable {
 }
 
 struct CommentPage_pass: View {
-    @Binding var isFlipped: Bool
+    @Binding var isPresented: Bool
+    let onPhotoView: () -> Void
+    
     @State private var commentText = ""
     @State private var comments: [PassComment] = []
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 0) {
-            // ✅ 카드 (댓글 영역)
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
                 .frame(width: 280, height: 452)
                 .overlay(
                     VStack(spacing: 0) {
-                        // 상단 바 (타이틀 + 닫기 버튼)
+                        // 상단 바
                         HStack {
                             Text("댓글")
                                 .font(.custom("Pretendard-Bold", size: 18))
@@ -41,7 +34,7 @@ struct CommentPage_pass: View {
                             Spacer()
                             Button(action: {
                                 withAnimation {
-                                    isFlipped = false  // 뒤집기 (카드로 돌아가기)
+                                    isPresented = false
                                 }
                             }) {
                                 Image(systemName: "xmark")
@@ -110,16 +103,11 @@ struct CommentPage_pass: View {
                     }
                 )
             
-            // ✅ 카드 밖 버튼 (사진 보기)
-            Spacer().frame(height: 53)
+            // 사진 보기 버튼
+            Spacer().frame(height: 30)
             Button(action: {
                 withAnimation {
-                    isFlipped = false  // 1️⃣ 카드 뒤집기 (사진으로)
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {  // 2️⃣ 뒤집기 끝나고
-                    withAnimation(.easeInOut(duration: 0.3)) {  // 3️⃣ Fade Out 애니메이션
-                        dismiss()  // 4️⃣ TestingPage 사라짐
-                    }
+                    onPhotoView()  // ✅ 카드 뒤집기 (모달 유지)
                 }
             }) {
                 HStack {
@@ -137,7 +125,22 @@ struct CommentPage_pass: View {
         }
     }
     
-    // ✅ 시간 표시
+    // 댓글 저장
+    func saveComments() {
+        if let data = try? JSONEncoder().encode(comments) {
+            UserDefaults.standard.set(data, forKey: "savedPassComments")  // ✅ 패스카드용 저장소
+        }
+    }
+    
+    // 댓글 불러오기
+    func loadComments() {
+        if let data = UserDefaults.standard.data(forKey: "savedPassComments"),
+           let decoded = try? JSONDecoder().decode([PassComment].self, from: data) {
+            comments = decoded
+        }
+    }
+    
+    // 시간 표시
     func relativeTimeString(from date: Date) -> String {
         let seconds = Int(Date().timeIntervalSince(date))
         if seconds < 60 {
@@ -150,23 +153,4 @@ struct CommentPage_pass: View {
             return "\(hours)시간 전"
         }
     }
-    
-    // ✅ 댓글 저장
-    func saveComments() {
-        if let data = try? JSONEncoder().encode(comments) {
-            UserDefaults.standard.set(data, forKey: "savedPassComments")
-        }
-    }
-    
-    // ✅ 댓글 불러오기
-    func loadComments() {
-        if let data = UserDefaults.standard.data(forKey: "savedPassComments"),
-           let decoded = try? JSONDecoder().decode([PassComment].self, from: data) {
-            comments = decoded
-        }
-    }
 }
-
-//#Preview {
-//    CommentPage_pass(isFlipped: .constant(true))
-//}

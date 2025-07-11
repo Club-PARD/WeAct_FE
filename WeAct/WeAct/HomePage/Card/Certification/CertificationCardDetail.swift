@@ -1,11 +1,3 @@
-//
-//  CertificationCardDetail.swift
-//  WeAct
-//
-//  Created by 현승훈 on 7/8/25.
-//
-
-
 import SwiftUI
 
 struct CertificationCardDetail: View {
@@ -15,7 +7,6 @@ struct CertificationCardDetail: View {
     @State private var isLiked = UserDefaults.standard.bool(forKey: "isLiked")
     @State private var likeCount = UserDefaults.standard.integer(forKey: "likeCount")
         
-    
     let userName: String = "이주원"
     let message: String = "오늘은 책을 읽어보았습니다 - 250까지"
     

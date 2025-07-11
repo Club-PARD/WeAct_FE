@@ -34,11 +34,6 @@ struct SimpleUserProfileResponse: Codable {
     let profilePhoto: String
 }
 
-// 사용자 삭제 응답 구조체
-struct UserDeleteResponse: Codable {
-    let success: Bool
-    let message: String?
-}
 
 // JWT 토큰 디코딩을 위한 구조체
 struct JWTPayload: Codable {
@@ -205,6 +200,35 @@ class UserService {
             
             return matchedUser
         }
+    
+    // 사용자 삭제 함수 추가
+    func deleteUser(token: String) async throws -> Bool {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.User.delete) else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        // 응답 코드 확인
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "알 수 없는 오류"
+            throw NSError(domain: "", code: httpResponse.statusCode, userInfo: [
+                NSLocalizedDescriptionKey: "❌ DELETE 요청 실패 (코드 \(httpResponse.statusCode)): \(errorMessage)"
+            ])
+        }
+
+        return true
+    }
+
+    
     
     // MARK: - 사용자 프로필 조회 (GET /user/profile)
     func getUserProfile(token: String) async throws -> UserProfileResponse {

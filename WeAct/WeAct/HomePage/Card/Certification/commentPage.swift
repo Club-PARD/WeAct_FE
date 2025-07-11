@@ -4,6 +4,7 @@
 //
 //  Created by 현승훈 on 7/8/25.
 //
+
 import SwiftUI
 
 struct Comment: Identifiable, Hashable, Codable {
@@ -19,21 +20,21 @@ struct Comment: Identifiable, Hashable, Codable {
 }
 
 struct CommentPage: View {
-    @Binding var isFlipped: Bool
+    @Binding var isPresented: Bool
+    @FocusState private var isTextFieldFocused: Bool
     @State private var commentText = ""
     @State private var comments: [Comment] = []
-    @Environment(\.dismiss) private var dismiss
-    @FocusState private var isTextFieldFocused: Bool  // ✅ 키보드 감지
+    
+    let onPhotoView: () -> Void  // ✅ 사진보기 버튼 클로저
     
     var body: some View {
         VStack(spacing: 0) {
-            // ✅ 카드 (댓글 영역)
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
                 .frame(width: 280, height: 452)
                 .overlay(
                     VStack(spacing: 0) {
-                        // 상단 바 (타이틀 + 닫기 버튼)
+                        // 상단 바
                         HStack {
                             Text("댓글")
                                 .font(.custom("Pretendard-Bold", size: 18))
@@ -41,7 +42,7 @@ struct CommentPage: View {
                             Spacer()
                             Button(action: {
                                 withAnimation {
-                                    isFlipped = false
+                                    isPresented = false  // ✅ 모달 닫기만
                                 }
                             }) {
                                 Image(systemName: "xmark")
@@ -105,24 +106,19 @@ struct CommentPage: View {
                                         .foregroundStyle(Color(hex: "FF4B2F"))
                                 }
                                 .padding(.trailing, 26)
-                                .disabled(commentText.trimmingCharacters(in: .whitespaces).isEmpty)  // ✅ 비활성화
-                                .opacity(commentText.trimmingCharacters(in: .whitespaces).isEmpty ? 0.3 : 1)  // ✅ 흐리게
+                                .disabled(commentText.trimmingCharacters(in: .whitespaces).isEmpty)
+                                .opacity(commentText.trimmingCharacters(in: .whitespaces).isEmpty ? 0.3 : 1)
                             }
                         }
                         .padding(.bottom, 14)
                     }
                 )
             
-            // ✅ 카드 밖 버튼 (사진 보기) - 키보드 올라오면 비활성화
+            // 사진 보기 버튼
             Spacer().frame(height: 53)
             Button(action: {
                 withAnimation {
-                    isFlipped = false
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        dismiss()
-                    }
+                    onPhotoView()  // ✅ 카드 뒤집기
                 }
             }) {
                 HStack {
@@ -134,14 +130,30 @@ struct CommentPage: View {
             .frame(width: 118, height: 48)
             .background(Color(hex: "464646"))
             .cornerRadius(24)
-            .disabled(isTextFieldFocused)  // ✅ 비활성화
-            .opacity(isTextFieldFocused ? 0.3 : 1)  // ✅ 흐리게
+            .disabled(isTextFieldFocused)
+            .opacity(isTextFieldFocused ? 0.3 : 1)
         }
         .onAppear {
             loadComments()
         }
     }
     
+    // 댓글 저장
+    func saveComments() {
+        if let data = try? JSONEncoder().encode(comments) {
+            UserDefaults.standard.set(data, forKey: "savedComments")  // ✅ 인증카드용 저장소
+        }
+    }
+    
+    // 댓글 불러오기
+    func loadComments() {
+        if let data = UserDefaults.standard.data(forKey: "savedComments"),
+           let decoded = try? JSONDecoder().decode([Comment].self, from: data) {
+            comments = decoded
+        }
+    }
+    
+    // 시간 표시
     func relativeTimeString(from date: Date) -> String {
         let seconds = Int(Date().timeIntervalSince(date))
         if seconds < 60 {
@@ -152,19 +164,6 @@ struct CommentPage: View {
         } else {
             let hours = seconds / 3600
             return "\(hours)시간 전"
-        }
-    }
-    
-    func saveComments() {
-        if let data = try? JSONEncoder().encode(comments) {
-            UserDefaults.standard.set(data, forKey: "savedComments")
-        }
-    }
-    
-    func loadComments() {
-        if let data = UserDefaults.standard.data(forKey: "savedComments"),
-           let decoded = try? JSONDecoder().decode([Comment].self, from: data) {
-            comments = decoded
         }
     }
 }

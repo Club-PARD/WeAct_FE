@@ -1,24 +1,16 @@
-//
-//  CertificationCardDetail.swift
-//  WeAct
-//
-//  Created by 현승훈 on 7/8/25.
-//
-
-
 import SwiftUI
 
 struct CertificationCardDetail: View {
     @Binding var isFlipped: Bool
     @Binding var isPresented: Bool
-    
+
     @State private var isLiked = UserDefaults.standard.bool(forKey: "isLiked")
     @State private var likeCount = UserDefaults.standard.integer(forKey: "likeCount")
-        
-    
-    let userName: String = "이주원"
-    let message: String = "오늘은 책을 읽어보았습니다 - 250까지"
-    
+
+    let userName: String
+    let message: String
+    let imageUrl: String?
+
     var body: some View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 20)
@@ -27,12 +19,21 @@ struct CertificationCardDetail: View {
                 .overlay(
                     VStack {
                         ZStack(alignment: .topTrailing) {
-                            Image("image")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 268, height: 372)
-                                .clipShape(RoundedRectangle(cornerRadius: 15))
-                                .padding(.top, 26)
+                            if let imageUrl = imageUrl, let url = URL(string: imageUrl) {
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 268, height: 372)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .padding(.top, 26)
+                                } placeholder: {
+                                    Color.gray.opacity(0.3)
+                                        .frame(width: 268, height: 372)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .padding(.top, 26)
+                                }
+                            }
 
                             Button(action: {
                                 withAnimation {
@@ -50,9 +51,9 @@ struct CertificationCardDetail: View {
                             .padding(.top, 20)
                             .padding(.trailing, 20)
                         }
-                        
+
                         Spacer()
-                        
+
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Image("BasicProfile")
@@ -65,7 +66,7 @@ struct CertificationCardDetail: View {
                                 Button(action: {
                                     isLiked.toggle()
                                     likeCount += isLiked ? 1 : -1
-                                    
+
                                     UserDefaults.standard.set(isLiked, forKey: "isLiked")
                                     UserDefaults.standard.set(likeCount, forKey: "likeCount")
                                 }) {
@@ -79,7 +80,7 @@ struct CertificationCardDetail: View {
                                 }
                                 .buttonStyle(.plain)
                             }
-                            
+
                             Text(message)
                                 .font(.custom("Pretendard-Medium", size: 14))
                                 .foregroundColor(Color(hex: "464646"))
@@ -89,7 +90,9 @@ struct CertificationCardDetail: View {
                         .cornerRadius(12)
                     }
                 )
+
             Spacer().frame(height: 53)
+
             Button(action: {
                 withAnimation {
                     isFlipped = true

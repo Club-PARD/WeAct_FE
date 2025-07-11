@@ -9,9 +9,8 @@ import SwiftUI
 
 struct CertificationCard: View {
     let userName: String
-        init(userName: String = "이주원") {
-            self.userName = userName
-        }
+    let imageUrl: String?
+    
     var body: some View {
         ZStack {
             // 맨뒤 카드 배경
@@ -23,14 +22,24 @@ struct CertificationCard: View {
                 .fill(Color.clear)  // 우선 투명으로 채움
                 .frame(width: 132, height: 174)
                 .overlay(
-                    Image("image")
-                        .resizable()
-                        .scaledToFit()
+                        Group {
+                            if let urlString = imageUrl,
+                               let url = URL(string: urlString) {
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                            }
+                        }
                         .frame(width: 132, height: 174)
-                        .clipShape(RoundedRectangle(cornerRadius: 7))  // 모서리 둥글게 자름
-                )
-            VStack {
-                HStack {
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                    )
+            
+              VStack {
+                 HStack {
                     Text(userName)
                         .font(.custom("Pretendard-Bold", size: 14))
                         .foregroundColor(.black)
@@ -51,6 +60,3 @@ struct CertificationCard: View {
         
 }
 
-#Preview {
-    CertificationCard()
-}

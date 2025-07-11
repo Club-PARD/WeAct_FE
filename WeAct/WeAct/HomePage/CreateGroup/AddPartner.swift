@@ -124,9 +124,9 @@ struct AddPartner: View {
                     .resizable()
                     .scaledToFill()
                     .frame(width: 70, height: 70)
-                    .clipShape(Circle())
+                    .cornerRadius(20)
             } placeholder: {
-                Image("myprofile") // 기본 이미지
+                Image("BasicProfile") // 기본 이미지
                     .resizable()
                     .scaledToFit()
                     .frame(height: 70)
@@ -145,7 +145,7 @@ struct AddPartner: View {
     }
     
     private var selectedPartnersView: some View {
-        ForEach(Array(selectedPartners), id: \.self) { partner in
+        ForEach(Array(selectedPartners), id: \.self) { partner in 
             ZStack(alignment: .topTrailing) {
                 VStack(spacing: 7) {
                     // 프로필 이미지
@@ -154,7 +154,7 @@ struct AddPartner: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: 70, height: 70)
-                            .clipShape(Circle())
+                            .cornerRadius(20)
                     } else {
                         Image("BasicProfile")
                             .resizable()

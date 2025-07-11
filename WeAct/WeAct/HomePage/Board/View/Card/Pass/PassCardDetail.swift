@@ -11,25 +11,26 @@ struct PassCardDetail: View {
     @Binding var isFlipped: Bool
     @Binding var isPresented: Bool
     
-    let userName: String = "이단진"
-    let message: String = "오늘은 운동을 쉬었습니다"
+    let userName: String = "주현아"
+    let message: String = "Sorry..."
     
     var body: some View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
-                //.frame(width: 280, height: 452)
+                .frame(width: 280, height: 452)
                 .overlay(
-                    VStack {
+                    VStack(spacing: 0) {
+                        Spacer().frame(height: 5)
                         ZStack(alignment: .topTrailing) {
                             Image("rest")
                                 .resizable()
                                 .scaledToFill()
+                                .frame(width: 340, height: 360)
+                                .mask(
+                                    RoundedCorners(radius: 20, corners: [.topLeft, .topRight, .bottomLeft, .bottomRight])
+                                )
                                 
-                                .clipShape(RoundedRectangle(cornerRadius: 15))
-                                .padding(.top,6)
-                            
-
                             Button(action: {
                                 withAnimation {
                                     isPresented = false
@@ -39,16 +40,18 @@ struct PassCardDetail: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 20)
-                                    .padding(20)
+                                    .padding(.top, 15)
+                                    .padding(.trailing, 25)
                                     .foregroundStyle(.white)
+                                    .fontWeight(.bold)
                             }
-                            .padding(.top, 20)
+                            .padding(.top, 0)
                             .padding(.trailing, 20)
                         }
                         
-                        Spacer()
+                        Spacer().frame(height: 14)
                         
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading) {
                             HStack {
                                 Image("BasicProfile")
                                     .resizable()
@@ -63,12 +66,15 @@ struct PassCardDetail: View {
                                 .font(.custom("Pretendard-Medium", size: 14))
                                 .foregroundColor(Color(hex: "464646"))
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
+                        //.padding(.top, 44)
+                        .padding(.leading, 16)
+                        .padding(.bottom, 24 )
                     }
                 )
+
+            
             Spacer().frame(height: 53)
+            
             Button(action: {
                 withAnimation {
                     isFlipped = true  // ✅ 댓글 보기로 뒤집기
@@ -87,6 +93,17 @@ struct PassCardDetail: View {
     }
 }
 
-#Preview {
-    PassCardDetail(isFlipped: .constant(false), isPresented: .constant(false))
+// ✅ 모서리 방향 설정 가능하게 커스텀
+struct RoundedCorners: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
 }

@@ -14,7 +14,7 @@ struct TooltipShapeView: View {
                 .fill(Color(hex: "464646"))
                 .padding(.leading, 145)
             
-            CustomRectangleShape(text: "인증 기간 내 N회 이상 무단으로 미인증하면 방에서 강제 퇴장돼요. 단, ‘해명할래요’ 기능은 횟수 제한 없이 사용 가능해요.")
+            CustomRectangleShape(text: "인증 기간의 10% 이상 무단 미인증 시 방에서 강제 퇴장돼요. 단, ‘해명할래요’ 기능은 횟수 제한 없이 사용 가능해요.")
         }
         .frame(width: 190, height: 100)
     }

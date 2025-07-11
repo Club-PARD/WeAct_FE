@@ -84,17 +84,22 @@ struct GroupDetailBoard: View {
     }
     
     private var isCurrentDateCheckpoint: Bool {
-        guard let roomDetail = roomDetail else { return false }
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: groupStartDate)
+        let end = calendar.startOfDay(for: groupEndDate)
         
-        let formatter = apiDateFormatter
-        let checkpointDates = roomDetail.checkPoints.compactMap { formatter.date(from: $0) }
-        
-        let normalizedCurrentDate = Calendar.current.startOfDay(for: currentDate)
-        
-        return checkpointDates.contains(where: {
-            Calendar.current.isDate(Calendar.current.startOfDay(for: $0), inSameDayAs: normalizedCurrentDate)
-        })
+        // 날짜 간 차이 계산
+        let daysBetween = calendar.dateComponents([.day], from: start, to: end).day ?? 0
+        guard daysBetween >= 2 else { return false } // 최소 3일 이상일 때만 중간이 있음
+
+        // 중간 날짜 계산: 첫날, 마지막날 제외하고 정확히 중간 (예: 7.11~7.18이면 -> 7.15)
+        let middleIndex = daysBetween / 2
+        guard let middleDate = calendar.date(byAdding: .day, value: middleIndex, to: start) else { return false }
+
+        let normalizedCurrent = calendar.startOfDay(for: currentDate)
+        return calendar.isDate(normalizedCurrent, inSameDayAs: middleDate)
     }
+
 
     
     // 현재 날짜가 그룹 기간 내에 있는지 확인

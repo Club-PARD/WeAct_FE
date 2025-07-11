@@ -111,6 +111,8 @@ struct CreateGroup: View {
                         Divider()
                         // 현재 선택된 날짜 범위 표시
                         HStack {
+                            Spacer()
+                            
                             VStack {
                                 Text("시작일")
                                     .font(.custom("Pretendard-Medium", size: 14))
@@ -125,7 +127,7 @@ struct CreateGroup: View {
                                     .onTapGesture {
                                         isSelectingStartDate = true
                                     }
-                            }
+                            } // VStack
                             
                             Text("_")
                                 .font(.custom("Pretendard-Medium", size: 22))
@@ -146,6 +148,7 @@ struct CreateGroup: View {
                                         isSelectingStartDate = false
                                     }
                             } // VStack
+                            Spacer()
                         } // HStack
                         .padding(.horizontal, 90)
                         .padding(.top, 18)

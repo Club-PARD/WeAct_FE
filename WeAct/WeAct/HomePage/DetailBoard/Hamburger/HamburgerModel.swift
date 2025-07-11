@@ -12,7 +12,7 @@ struct HamburgerModel: Decodable {
 struct memberNameAndHabit: Decodable {
     let memberName: String
     let memberHabit: String
-    let imageUrl: String
+    let imageUrl: String?
 }
 
 class HamburgerService {

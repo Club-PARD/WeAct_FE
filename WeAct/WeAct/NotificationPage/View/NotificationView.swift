@@ -46,8 +46,8 @@ struct NotificationView: View {
                         }
                         .padding(.top, 10)
                         Spacer()
-                    }//ScrollView
-                }//VStack
+                    } //ScrollView
+                } //VStack
                 .background(Color.white)
                 
                 if isShowingRejectToast {
@@ -57,9 +57,9 @@ struct NotificationView: View {
                              .transition(.move(edge: .bottom).combined(with: .opacity))
                              .animation(.easeInOut, value: isShowingRejectToast)
                      }
-                 }//isShowingRejectToast
-            }//ZStack
-        }//NavigationView
+                 } //isShowingRejectToast
+            } //ZStack
+        } //NavigationView
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: customBackButton)
         .navigationTitle("알림")
@@ -74,7 +74,10 @@ struct NotificationView: View {
            Task {
                let success = await viewModel.acceptInvite(roomId: item.roomId)
                if success {
+                   // 알림에서 제거
                    viewModel.removeNotification(roomId: item.roomId)
+                   // 습관 설정 화면으로 이동
+                   navigationPath.append(NavigationDestination.setuphabit(roomId: item.roomId))
                } else {
                    // 실패 시 처리 (필요하면 에러 토스트 추가)
                    print("❌ 초대 수락 실패")

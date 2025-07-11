@@ -8,7 +8,6 @@ struct RoomGroupModel: Equatable, Decodable {
     let reward: String
     let period: String
     let days: String
-
 }
 
 class RoomGroupService {

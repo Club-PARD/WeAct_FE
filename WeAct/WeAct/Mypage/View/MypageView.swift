@@ -185,10 +185,16 @@ struct MypageView: View {
                        firstButtonTitle: "취소",
                        secondButtonTitle: "탈퇴하기",
                        firstButtonAction: {
+                           isLoggedIn = false
+                           navigationPath = NavigationPath()
                            isShowingDeleteAccountModal=false
                            print("취소 버튼 클릭")
+                           
                        },
                        secondButtonAction: {
+                           Task {
+                              await userViewModel.deleteUser()
+                          }
                            isShowingDeleteAccountModal=false
                            print("탈퇴하기 버튼 클릭")
                        }

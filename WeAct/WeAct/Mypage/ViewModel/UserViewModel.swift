@@ -19,7 +19,6 @@ class UserViewModel: ObservableObject {
     )
     
     @Published var token: String?
-    
     @Published var isShowingImagePicker = false
     @Published var selectedImage: UIImage? {
         didSet {
@@ -31,8 +30,6 @@ class UserViewModel: ObservableObject {
             }
         }
     }
-
-    
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @Published var errorMessage: String? = nil
     
@@ -283,6 +280,39 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+    
+    // MARK: - 사용자 탈퇴 처리
+    func deleteUser() async {
+        guard let token = token else {
+            print("❌ 토큰이 없어서 사용자 삭제할 수 없습니다")
+            return
+        }
+            
+        do {
+            // 1. 사용자 삭제 요청
+            let success = try await service.deleteUser(token: token)
+            
+            if success {
+                // 2. 삭제 후 사용자 정보 초기화
+                await MainActor.run {
+                    self.user = UserModel(id: nil, userId: nil, pw: nil, userName: "", gender: nil, profileImageURL: nil)
+                    self.token = nil
+                    self.isLoggedIn = false
+                    self.errorMessage = nil
+                }
+                // 3. 로그아웃 처리
+                TokenManager.shared.logout()
+                print("✅ 사용자 탈퇴 성공")
+            }
+        } catch {
+            print("❌ 사용자 탈퇴 실패: \(error)")
+            await MainActor.run {
+                self.errorMessage = "사용자 탈퇴에 실패했습니다."
+            }
+        }
+    }
+    
+
     
     // MARK: - 프로필 이미지 관련
     func updateProfileImage(image: UIImage) {

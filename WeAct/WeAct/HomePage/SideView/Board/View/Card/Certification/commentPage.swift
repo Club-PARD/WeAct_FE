@@ -21,6 +21,7 @@ struct Comment: Identifiable, Hashable, Codable {
 
 struct CommentPage: View {
     @Binding var isPresented: Bool
+    let postDetail: HabitPostDetailResponse  
     @FocusState private var isTextFieldFocused: Bool
     @State private var commentText = ""
     @State private var comments: [Comment] = []

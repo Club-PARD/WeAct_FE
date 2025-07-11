@@ -14,12 +14,12 @@ struct WeActApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            NavigationStack {
-//                RootView()
-//                    .environmentObject(userViewModel)
-//
-//            }
-            TestingPage()
+            NavigationStack {
+                RootView()
+                    .environmentObject(userViewModel)
+
+            }
+          
         }
         
     }

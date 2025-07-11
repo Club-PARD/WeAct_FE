@@ -8,6 +8,7 @@ import SwiftUI
 
 struct PassCardMax: View {
     @Binding var isPresented: Bool
+    let postDetail: HabitPostDetailResponse
     @State private var isFlipped = false
 
     var body: some View {

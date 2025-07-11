@@ -6,8 +6,10 @@
 //
 import SwiftUI
 
-struct CerificationMax: View {
+struct CertificationMax: View {
     @Binding var isPresented: Bool
+    let postDetail: HabitPostDetailResponse
+    @EnvironmentObject var habitBoardVM: HabitBoardViewModel 
     @State private var isFlipped = false  // ✅ 뒤집힘 상태
     
     var body: some View {
@@ -17,12 +19,21 @@ struct CerificationMax: View {
             
             ZStack {
                 if !isFlipped {
-                    CertificationCardDetail(isFlipped: $isFlipped, isPresented: $isPresented)
+                    CertificationCardDetail(
+                        isFlipped: $isFlipped,
+                        isPresented: $isPresented,
+                        userName: postDetail.userName,
+                        message: postDetail.message,
+                        imageUrl: postDetail.imageUrl
+                    )
+
                         .transition(.identity)
                 }
                 
                 if isFlipped {
-                    CommentPage(isPresented: $isPresented, onPhotoView: {
+                    CommentPage(isPresented: $isPresented,
+                        postDetail: postDetail,
+                        onPhotoView: {
                         withAnimation {
                             isFlipped = false  // 뒤집기만 함, 모달 안 닫음
                         }

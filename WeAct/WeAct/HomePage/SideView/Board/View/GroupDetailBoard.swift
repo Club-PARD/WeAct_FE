@@ -19,6 +19,11 @@ struct GroupDetailBoard: View {
     
     // 추가: 방 세부 정보 상태
     @State private var roomDetail: RoomGroupModel?
+    @StateObject private var habitBoardVM = HabitBoardViewModel()
+    @State private var selectedPost: HabitBoardResponse? = nil
+    @State private var showMaxView = false
+    @State private var showPassCard = false
+
     @State private var isLoadingRoomDetail = false
     
     // 날짜 관련 상태 추가
@@ -350,197 +355,29 @@ struct GroupDetailBoard: View {
                                     .foregroundColor(Color(hex: "C6C6C6"))
                             }
                         }
-                        .sheet(isPresented: $showDatePicker) {
-                            VStack(alignment: .leading) {
-                                Text("날짜를 선택해주세요")
-                                    .font(.custom("Pretendard-Medium", size: 18))
-                                    .foregroundColor(Color(hex: "464646"))
-                                    .padding(.vertical, 20)
-                                Divider()
-                                
-                                // 단일 날짜 선택 (그룹 기간 내로 제한)
-                                DatePicker(
-                                    "날짜 선택",
-                                    selection: $currentDate,
-                                    in: groupStartDate...groupEndDate,
-                                    displayedComponents: [.date]
-                                )
-                                .datePickerStyle(.graphical)
-                                .accentColor(Color(hex: "FF4B2F"))
-                                .onChange(of: currentDate) { _ in
-                                    // 날짜가 변경될 때 API 호출
-                                    checkOneDayCount()
-                                }
-                                
-                                Button(action: {
-                                    showDatePicker = false
-                                }) {
-                                    Text("선택 완료")
-                                        .font(.custom("Pretendard-Medium", size: 16))
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
-                                        .background(Color(hex: "FF4B2F"))
-                                        .cornerRadius(8)
-                                }
-                                
-                                Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            .presentationDetents([.height(UIScreen.main.bounds.height * 0.6)])
-                        }
-                        
                         Spacer()
-                        
                         hamburgerMenuButton
+                    }
+                    .sheet(isPresented: $showDatePicker) {
+                        datePickerSheet()
+                        
                     }
                     .padding(.top, 10)
                     .background(Color.clear)
                     
-                    // 그룹 정보 (roomDetail 데이터 사용)
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text(roomDetail?.roomName ?? "로딩 중...")
-                                .font(.custom("Pretendard-Bold", size: 22))
-                                .foregroundColor(Color(hex: "171717"))
-                            Spacer()
-                            
-                            Text(roomDetail?.period ?? "")
-                                .font(.custom("Pretendard-Medium", size: 14))
-                                .foregroundColor(Color(hex: "858588"))
-                        }
-                        
-  
-                            HStack {
-                                Text("주기")
-                                    .font(.system(size: 14))
-                                    .padding(.vertical, 3)
-                                    .padding(.horizontal, 8)
-                                    .foregroundColor(Color(hex: "858588"))
-                                    .background(Color(hex: "F7F7F7"))
-                                    .cornerRadius(6)
-                                
-                                Text(roomDetail?.days.toDisplayDays() ?? "")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(hex: "464646"))
-                            }
-                        
-                        
-                        HStack {
-                            Text("보상")
-                                .font(.system(size: 14))
-                                .padding(.vertical, 3)
-                                .padding(.horizontal, 8)
-                                .foregroundColor(Color(hex: "858588"))
-                                .background(Color(hex: "F7F7F7"))
-                                .cornerRadius(6)
-                            
-                            Text(roomDetail?.reward ?? "")
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "464646"))
-                        }
-                        
-                    }
-                    .padding(.horizontal, 22)
-                    .padding(.vertical, 20)
-                    .background(.white)
-                    .cornerRadius(16)
-                    .padding(.top, 20)
+                    groupInfoView()
                     
                     // 중간 랭킹 추가
                     VStack(alignment: .leading) {
                         if isCurrentDateCheckpoint {
-                                CheckPointRankingView(roomId: roomId)
-                            }
+                            CheckPointRankingView(roomId: roomId)
+                        }
                     }
                     .padding(.vertical, 20)
                     
-                    ZStack {
-                        // 날짜 네비게이션
-                        HStack {
-                            // 이전 날짜 버튼
-                            Button(action: {
-                                if canGoPrevious {
-                                    currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
-                                    checkOneDayCount()
-                                }
-                            }) {
-                                Image(systemName: "chevron.left")
-                                    .frame(width: 6, height: 12)
-                                    .foregroundColor(canGoPrevious ? Color(hex: "8691A2") : Color(hex: "C6C6C6"))
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 15)
-                                    .background(.white)
-                                    .cornerRadius(8)
-                            }
-                            .disabled(!canGoPrevious)
-                            
-                            Spacer()
-                            
-                            // 다음 날짜 버튼
-                            Button(action: {
-                                if canGoNext {
-                                    currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
-                                    checkOneDayCount()
-                                }
-                            }) {
-                                Image(systemName: "chevron.right")
-                                    .frame(width: 6, height: 12)
-                                    .foregroundColor(canGoNext ? Color(hex: "8691A2") : Color(hex: "C6C6C6"))
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 15)
-                                    .background(.white)
-                                    .cornerRadius(8)
-                            }
-                            .disabled(!canGoNext)
-                        }
-                        .padding(.vertical, 50)
-                        
-                        VStack {
-                            // 선택된 날짜의 보드 내용 표시
-                            if isCurrentDateInRange {
-                                VStack(spacing: 16) {
-                                    Text("선택된 날짜: \(displayDateFormatter.string(from: currentDate))")
-                                        .font(.custom("Pretendard-Medium", size: 16))
-                                        .foregroundColor(Color(hex: "464646"))
-                                    
-                                    if isAllCompleted {
-                                        HStack {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.green)
-                                            Text("모든 멤버가 인증을 완료했습니다!")
-                                                .font(.custom("Pretendard-Medium", size: 14))
-                                                .foregroundColor(.green)
-                                        }
-                                        .padding()
-                                        .background(Color.green.opacity(0.1))
-                                        .cornerRadius(8)
-                                    } else {
-                                        HStack {
-                                            Image(systemName: "clock")
-                                                .foregroundColor(Color(hex: "8691A2"))
-                                            Text("아직 인증하지 않은 멤버가 있습니다")
-                                                .font(.custom("Pretendard-Medium", size: 14))
-                                                .foregroundColor(Color(hex: "8691A2"))
-                                        }
-                                        .padding()
-                                        .background(Color(hex: "F7F7F7"))
-                                        .cornerRadius(8)
-                                    }
-                                }
-                                .padding()
-                            } else {
-                                // 기간 외 날짜일 때는 메시지 표시
-                                Text("해당 날짜는 그룹 활동 기간이 아닙니다.")
-                                    .font(.custom("Pretendard-Medium", size: 16))
-                                    .foregroundColor(Color(hex: "8691A2"))
-                                    .padding()
-                            }
-                        }
-                    }
+                    dateNavigationSection()
                     
                     Spacer()
-                    
                     // 인증하기 버튼 (기간 내 날짜이면서 선택한 요일일 때만 표시)
                     if isCurrentDateInRange && canCertifyToday {
                         HStack {
@@ -572,15 +409,245 @@ struct GroupDetailBoard: View {
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
                 SideMenuViewContents(presentSideMenu: $presentSideMenu)
             }
+            
+            if let post = selectedPost, showMaxView, let postDetail = habitBoardVM.selectedPostDetail {
+                // 인증 카드 내부
+                CertificationMax(isPresented: $showMaxView, postDetail: postDetail)
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
+            
+            if let post = selectedPost, showPassCard, let postDetail = habitBoardVM.selectedPostDetail {
+                // 해명 카드 내부
+                PassCardMax(isPresented: $showPassCard, postDetail: postDetail)
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
         }
+        
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            // 방 세부 정보 가져오기, 내부에서 check 함수 호출까지 포함됨
             fetchRoomDetail()
         }
         .task(id: currentDate) {
             checkOneDayCount()
+            await habitBoardVM.loadPosts(roomId: roomId, date: currentDate)
+        }
+    
+    }
+    
+    private func datePickerSheet() -> some View {
+        VStack(alignment: .leading) {
+            Text("날짜를 선택해주세요")
+                .font(.custom("Pretendard-Medium", size: 18))
+                .foregroundColor(Color(hex: "464646"))
+                .padding(.vertical, 20)
+            Divider()
+            
+            // 단일 날짜 선택 (그룹 기간 내로 제한)
+            DatePicker(
+                "날짜 선택",
+                selection: $currentDate,
+                in: groupStartDate...groupEndDate,
+                displayedComponents: [.date]
+            )
+            .datePickerStyle(.graphical)
+            .accentColor(Color(hex: "FF4B2F"))
+            .onChange(of: currentDate) { _ in
+                // 날짜가 변경될 때 API 호출
+                checkOneDayCount()
+            }
+            
+            Button(action: {
+                showDatePicker = false
+            }) {
+                Text("선택 완료")
+                    .font(.custom("Pretendard-Medium", size: 16))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(hex: "FF4B2F"))
+                    .cornerRadius(8)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .presentationDetents([.height(UIScreen.main.bounds.height * 0.6)])
+    }
+    
+    private func certificationStatusView() -> some View {
+        if isAllCompleted {
+            return AnyView(
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                    Text("모든 멤버가 인증을 완료했습니다!")
+                        .font(.custom("Pretendard-Medium", size: 14))
+                        .foregroundColor(.green)
+                }
+                .padding()
+                .background(Color.green.opacity(0.1))
+                .cornerRadius(8)
+            )
+        } else {
+            return AnyView(
+                HStack {
+                    Image(systemName: "clock")
+                        .foregroundColor(Color(hex: "8691A2"))
+                    Text("아직 인증하지 않은 멤버가 있습니다")
+                        .font(.custom("Pretendard-Medium", size: 14))
+                        .foregroundColor(Color(hex: "8691A2"))
+                }
+                .padding()
+                .background(Color(hex: "F7F7F7"))
+                .cornerRadius(8)
+            )
+        }
+    }
+    
+    private func groupInfoView() -> some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(roomDetail?.roomName ?? "로딩 중...")
+                    .font(.custom("Pretendard-Bold", size: 22))
+                    .foregroundColor(Color(hex: "171717"))
+                Spacer()
+                
+                Text(roomDetail?.period ?? "")
+                    .font(.custom("Pretendard-Medium", size: 14))
+                    .foregroundColor(Color(hex: "858588"))
+            }
+            
+            
+            HStack {
+                Text("주기")
+                    .font(.system(size: 14))
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 8)
+                    .foregroundColor(Color(hex: "858588"))
+                    .background(Color(hex: "F7F7F7"))
+                    .cornerRadius(6)
+                
+                Text(roomDetail?.days.toDisplayDays() ?? "")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "464646"))
+            }
+            
+            
+            HStack {
+                Text("보상")
+                    .font(.system(size: 14))
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 8)
+                    .foregroundColor(Color(hex: "858588"))
+                    .background(Color(hex: "F7F7F7"))
+                    .cornerRadius(6)
+                
+                Text(roomDetail?.reward ?? "")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "464646"))
+            }
+        }
+        .padding(.horizontal, 22)
+        .padding(.vertical, 20)
+        .background(.white)
+        .cornerRadius(16)
+        .padding(.top, 20)
+    }
+    
+    private func dateNavigationSection() -> some View {
+        ZStack {
+            // 날짜 네비게이션
+            HStack {
+                // 이전 날짜 버튼
+                Button(action: {
+                    if canGoPrevious {
+                        currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+                        checkOneDayCount()
+                    }
+                }) {
+                    Image(systemName: "chevron.left")
+                        .frame(width: 6, height: 12)
+                        .foregroundColor(canGoPrevious ? Color(hex: "8691A2") : Color(hex: "C6C6C6"))
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 15)
+                        .background(.white)
+                        .cornerRadius(8)
+                }
+                .disabled(!canGoPrevious)
+                
+                Spacer()
+                
+                // 다음 날짜 버튼
+                Button(action: {
+                    if canGoNext {
+                        currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+                        checkOneDayCount()
+                    }
+                }) {
+                    Image(systemName: "chevron.right")
+                        .frame(width: 6, height: 12)
+                        .foregroundColor(canGoNext ? Color(hex: "8691A2") : Color(hex: "C6C6C6"))
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 15)
+                        .background(.white)
+                        .cornerRadius(8)
+                }
+                .disabled(!canGoNext)
+            }
+            .padding(.vertical, 50)
+            
+            VStack {
+                // 선택된 날짜의 보드 내용 표시
+                if isCurrentDateInRange {
+                    VStack(spacing: 16) {
+                        Text("선택된 날짜: \(displayDateFormatter.string(from: currentDate))")
+                            .font(.custom("Pretendard-Medium", size: 16))
+                            .foregroundColor(Color(hex: "464646"))
+                        certificationStatusView()
+                    }
+                    .padding()
+                } else {
+                    // 기간 외 날짜일 때는 메시지 표시
+                    Text("해당 날짜는 그룹 활동 기간이 아닙니다.")
+                        .font(.custom("Pretendard-Medium", size: 16))
+                        .foregroundColor(Color(hex: "8691A2"))
+                        .padding()
+                }
+                
+                ScrollView {
+                    VStack(spacing: 30) {
+                        ForEach(habitBoardVM.posts.chunked(into: 2), id: \.first?.id) { row in
+                            HStack(spacing: 25) {
+                                ForEach(row, id: \.id) { post in
+                                    if post.haemyeong {
+                                        PassCard(userName: post.userName)
+                                            .onTapGesture {
+                                                Task {
+                                                    await habitBoardVM.loadPostDetail(postId: post.id)
+                                                }
+                                                selectedPost = post
+                                                showPassCard = true
+                                            }
+                                    } else {
+                                        CertificationCard(userName: post.userName, imageUrl: post.imageUrl)
+                                            .onTapGesture {
+                                                Task {
+                                                    await habitBoardVM.loadPostDetail(postId: post.id)
+                                                }
+                                                selectedPost = post
+                                                showMaxView = true
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+            }
         }
     }
 }
@@ -588,9 +655,18 @@ struct GroupDetailBoard: View {
 extension String {
     // "월,화,수" -> "월, 화, 수"
     func toDisplayDays() -> String {
-           return self
-               .split(separator: ",")
-               .map { $0.trimmingCharacters(in: .whitespaces) }
-               .joined(separator: ", ")
-       }
+        return self
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .joined(separator: ", ")
+    }
+}
+
+// Array의 chunked 메서드 익스텐션 추가
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
+        }
+    }
 }

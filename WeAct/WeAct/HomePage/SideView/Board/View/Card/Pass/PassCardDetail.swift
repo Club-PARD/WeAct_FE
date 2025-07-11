@@ -18,18 +18,19 @@ struct PassCardDetail: View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
+                .frame(width: 280, height: 452)
                 .overlay(
                     VStack(spacing: 0) {
+                        Spacer().frame(height: 5)
                         ZStack(alignment: .topTrailing) {
                             Image("rest")
                                 .resizable()
                                 .scaledToFill()
+                                .frame(width: 340, height: 360)
                                 .mask(
                                     RoundedCorners(radius: 20, corners: [.topLeft, .topRight, .bottomLeft, .bottomRight])
                                 )
-                                .frame(width: 340, height: 300)
                                 
-                            
                             Button(action: {
                                 withAnimation {
                                     isPresented = false
@@ -39,14 +40,18 @@ struct PassCardDetail: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 20)
-                                    .padding(20)
+                                    .padding(.top, 15)
+                                    .padding(.trailing, 25)
                                     .foregroundStyle(.white)
+                                    .fontWeight(.bold)
                             }
-                            .padding(.top, 20)
+                            .padding(.top, 0)
                             .padding(.trailing, 20)
                         }
-
-                        VStack(alignment: .leading, spacing: 8) {
+                        
+                        Spacer().frame(height: 14)
+                        
+                        VStack(alignment: .leading) {
                             HStack {
                                 Image("BasicProfile")
                                     .resizable()
@@ -61,11 +66,9 @@ struct PassCardDetail: View {
                                 .font(.custom("Pretendard-Medium", size: 14))
                                 .foregroundColor(Color(hex: "464646"))
                         }
-                        .padding()
-                        .background(Color.white)
-                        .mask(
-                            RoundedCorners(radius: 20, corners: [.bottomLeft, .bottomRight])
-                        )
+                        //.padding(.top, 44)
+                        .padding(.leading, 16)
+                        .padding(.bottom, 24 )
                     }
                 )
 

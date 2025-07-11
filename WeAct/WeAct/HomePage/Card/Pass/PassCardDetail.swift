@@ -18,18 +18,18 @@ struct PassCardDetail: View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.white)
-                //.frame(width: 280, height: 452)
                 .overlay(
-                    VStack {
+                    VStack(spacing: 0) {
                         ZStack(alignment: .topTrailing) {
                             Image("rest")
                                 .resizable()
                                 .scaledToFill()
+                                .mask(
+                                    RoundedCorners(radius: 20, corners: [.topLeft, .topRight, .bottomLeft, .bottomRight])
+                                )
+                                .frame(width: 340, height: 300)
                                 
-                                .clipShape(RoundedRectangle(cornerRadius: 15))
-                                .padding(.top,6)
                             
-
                             Button(action: {
                                 withAnimation {
                                     isPresented = false
@@ -45,10 +45,8 @@ struct PassCardDetail: View {
                             .padding(.top, 20)
                             .padding(.trailing, 20)
                         }
-                        
-                        Spacer()
-                        
-                        VStack(alignment: .leading, spacing: 10) {
+
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Image("BasicProfile")
                                     .resizable()
@@ -65,10 +63,15 @@ struct PassCardDetail: View {
                         }
                         .padding()
                         .background(Color.white)
-                        .cornerRadius(12)
+                        .mask(
+                            RoundedCorners(radius: 20, corners: [.bottomLeft, .bottomRight])
+                        )
                     }
                 )
+
+            
             Spacer().frame(height: 53)
+            
             Button(action: {
                 withAnimation {
                     isFlipped = true  // ✅ 댓글 보기로 뒤집기
@@ -87,6 +90,17 @@ struct PassCardDetail: View {
     }
 }
 
-#Preview {
-    PassCardDetail(isFlipped: .constant(false), isPresented: .constant(false))
+// ✅ 모서리 방향 설정 가능하게 커스텀
+struct RoundedCorners: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
 }

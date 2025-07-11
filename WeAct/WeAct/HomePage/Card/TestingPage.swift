@@ -32,6 +32,27 @@ struct TestingPage: View {
                                 showPassCard = true
                             }
                         }
+                    
+                }
+                Spacer().frame(height:30)
+                
+                HStack(spacing: 25) {
+                    
+                    PassCard(userName: "현승훈")
+                        .rotationEffect(.degrees(-4))
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showPassCard = true
+                            }
+                        }
+                    
+                    CertificationCard(userName: "최승아")
+                        .rotationEffect(.degrees(4))
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showMaxView = true
+                            }
+                        }
                 }
             }
             

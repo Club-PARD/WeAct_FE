@@ -104,7 +104,7 @@ struct CommentPage_pass: View {
                 )
             
             // 사진 보기 버튼
-            Spacer().frame(height: 53)
+            Spacer().frame(height: 30)
             Button(action: {
                 withAnimation {
                     onPhotoView()  // ✅ 카드 뒤집기 (모달 유지)

@@ -44,6 +44,7 @@ struct APIConstants {
     }
     
     struct MemberInformation {
+        static let exit = "/member/exit"           // + /{roomId}
         static let hamburger = "/member/hamburger"           // + /{roomId}
         static let habitAndRemindTime = "/member/habitAndRemindTime"
     }

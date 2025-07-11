@@ -10,7 +10,6 @@ import SwiftUI
 struct GroupDetailBoard: View {
     @Binding var navigationPath: NavigationPath
     let groupResponse: GroupResponse?
-    //let group: GroupModel
     @ObservedObject var groupStore: GroupStore
     @State var presentSideMenu = false
     @State private var showDatePicker: Bool = false
@@ -144,9 +143,9 @@ struct GroupDetailBoard: View {
                 await MainActor.run {
                     print("✅ [fetchRoomDetail] 성공: \(roomDetail)")
                     self.roomDetail = roomDetail
-                    self.currentDate = groupStartDate  // ✅ 초기 날짜 설정
+                    self.currentDate = groupStartDate
                     self.isLoadingRoomDetail = false
-                    self.checkDays()                   // ✅ 호출 시점 명확화
+                    self.checkDays()
                     self.checkOneDayCount()
                 }
             } catch {
@@ -355,7 +354,7 @@ struct GroupDetailBoard: View {
                                 Text("날짜를 선택해주세요")
                                     .font(.custom("Pretendard-Medium", size: 18))
                                     .foregroundColor(Color(hex: "464646"))
-                                    .padding(.vertical, 20)
+                                    .padding(.vertical, 17)
                                 Divider()
                                 
                                 // 단일 날짜 선택 (그룹 기간 내로 제한)
@@ -389,6 +388,7 @@ struct GroupDetailBoard: View {
                             .padding(.horizontal, 16)
                             .presentationDetents([.height(UIScreen.main.bounds.height * 0.6)])
                         }
+                        .padding(.leading, 20)
                         
                         Spacer()
                         
@@ -570,7 +570,11 @@ struct GroupDetailBoard: View {
             }
             
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
-                SideMenuViewContents(presentSideMenu: $presentSideMenu, roomId: roomId, token: getAccessToken() ?? "")
+                SideMenuViewContents(
+                    navigationPath: $navigationPath,
+                    presentSideMenu: $presentSideMenu,
+                    roomId: roomId,
+                    token: getAccessToken() ?? "")
             }
         }
         .navigationBarBackButtonHidden(true)

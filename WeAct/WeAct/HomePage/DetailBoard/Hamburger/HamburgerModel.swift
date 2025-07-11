@@ -19,6 +19,33 @@ class HamburgerService {
     static let shared = HamburgerService()
     private init() {}
     
+    func exitGroup(roomId: String, token: String) async throws {
+        let urlString = "\(APIConstants.baseURL)\(APIConstants.MemberInformation.exit)/\(roomId)"
+        print("🌐 [getHamburger] 요청 URL: \(urlString)")
+        
+        guard let url = URL(string: urlString) else {
+            print("❌ [getHamburger] 잘못된 URL: \(urlString)")
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw URLError(.badServerResponse)
+            }
+            
+            if httpResponse.statusCode != 200 {
+                throw NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: [
+                    NSLocalizedDescriptionKey: "HTTP Error: \(httpResponse.statusCode)"
+                ])
+            }
+        }
+    
     func getHamburger(roomId: String, token: String) async throws -> HamburgerModel {
         // URL 구성
         let urlString = "\(APIConstants.baseURL)\(APIConstants.MemberInformation.hamburger)/\(roomId)"

@@ -1,18 +1,19 @@
 import SwiftUI
 
 struct SideMenuViewContents: View {
+    @Binding var navigationPath: NavigationPath
     @Binding var presentSideMenu: Bool
     @State var isDisplayTooltip: Bool = false
-    let roomId: Int
-    let token: String
-    
-    // 햄버거 메뉴 정보 상태
     @State private var hamburgerInfo: HamburgerModel?
     @State private var isLoadingHamburger = false
     @State private var errorMessage: String?
+    @State private var isShowingExitGroupModal = false
+    let roomId: Int
+    let token: String
     
     var body: some View {
         ZStack {
+            // 메인 컨텐츠
             VStack {
                 // 상단 헤더
                 VStack(spacing: 16) {
@@ -44,7 +45,7 @@ struct SideMenuViewContents: View {
                                 .foregroundColor(Color(hex: "858588"))
                         }
                     }
-                    .padding(.top, 15)
+                    .padding(.top, 10)
                     .padding(.horizontal, 18)
                     
                     // 로딩 상태 또는 그룹 정보
@@ -80,34 +81,35 @@ struct SideMenuViewContents: View {
                         VStack(alignment: .leading) {
                             HStack {
                                 // 프로필 이미지
-                                AsyncImage(url: URL(string: hamburgerInfo.imageUrl ?? "")) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                    case .failure(_):
-                                        Rectangle()
-                                            .fill(Color(hex: "F0F0F0"))
-                                            .overlay(
-                                                Image(systemName: "person.circle")
-                                                    .font(.system(size: 20))
-                                                    .foregroundColor(Color(hex: "C6C6C6"))
-                                            )
-                                    case .empty:
-                                        Rectangle()
-                                            .fill(Color(hex: "F0F0F0"))
-                                            .overlay(
-                                                ProgressView()
-                                                    .scaleEffect(0.8)
-                                            )
-                                    @unknown default:
-                                        Rectangle()
-                                            .fill(Color(hex: "F0F0F0"))
+                                if let imageURLString = hamburgerInfo.imageUrl,
+                                   let imageURL = URL(string: imageURLString) {
+                                    AsyncImage(url: imageURL) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            Image("BasicProfile")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                            
+                                        @unknown default:
+                                            Image("BasicProfile")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                        }
                                     }
+                                    .frame(width: 48, height: 48)
+                                    .cornerRadius(14)
+                                } else {
+                                    Image("BasicProfile")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 48, height: 48)
+                                        .cornerRadius(14)
                                 }
-                                .frame(width: 48, height: 48)
-                                .cornerRadius(14)
+                                
                                 
                                 Text(hamburgerInfo.myName)
                                     .font(.custom("Pretendard-Bold", size: 22))
@@ -117,7 +119,7 @@ struct SideMenuViewContents: View {
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 
-                                HStack(spacing: 4) {
+                                HStack(spacing: 6) {
                                     Image("pen")
                                         .resizable()
                                         .scaledToFit()
@@ -127,8 +129,9 @@ struct SideMenuViewContents: View {
                                         .font(.system(size: 14))
                                         .foregroundColor(Color(hex: "464646"))
                                 }
+                                .padding(.bottom, 9)
                                 
-                                HStack(spacing: 4) {
+                                HStack(spacing: 6) {
                                     Image("icon_goal")
                                         .resizable()
                                         .scaledToFit()
@@ -146,11 +149,14 @@ struct SideMenuViewContents: View {
                                         .foregroundColor(Color(hex: "FF4B2F"))
                                 }
                                 
+                                
                                 // 진행률 바
                                 let progressValue = Double(hamburgerInfo.myPercent) / 100.0
                                 ProgressView(value: progressValue)
                                     .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "FF4B2F")))
-                                    .scaleEffect(x: 1, y: 1.5, anchor: .center)
+                                    .scaleEffect(x: 1, y: 2, anchor: .center)
+                                    .padding(.top, 11)
+                                
                             }
                         }
                         .padding(.horizontal, 20)
@@ -180,7 +186,7 @@ struct SideMenuViewContents: View {
                 
                 // 구분선
                 Rectangle()
-                    .fill(Color(hex: "F0F0F0"))
+                    .fill(Color(hex: "F7F7F7"))
                     .frame(height: 8)
                 
                 // 멤버 목록
@@ -208,30 +214,24 @@ struct SideMenuViewContents: View {
                                     let member = hamburgerInfo.memberNameAndHabitDtos[index]
                                     HStack(spacing: 12) {
                                         // 멤버 프로필 이미지
-                                        AsyncImage(url: URL(string: member.imageUrl ?? "")) { phase in
+                                        AsyncImage(url: URL(string: member.imageUrl)) { phase in
                                             switch phase {
                                             case .success(let image):
                                                 image
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
                                             case .failure(_):
-                                                Rectangle()
-                                                    .fill(Color(hex: "F0F0F0"))
-                                                    .overlay(
-                                                        Image(systemName: "person.circle")
-                                                            .font(.system(size: 16))
-                                                            .foregroundColor(Color(hex: "C6C6C6"))
-                                                    )
+                                                Image("BasicProfile")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
                                             case .empty:
-                                                Rectangle()
-                                                    .fill(Color(hex: "F0F0F0"))
-                                                    .overlay(
-                                                        ProgressView()
-                                                            .scaleEffect(0.6)
-                                                    )
+                                                Image("BasicProfile")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
                                             @unknown default:
-                                                Rectangle()
-                                                    .fill(Color(hex: "F0F0F0"))
+                                                Image("BasicProfile")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
                                             }
                                         }
                                         .frame(width: 48, height: 48)
@@ -259,31 +259,122 @@ struct SideMenuViewContents: View {
                 
                 Spacer()
                 
-                // 하단 그룹 나가기 버튼
+                Divider()
+                    .foregroundColor(Color(hex: "EFF1F5"))
+                
                 Button(action: {
-                    // 그룹 나가기 액션
+                    isShowingExitGroupModal = true
                 }) {
                     Text("그룹 나가기")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color(hex: "FF6B47"))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 12)
+                        .padding(.bottom, 34)
+                        .padding(.leading, 20)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
             
+            // 툴팁 오버레이
             if isDisplayTooltip {
                 TooltipView(isDisplayTooltip: $isDisplayTooltip)
-                    .offset(x: -30, y: -268)
+                    .offset(x: -25, y: -275)
+                    .zIndex(1)
             }
         }
         .onTapGesture {
             isDisplayTooltip = false
         }
         .onAppear {
-            // 뷰가 나타날 때 햄버거 정보 가져오기
             fetchHamburgerInfo()
+        }
+        // 모달 오버레이를 여기에 추가 (사이드 메뉴를 포함한 전체 화면에 적용)
+        .overlay(
+            // 모달이 표시될 때만 전체 화면 오버레이 적용
+            isShowingExitGroupModal ?
+            Color.black.opacity(0.6)
+                .ignoresSafeArea(.all)
+                .onTapGesture {
+                    isShowingExitGroupModal = false
+                }
+                .overlay(
+                    CustomModalView(
+                        title: "그룹을 나갈까요?",
+                        message: "그룹을 나가면 인증 기록이 사라지고\n다시 입장할 수 없어요.",
+                        firstButtonTitle: "취소",
+                        secondButtonTitle: "그룹 나가기",
+                        firstButtonAction: {
+                            isShowingExitGroupModal = false
+                            print("취소 버튼 클릭")
+                        },
+                        secondButtonAction: {
+                            isShowingExitGroupModal = false
+                            exitGroup()
+                            print("그룹 나가기 버튼 클릭")
+                        }
+                    )
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 85)
+                )
+            : nil
+        )
+    }
+    
+    // MARK: - 그룹 나가기
+    private func exitGroup() {
+        print("🚪 [exitGroup] 시작 - roomId: \(roomId)")
+        
+        guard !token.isEmpty else {
+            print("❌ [exitGroup] 액세스 토큰이 없습니다")
+            errorMessage = "인증 토큰이 없습니다. 다시 로그인해 주세요."
+            return
+        }
+        
+        Task {
+            do {
+                try await HamburgerService.shared.exitGroup(
+                    roomId: String(roomId),
+                    token: token
+                )
+                
+                await MainActor.run {
+                    print("✅ [exitGroup] 성공")
+                    presentSideMenu = false
+                    navigationPath = NavigationPath()
+                }
+            } catch {
+                await MainActor.run {
+                    print("❌ [exitGroup] 실패: \(error)")
+                    
+                    if let nsError = error as NSError? {
+                        switch nsError.code {
+                        case 401:
+                            self.errorMessage = "인증이 필요합니다. 다시 로그인해 주세요."
+                        case 403:
+                            self.errorMessage = "그룹에서 나갈 권한이 없습니다."
+                        case 404:
+                            self.errorMessage = "존재하지 않는 그룹입니다."
+                        case 500:
+                            self.errorMessage = "서버 오류가 발생했습니다."
+                        default:
+                            self.errorMessage = "그룹 나가기에 실패했습니다. (코드: \(nsError.code))"
+                        }
+                    } else if let urlError = error as? URLError {
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            self.errorMessage = "인터넷 연결을 확인해 주세요."
+                        case .timedOut:
+                            self.errorMessage = "요청 시간이 초과되었습니다."
+                        default:
+                            self.errorMessage = "네트워크 오류가 발생했습니다."
+                        }
+                    } else {
+                        self.errorMessage = "알 수 없는 오류가 발생했습니다."
+                    }
+                }
+            }
         }
     }
     
@@ -322,7 +413,6 @@ struct SideMenuViewContents: View {
                     print("❌ [fetchHamburgerInfo] 실패: \(error)")
                     self.isLoadingHamburger = false
                     
-                    // HTTP 상태 코드 확인을 위한 처리
                     if let nsError = error as NSError? {
                         switch nsError.code {
                         case 401:
@@ -379,7 +469,7 @@ struct SideView<RenderView: View>: View {
             if isShowing {
                 // 배경 오버레이 - 이전 페이지가 비치도록
                 Color.black
-                    .opacity(0.3)
+                    .opacity(0.6)
                     .ignoresSafeArea()
                     .onTapGesture {
                         isShowing.toggle()
@@ -388,7 +478,7 @@ struct SideView<RenderView: View>: View {
                 // 사이드 메뉴 컨텐츠
                 HStack(spacing: 0) {
                     if direction == .trailing {
-                        Spacer() // 오른쪽 정렬을 위한 Spacer
+                        Spacer()
                     }
                     
                     content
@@ -397,7 +487,7 @@ struct SideView<RenderView: View>: View {
                         .transition(.move(edge: direction))
                     
                     if direction == .leading {
-                        Spacer() // 왼쪽 정렬을 위한 Spacer
+                        Spacer()
                     }
                 }
             }
@@ -405,6 +495,3 @@ struct SideView<RenderView: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
-    #Preview {
-        SideMenuViewContents(presentSideMenu: .constant(true), roomId: 1, token: "test")
-    }

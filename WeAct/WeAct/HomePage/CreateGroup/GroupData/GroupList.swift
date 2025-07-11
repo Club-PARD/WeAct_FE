@@ -56,7 +56,7 @@ struct GroupList: View {
                         Spacer()
                         
                         Button {
-                            navigationPath.append(NavigationDestination.certification)
+                            navigationPath.append(NavigationDestination.certification(roomId: homeGroup.roomId))
                         } label: {
                             VStack {
                                 Image(systemName: "camera.fill")

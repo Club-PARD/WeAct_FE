@@ -49,7 +49,7 @@ class GroupService {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization"
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let jsonData = try JSONEncoder().encode(request)
         urlRequest.httpBody = jsonData

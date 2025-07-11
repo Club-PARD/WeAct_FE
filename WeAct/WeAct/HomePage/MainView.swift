@@ -194,8 +194,8 @@ struct MainView: View {
                 case .nameEdit:
                     NameEditView(navigationPath: $navigationPath)
                         .environmentObject(userViewModel)
-                case .certification:
-                    CertificationView()
+                case .certification(let roomId):
+                    CertificationView(roomId: roomId)
                         .environmentObject(userViewModel)
                 case .setuphabit(let roomId):
                     SetUpHabbit(navigationPath: $navigationPath, roomId: roomId)

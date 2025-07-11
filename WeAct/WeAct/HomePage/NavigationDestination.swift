@@ -14,6 +14,6 @@ enum NavigationDestination: Hashable {
     case notification
     case myPage
     case nameEdit // myPage -> nameEdit
-    case certification
+    case certification(roomId: Int)
     case setuphabit(roomId: Int)
 }

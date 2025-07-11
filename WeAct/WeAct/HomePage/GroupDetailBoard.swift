@@ -546,7 +546,7 @@ struct GroupDetailBoard: View {
                         HStack {
                             Spacer()
                             Button {
-                                navigationPath.append(NavigationDestination.certification)
+                                navigationPath.append(NavigationDestination.certification(roomId:roomId))
                             } label: {
                                 HStack {
                                     Image(systemName: "camera.fill")

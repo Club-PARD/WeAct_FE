@@ -146,6 +146,7 @@ struct CertificationView: View {
                     Button(action: {
                         Task {
                             await viewModel.submitHabit(roomId: roomId)
+                            dismiss()
                         }
                     }) {
                         if viewModel.isSubmitting {

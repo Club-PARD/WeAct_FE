@@ -371,9 +371,9 @@ struct GroupDetailBoard: View {
                     VStack(alignment: .leading) {
                         if isCurrentDateCheckpoint {
                             CheckPointRankingView(roomId: roomId)
+                                .padding(.top, 5)
                         }
                     }
-                    .padding(.vertical, 20)
                     
                     dateNavigationSection()
                     
@@ -407,8 +407,12 @@ struct GroupDetailBoard: View {
             }
             
             SideView(isShowing: $presentSideMenu, direction: .trailing) {
-                SideMenuViewContents(presentSideMenu: $presentSideMenu)
-            }
+                            SideMenuViewContents(
+                                navigationPath: $navigationPath,
+                                presentSideMenu: $presentSideMenu,
+                                roomId: roomId,
+                                token: getAccessToken() ?? "")
+                        }
             
             if let post = selectedPost, showMaxView, let postDetail = habitBoardVM.selectedPostDetail {
                 // 인증 카드 내부
@@ -487,8 +491,6 @@ struct GroupDetailBoard: View {
                         .font(.custom("Pretendard-Medium", size: 14))
                         .foregroundColor(.green)
                 }
-                .padding()
-                .background(Color.green.opacity(0.1))
                 .cornerRadius(8)
             )
         } else {
@@ -500,7 +502,6 @@ struct GroupDetailBoard: View {
                         .font(.custom("Pretendard-Medium", size: 14))
                         .foregroundColor(Color(hex: "8691A2"))
                 }
-                .padding()
                 .background(Color(hex: "F7F7F7"))
                 .cornerRadius(8)
             )
@@ -559,6 +560,51 @@ struct GroupDetailBoard: View {
     
     private func dateNavigationSection() -> some View {
         ZStack {
+            ScrollView {
+            VStack {
+                // 선택된 날짜의 보드 내용 표시
+                if isCurrentDateInRange {
+                        certificationStatusView()
+                    .padding()
+                } else {
+                    // 기간 외 날짜일 때는 메시지 표시
+                    Text("해당 날짜는 그룹 활동 기간이 아닙니다.")
+                        .font(.custom("Pretendard-Medium", size: 16))
+                        .foregroundColor(Color(hex: "8691A2"))
+                        .padding()
+                } // else
+                
+      
+                    VStack(spacing: 30) {
+                        ForEach(habitBoardVM.posts.chunked(into: 2), id: \.first?.id) { row in
+                            HStack(spacing: 25) {
+                                ForEach(row, id: \.id) { post in
+                                    if post.haemyeong {
+                                        PassCard(userName: post.userName)
+                                            .onTapGesture {
+                                                Task {
+                                                    await habitBoardVM.loadPostDetail(postId: post.id)
+                                                }
+                                                selectedPost = post
+                                                showPassCard = true
+                                            }
+                                    } else {
+                                        CertificationCard(userName: post.userName, imageUrl: post.imageUrl)
+                                            .onTapGesture {
+                                                Task {
+                                                    await habitBoardVM.loadPostDetail(postId: post.id)
+                                                }
+                                                selectedPost = post
+                                                showMaxView = true
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    } // VStack
+                    .padding(.horizontal, 8)
+                } // ScrollView
+            } // VStack
             // 날짜 네비게이션
             HStack {
                 // 이전 날짜 버튼
@@ -596,59 +642,9 @@ struct GroupDetailBoard: View {
                         .cornerRadius(8)
                 }
                 .disabled(!canGoNext)
-            }
+            } // HStack
             .padding(.vertical, 50)
-            
-            VStack {
-                // 선택된 날짜의 보드 내용 표시
-                if isCurrentDateInRange {
-                    VStack(spacing: 16) {
-                        Text("선택된 날짜: \(displayDateFormatter.string(from: currentDate))")
-                            .font(.custom("Pretendard-Medium", size: 16))
-                            .foregroundColor(Color(hex: "464646"))
-                        certificationStatusView()
-                    }
-                    .padding()
-                } else {
-                    // 기간 외 날짜일 때는 메시지 표시
-                    Text("해당 날짜는 그룹 활동 기간이 아닙니다.")
-                        .font(.custom("Pretendard-Medium", size: 16))
-                        .foregroundColor(Color(hex: "8691A2"))
-                        .padding()
-                }
-                
-                ScrollView {
-                    VStack(spacing: 30) {
-                        ForEach(habitBoardVM.posts.chunked(into: 2), id: \.first?.id) { row in
-                            HStack(spacing: 25) {
-                                ForEach(row, id: \.id) { post in
-                                    if post.haemyeong {
-                                        PassCard(userName: post.userName)
-                                            .onTapGesture {
-                                                Task {
-                                                    await habitBoardVM.loadPostDetail(postId: post.id)
-                                                }
-                                                selectedPost = post
-                                                showPassCard = true
-                                            }
-                                    } else {
-                                        CertificationCard(userName: post.userName, imageUrl: post.imageUrl)
-                                            .onTapGesture {
-                                                Task {
-                                                    await habitBoardVM.loadPostDetail(postId: post.id)
-                                                }
-                                                selectedPost = post
-                                                showMaxView = true
-                                            }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 8)
-                }
-            }
-        }
+        } // ZStack
     }
 }
 

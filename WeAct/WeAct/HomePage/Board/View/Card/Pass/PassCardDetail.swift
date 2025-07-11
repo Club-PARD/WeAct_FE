@@ -11,8 +11,8 @@ struct PassCardDetail: View {
     @Binding var isFlipped: Bool
     @Binding var isPresented: Bool
     
-    let userName: String = "이단진"
-    let message: String = "오늘은 운동을 쉬었습니다"
+    let userName: String = "주현아"
+    let message: String = "Sorry..."
     
     var body: some View {
         VStack(spacing: 0) {
